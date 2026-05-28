@@ -19,3 +19,5 @@ MonoBehaviour:
   decalMaterial:
   - {fileID: 2100000, guid: 9c17275b6541d9148b9f64bb8a61853d, type: 2}
   diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
+  baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  targetColor: {r: 0.9622642, g: 0.9622642, b: 0.9622642, a: 1}

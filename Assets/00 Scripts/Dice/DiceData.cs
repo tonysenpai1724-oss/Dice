@@ -18,4 +18,6 @@ public class DiceData : ScriptableObject
 
     public List<Material> decalMaterial;
     public Sprite diceSprite;
+    public Color baseOutlineColor;
+    public Color targetColor;
 }

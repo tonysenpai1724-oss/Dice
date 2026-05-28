@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 public enum DiceState
 {
     Idle,
@@ -16,6 +18,7 @@ public class Dice : MonoBehaviour
 {
     [Header("Data")]
     public DiceData data;
+    public bool isMerging;
 
     [Header("Components")]
     public Rigidbody rb;
@@ -31,10 +34,13 @@ public class Dice : MonoBehaviour
     public float rbMaxAngularVelocity = 35f;
     public PhysicsMaterial dicePhysicMaterial;
 
+
     [Header("State")]
     public DiceState state;
 
     Vector3 defaultScale;
+    Material outlineMaterial;
+    bool isHovered;
     readonly RigidbodyConstraints groundedConstraints =
         RigidbodyConstraints.FreezePositionY |
         RigidbodyConstraints.FreezeRotationX |
@@ -68,12 +74,16 @@ public class Dice : MonoBehaviour
     {
         data = newData;
         canMerge = false;
+        isMerging = false;
 
         state = DiceState.Idle;
+        isHovered = false;
 
         transform.localScale = defaultScale;
 
         meshRenderer.material = data.diceMaterial;
+        CacheOutlineMaterial();
+        ApplyOutlineColor(data.baseOutlineColor);
 
         foreach (var d in decals)
         {
@@ -230,6 +240,61 @@ public class Dice : MonoBehaviour
         rb.Sleep();
     }
 
+    void CacheOutlineMaterial()
+    {
+        if (meshRenderer == null)
+            return;
+
+        Material[] materials =
+            meshRenderer.materials;
+
+        if (materials == null || materials.Length <= 1)
+            return;
+
+        outlineMaterial = materials[1];
+    }
+
+    void ApplyOutlineColor(Color color)
+    {
+        if (outlineMaterial == null)
+            return;
+
+        outlineMaterial.SetColor(
+            "_outlineColor",
+            color
+        );
+    }
+    public void SetHovered(bool value)
+    {
+        SetHoverState(value);
+    }
+
+    void SetHoverState(bool hovered)
+    {
+        if (data == null)
+            return;
+
+        isHovered = hovered;
+        Debug.Log("Hover state: " + isHovered);
+
+        ApplyOutlineColor(
+            isHovered
+                ? data.targetColor
+                : data.baseOutlineColor
+        );
+    }
+
+    void OnMouseEnter()
+    {
+        Debug.Log("Mouse Enter");
+        SetHoverState(true);
+    }
+
+    void OnMouseExit()
+    {
+        SetHoverState(false);
+    }
+
     public Quaternion GetUprightRotation()
     {
         Vector3 euler =
@@ -269,4 +334,8 @@ public class Dice : MonoBehaviour
 
         DiceManager.Instance.TryMerge(this, other);
     }
+
+
 }
+
+

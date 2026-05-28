@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEngine.InputSystem;
 
 public class DiceManager : MonoBehaviour
 {
@@ -37,19 +38,22 @@ public class DiceManager : MonoBehaviour
     public Vector2 comboSpinTurnsZ = new Vector2(1.5f, 3f);
     //  public Transform point;
     [Header("Stack")]
-    public Dice stackDicePrefab;
-
-    public Transform stackRoot;
-
-    public float stackSpacing = 0.65f;
-
-    List<Dice> stackDices =
-        new List<Dice>();
 
     List<Dice> boardDices =
         new List<Dice>();
 
     public DiceQueue diceQueue;
+    [Header("Combo Scaling")]
+    public float comboArcPerChain = 0.45f;
+    public float maxComboArcHeight = 6f;
+
+    public float comboDurationPerChain = 0.03f;
+    public float maxComboDuration = 0.75f;
+
+    Dictionary<Dice, int> comboChainMap =
+        new Dictionary<Dice, int>();
+
+    Dice currentHover;
     void Awake()
     {
         Instance = this;
@@ -59,7 +63,48 @@ public class DiceManager : MonoBehaviour
     {
         SpawnStartBoard();
     }
+    void Update()
+    {
+        //HandleHover();
+    }
+    void HandleHover()
+    {
+        if (Mouse.current == null)
+            return;
 
+        Ray ray =
+            Camera.main.ScreenPointToRay(
+                Mouse.current.position.ReadValue()
+            );
+
+        Dice hitDice = null;
+
+        if (
+            Physics.Raycast(
+                ray,
+                out RaycastHit hit
+            )
+        )
+        {
+            hitDice =
+                hit.collider.GetComponent<Dice>();
+        }
+
+        if (currentHover != hitDice)
+        {
+            if (currentHover != null)
+            {
+                currentHover.SetHovered(false);
+            }
+
+            currentHover = hitDice;
+
+            if (currentHover != null)
+            {
+                currentHover.SetHovered(true);
+            }
+        }
+    }
     #region SPAWN
     [Button]
 
@@ -252,10 +297,36 @@ public class DiceManager : MonoBehaviour
 
     #region MERGE
 
+    // public void TryMerge(
+    //     Dice a,
+    //     Dice b
+    // )
+    // {
+    //     if (a == null || b == null)
+    //         return;
+
+    //     if (a == b)
+    //         return;
+
+    //     if (a.state == DiceState.Merging)
+    //         return;
+
+    //     if (b.state == DiceState.Merging)
+    //         return;
+    //     if (!a.gameObject.activeInHierarchy)
+    //         return;
+
+    //     if (!b.gameObject.activeInHierarchy)
+    //         return;
+
+    //     StartCoroutine(
+    //         MergeRoutine(a, b)
+    //     );
+    // }
     public void TryMerge(
-        Dice a,
-        Dice b
-    )
+    Dice a,
+    Dice b
+)
     {
         if (a == null || b == null)
             return;
@@ -263,16 +334,18 @@ public class DiceManager : MonoBehaviour
         if (a == b)
             return;
 
-        if (a.state == DiceState.Merging)
+        if (a.isMerging || b.isMerging)
             return;
 
-        if (b.state == DiceState.Merging)
-            return;
         if (!a.gameObject.activeInHierarchy)
             return;
 
         if (!b.gameObject.activeInHierarchy)
             return;
+
+        // LOCK IMMEDIATELY
+        a.isMerging = true;
+        b.isMerging = true;
 
         StartCoroutine(
             MergeRoutine(a, b)
@@ -307,9 +380,11 @@ public class DiceManager : MonoBehaviour
                 diceDatabase.Count
             );
 
+
         ReturnBoardDice(a);
 
         ReturnBoardDice(b);
+
 
         Dice merged =
             SpawnDice(
@@ -320,6 +395,7 @@ public class DiceManager : MonoBehaviour
         merged.PlaceUpright(
             merged.transform.position
         );
+
 
         TryComboChain(merged);
         yield break;
@@ -414,12 +490,205 @@ public class DiceManager : MonoBehaviour
         );
     }
 
+    //     IEnumerator ComboJumpRoutine(
+    //      Dice dice,
+    //      Dice target,
+    //      Vector3 targetPos,
+    //      Vector3 dir
+    //  )
+    //     {
+    //         if (dice == null)
+    //             yield break;
+
+    //         dice.state =
+    //             DiceState.FlyingCombo;
+
+    //         dice.canMerge = true;
+
+    //         dice.rb.isKinematic = true;
+    //         dice.rb.linearVelocity =
+    //             Vector3.zero;
+    //         dice.rb.angularVelocity =
+    //             Vector3.zero;
+    //         dice.SetCollisionEnabled(false);
+
+    //         Vector3 start =
+    //             dice.transform.position;
+    //         Vector3 finalPos =
+    //             targetPos;
+    //         Quaternion startRotation =
+    //             dice.transform.rotation;
+    //         Quaternion endRotation =
+    //             startRotation *
+    //             Quaternion.Euler(
+    //                 Random.Range(
+    //                     comboSpinTurnsX.x,
+    //                     comboSpinTurnsX.y
+    //                 ) * 360f,
+    //                 Random.Range(
+    //                     comboSpinTurnsY.x,
+    //                     comboSpinTurnsY.y
+    //                 ) * 360f,
+    //                 Random.Range(
+    //                     comboSpinTurnsZ.x,
+    //                     comboSpinTurnsZ.y
+    //                 ) * 360f
+    //             );
+    //         Vector3 sideOffset =
+    //             Vector3.Cross(
+    //                 Vector3.up,
+    //                 dir.sqrMagnitude > 0.001f
+    //                     ? dir.normalized
+    //                     : Vector3.forward
+    //             ) * Random.Range(
+    //                 -comboSideScatter,
+    //                 comboSideScatter
+    //             );
+
+    //         float t = 0f;
+
+    //         while (t < 1f)
+    //         {
+    //             if (dice == null)
+    //                 yield break;
+
+    //             if (target != null &&
+    //                 !target.gameObject.activeInHierarchy)
+    //             {
+    //                 break;
+    //             }
+
+    //             t +=
+    //                 Time.deltaTime /
+    //                 comboDuration;
+
+    //             Vector3 end =
+    //                 targetPos;
+
+    //             finalPos = end;
+
+    //             Vector3 pos =
+    //                 Vector3.Lerp(
+    //                     start,
+    //                     end,
+    //                     t
+    //                 );
+
+    //             // ARC
+    //             pos.y +=
+    //                 Mathf.Sin(
+    //                     t * Mathf.PI
+    //                 ) * comboArcHeight;
+    //             pos +=
+    //                 sideOffset *
+    //                 Mathf.Sin(
+    //                     t * Mathf.PI
+    //                 );
+
+    //             dice.transform.position = pos;
+    //             dice.transform.rotation =
+    //                 Quaternion.SlerpUnclamped(
+    //                     startRotation,
+    //                     endRotation,
+    //                     t
+    //                 );
+
+    //             yield return null;
+    //         }
+
+    //         if (target != null && target.gameObject.activeInHierarchy)
+    //         {
+    //             float distToTarget =
+    //                 Vector3.Distance(
+    //                     dice.transform.position,
+    //                     target.transform.position
+    //                 );
+
+    //             if (distToTarget <= 1f)
+    //             {
+    //                 TryMerge(
+    //                     dice,
+    //                     target
+    //                 );
+
+    //                 yield break;
+    //             }
+    //         }
+
+    //         dice.transform.rotation =
+    //             endRotation;
+
+    //         // if (Physics.Raycast(
+    //         //     finalPos +
+    //         //     Vector3.up * 2f,
+    //         //     Vector3.down,
+    //         //     out RaycastHit hit,
+    //         //     5f
+    //         // ))
+    //         // {
+    //         //     finalPos =
+    //         //         new Vector3(
+    //         //             finalPos.x,
+    //         //             hit.point.y + 0.5f,
+    //         //             finalPos.z
+    //         //         );
+    //         // }
+
+    //         // finalPos =
+    //         //     FindClearPosition(
+    //         //         finalPos,
+    //         //         dice
+    //         //     );
+    //         // dice.PlaceUpright(
+    //         //     finalPos
+    //         // );
+
+    //         // dice.state =
+    //         //     DiceState.Idle;
+    //         Collider col =
+    //      dice.GetComponent<Collider>();
+
+    //         float bottomOffset =
+    //             dice.transform.position.y -
+    //             col.bounds.min.y;
+
+    //         if (Physics.Raycast(
+    //             finalPos + Vector3.up * 3f,
+    //             Vector3.down,
+    //             out RaycastHit hit,
+    //             10f
+    //         ))
+    //         {
+    //             finalPos.y =
+    //                 hit.point.y +
+    //                 bottomOffset +
+    //                 1f;
+    //         }
+
+    //         dice.transform.position = finalPos;
+
+    //         dice.rb.isKinematic = false;
+
+    //         dice.rb.linearVelocity =
+    //             Vector3.down * 1.5f;
+
+    //         dice.rb.angularVelocity =
+    //             Vector3.zero;
+
+    //         dice.SetCollisionEnabled(true);
+
+    //         dice.state = DiceState.Idle;
+
+    //         StartCoroutine(
+    //             RecoverUprightRoutine(dice)
+    //         );
+    //     }
     IEnumerator ComboJumpRoutine(
-     Dice dice,
-     Dice target,
-     Vector3 targetPos,
-     Vector3 dir
- )
+        Dice dice,
+        Dice target,
+        Vector3 targetPos,
+        Vector3 dir
+    )
     {
         if (dice == null)
             yield break;
@@ -430,34 +699,23 @@ public class DiceManager : MonoBehaviour
         dice.canMerge = true;
 
         dice.rb.isKinematic = true;
+
         dice.rb.linearVelocity =
             Vector3.zero;
+
         dice.rb.angularVelocity =
             Vector3.zero;
+
         dice.SetCollisionEnabled(false);
 
         Vector3 start =
             dice.transform.position;
+
         Vector3 finalPos =
             targetPos;
-        Quaternion startRotation =
-            dice.transform.rotation;
-        Quaternion endRotation =
-            startRotation *
-            Quaternion.Euler(
-                Random.Range(
-                    comboSpinTurnsX.x,
-                    comboSpinTurnsX.y
-                ) * 360f,
-                Random.Range(
-                    comboSpinTurnsY.x,
-                    comboSpinTurnsY.y
-                ) * 360f,
-                Random.Range(
-                    comboSpinTurnsZ.x,
-                    comboSpinTurnsZ.y
-                ) * 360f
-            );
+        int comboCount = 1;
+
+        // RANDOM SIDE ARC
         Vector3 sideOffset =
             Vector3.Cross(
                 Vector3.up,
@@ -469,6 +727,19 @@ public class DiceManager : MonoBehaviour
                 comboSideScatter
             );
 
+        // NATURAL SPIN
+        Vector3 angularSpin =
+     new Vector3(
+         Random.Range(1265f, 2530f),
+         Random.Range(210f, 630f),
+         Random.Range(1265f, 2530f)
+     );
+        // OCCASIONAL CRAZY SPIN
+        if (Random.value < 0.2f)
+        {
+            angularSpin *= 1.8f;
+        }
+
         float t = 0f;
 
         while (t < 1f)
@@ -476,8 +747,10 @@ public class DiceManager : MonoBehaviour
             if (dice == null)
                 yield break;
 
-            if (target != null &&
-                !target.gameObject.activeInHierarchy)
+            if (
+                target != null &&
+                !target.gameObject.activeInHierarchy
+            )
             {
                 break;
             }
@@ -491,6 +764,7 @@ public class DiceManager : MonoBehaviour
 
             finalPos = end;
 
+            // POSITION
             Vector3 pos =
                 Vector3.Lerp(
                     start,
@@ -498,28 +772,77 @@ public class DiceManager : MonoBehaviour
                     t
                 );
 
-            // ARC
+            // NATURAL ARC
+            // =========================
+            // COMBO CHAIN
+            // =========================
+
+
+
+            if (comboChainMap.ContainsKey(dice))
+            {
+                comboCount =
+                    comboChainMap[dice] + 1;
+            }
+
+            comboChainMap[dice] =
+                comboCount;
+
+            // =========================
+            // DYNAMIC ARC
+            // =========================
+
+            float dynamicArcHeight =
+                Mathf.Min(
+                    comboArcHeight +
+                    comboCount *
+                    comboArcPerChain,
+                    maxComboArcHeight
+                );
+
+            // NATURAL ARC
+            float arc =
+                1f -
+                Mathf.Pow(
+                    2f * t - 1f,
+                    2f
+                );
+
             pos.y +=
-                Mathf.Sin(
-                    t * Mathf.PI
-                ) * comboArcHeight;
+                arc * dynamicArcHeight;
+
+            // SIDE MOTION
             pos +=
                 sideOffset *
                 Mathf.Sin(
                     t * Mathf.PI
                 );
 
-            dice.transform.position = pos;
-            dice.transform.rotation =
-                Quaternion.SlerpUnclamped(
-                    startRotation,
-                    endRotation,
-                    t
+            dice.transform.position =
+                pos;
+
+            // NATURAL SPIN DECAY
+            float spinDamping =
+                1f -
+                Mathf.Pow(
+                    t,
+                    1.8f
                 );
+
+            Vector3 currentSpin =
+                angularSpin *
+                spinDamping;
+
+            dice.transform.Rotate(
+                currentSpin *
+                Time.deltaTime,
+                Space.Self
+            );
 
             yield return null;
         }
 
+        // TRY MERGE
         if (target != null && target.gameObject.activeInHierarchy)
         {
             float distToTarget =
@@ -530,45 +853,163 @@ public class DiceManager : MonoBehaviour
 
             if (distToTarget <= 1f)
             {
+                comboChainMap[target] =
+    comboCount;
+
                 TryMerge(
                     dice,
                     target
                 );
-
                 yield break;
             }
         }
 
-        dice.transform.rotation =
-            endRotation;
 
-        if (Physics.Raycast(
-            finalPos +
-            Vector3.up * 2f,
-            Vector3.down,
-            out RaycastHit hit,
-            5f
-        ))
+        // GROUND ALIGN
+        Collider col =
+            dice.GetComponent<Collider>();
+
+        float bottomOffset =
+            dice.transform.position.y -
+            col.bounds.min.y;
+
+        if (
+            Physics.Raycast(
+                finalPos + Vector3.up * 3f,
+                Vector3.down,
+                out RaycastHit hit,
+                10f
+            )
+        )
         {
-            finalPos =
-                new Vector3(
-                    finalPos.x,
-                    hit.point.y + 0.5f,
-                    finalPos.z
-                );
+            finalPos.y =
+                11.5f;
         }
 
-        finalPos =
-            FindClearPosition(
-                finalPos,
-                dice
+        dice.transform.position =
+     finalPos;
+
+        dice.rb.position =
+            finalPos;
+
+        Physics.SyncTransforms();
+
+        // UPRIGHT RECOVERY
+        Quaternion targetRot =
+            Quaternion.Euler(
+                0f,
+                dice.transform.eulerAngles.y,
+                0f
             );
-        dice.PlaceUpright(
-            finalPos
-        );
+
+        float recover = 0f;
+
+        Quaternion startRot =
+            dice.transform.rotation;
+
+        while (recover < 1f)
+        {
+            recover +=
+                Time.deltaTime * 6f;
+
+            float eased =
+                1f -
+                Mathf.Pow(
+                    1f - recover,
+                    3f
+                );
+
+            dice.transform.rotation =
+                Quaternion.Slerp(
+                    startRot,
+                    targetRot,
+                    eased
+                );
+
+            yield return null;
+        }
+
+        dice.transform.rotation =
+            targetRot;
+
+        dice.rb.isKinematic = false;
+
+        dice.rb.linearVelocity =
+            Vector3.down * 1.5f;
+
+        dice.rb.angularVelocity =
+            Vector3.zero;
+
+        dice.SetCollisionEnabled(true);
 
         dice.state =
             DiceState.Idle;
+        comboChainMap.Remove(dice);
+        StartCoroutine(
+            RecoverUprightRoutine(dice)
+        );
+    }
+    IEnumerator RecoverUprightRoutine(
+    Dice dice
+)
+    {
+        float duration = 0.35f;
+
+        Rigidbody rb = dice.rb;
+
+        float t = 0f;
+
+        Quaternion startRot =
+            dice.transform.rotation;
+
+        Quaternion targetRot =
+            Quaternion.Euler(
+                0f,
+                dice.transform.eulerAngles.y,
+                0f
+            );
+
+        while (t < 1f)
+        {
+            if (dice == null)
+                yield break;
+
+            t += Time.deltaTime / duration;
+
+            // smooth rotation
+            dice.transform.rotation =
+                Quaternion.Slerp(
+                    startRot,
+                    targetRot,
+                    1f - Mathf.Pow(1f - t, 3f)
+                );
+
+            // giảm velocity
+            rb.linearVelocity =
+                Vector3.Lerp(
+                    rb.linearVelocity,
+                    Vector3.zero,
+                    Time.deltaTime * 8f
+                );
+
+            rb.angularVelocity =
+                Vector3.Lerp(
+                    rb.angularVelocity,
+                    Vector3.zero,
+                    Time.deltaTime * 10f
+                );
+
+            yield return null;
+        }
+
+        dice.transform.rotation =
+            targetRot;
+
+        rb.linearVelocity =
+            Vector3.zero;
+
+        rb.angularVelocity =
+            Vector3.zero;
     }
     #endregion
 
@@ -784,65 +1225,7 @@ public class DiceManager : MonoBehaviour
         );
     }
     #endregion
-    void AddToStack(int level)
-    {
-        Dice d =
-            Instantiate(
-                stackDicePrefab,
-                stackRoot
-            );
 
-        d.Setup(
-            diceDatabase[level - 1]
-        );
 
-        // DISABLE GAMEPLAY
-        d.enabled = false;
-
-        // DISABLE PHYSICS
-        if (d.rb != null)
-        {
-            d.rb.isKinematic = true;
-            d.rb.linearVelocity =
-                Vector3.zero;
-
-            d.rb.angularVelocity =
-                Vector3.zero;
-        }
-
-        // DISABLE COLLISION
-        if (d.cachedCollider != null)
-        {
-            d.cachedCollider.enabled =
-                false;
-        }
-
-        int index =
-            stackDices.Count;
-
-        float offsetX =
-            (index % 2 == 0)
-            ? -0.08f
-            : 0.08f;
-
-        d.transform.localPosition =
-            new Vector3(
-                offsetX,
-                index * stackSpacing,
-                0f
-            );
-
-        d.transform.localRotation =
-            Quaternion.Euler(
-                Random.Range(-7f, 7f),
-                Random.Range(0f, 360f),
-                Random.Range(-7f, 7f)
-            );
-
-        d.transform.localScale =
-            Vector3.one * 0.9f;
-
-        stackDices.Add(d);
-    }
 
 }

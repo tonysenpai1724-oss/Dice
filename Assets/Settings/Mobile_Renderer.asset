@@ -74,6 +74,7 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: -38503410155102279}
   - {fileID: -4974631251528507931}
+  - {fileID: 7229228925215687819}
   m_RendererFeatureMap: b95f103b5a3577ffe51d16c43b8ff6ba
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
@@ -103,3 +104,16 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &7229228925215687819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d111dc2a0b22b142804f4d59508b893, type: 3}
+  m_Name: EPO Feature
+  m_EditorClassIdentifier: EPOURP::EPOOutline.URPOutlineFeature
+  m_Active: 1

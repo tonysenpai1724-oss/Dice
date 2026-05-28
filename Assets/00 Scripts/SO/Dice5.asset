@@ -15,7 +15,9 @@ MonoBehaviour:
   diceName: Dice 5
   level: 5
   damage: 5
-  diceMaterial: {fileID: 2100000, guid: 3e9da65a829ffd74da4be8d551e10479, type: 2}
+  diceMaterial: {fileID: 2100000, guid: b79622d702f28994fad7e152e3c149fb, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 0142c7b71c02de3498d7f8b8cd2f33c7, type: 2}
   diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
+  baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  targetColor: {r: 1, g: 1, b: 1, a: 1}

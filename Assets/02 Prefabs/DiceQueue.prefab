@@ -25,13 +25,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 599510784860556376}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.706992, y: 0.012738286, z: 0.7069921, w: -0.012738328}
-  m_LocalPosition: {x: 0.0112, y: -0.0036, z: 0.0039}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0112, y: -0.0036, z: 0.00661}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1402781919718223820}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 182.064}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!114 &3131988396555506720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,8 +55,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.22039914, y: 0.028299905, z: 0.45338136}
+  m_Size: {x: 2, y: 2, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -140,6 +140,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 32b5765d7ebf39143bff10f34d9935d8, type: 2}
+  - {fileID: 2100000, guid: 9fa4385ce8d3ae54aac5bcb34467ac0d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -217,7 +218,7 @@ Transform:
   m_GameObject: {fileID: 3257121828219899967}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0066, y: -0.0036, z: -0.0113}
+  m_LocalPosition: {x: 0.00669, y: -0.0036, z: -0.0113}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -246,8 +247,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.22039914, y: 0.028299905, z: 0.45338136}
+  m_Size: {x: 2, y: 2, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -276,13 +277,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3430348625361552523}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.022625064, y: 0.7067447, z: 0.022624979, w: 0.7067448}
-  m_LocalPosition: {x: -0.01108, y: -0.0036, z: -0.00552}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.01108, y: -0.0036, z: -0.00691}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1402781919718223820}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 3.667}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &3532919719173530099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -306,8 +307,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.22039914, y: 0.028299905, z: 0.45338136}
+  m_Size: {x: 2, y: 2, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -337,7 +338,7 @@ Transform:
   m_GameObject: {fileID: 4121745690786837423}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: -0.0058, y: -0.0036, z: 0.0101}
+  m_LocalPosition: {x: -0.0063, y: -0.0041, z: 0.0101}
   m_LocalScale: {x: 0.01, y: 0.010000003, z: 0.010000003}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -366,8 +367,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.22039914, y: 0.028299905, z: 0.45338136}
+  m_Size: {x: 2, y: 2, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -397,7 +398,7 @@ Transform:
   m_GameObject: {fileID: 4597876781165002042}
   serializedVersion: 2
   m_LocalRotation: {x: 0.70705646, y: 0.008435101, z: -0.008435101, w: 0.70705646}
-  m_LocalPosition: {x: -0.0043, y: 0.013080003, z: 0.00386}
+  m_LocalPosition: {x: 0.0066, y: 0.013080003, z: -0.0047}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -426,8 +427,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.22039914, y: 0.028299905, z: 0.45338136}
+  m_Size: {x: 2, y: 2, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -457,7 +458,7 @@ Transform:
   m_GameObject: {fileID: 4692471890735101750}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0017, y: 0.0006, z: -0.0113}
+  m_LocalPosition: {x: 0.00179, y: 0.0006, z: -0.0113}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -486,8 +487,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.3305987, y: 0.042449858, z: 0.45338136}
+  m_Size: {x: 3, y: 3, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -517,7 +518,7 @@ Transform:
   m_GameObject: {fileID: 4705145159449583509}
   serializedVersion: 2
   m_LocalRotation: {x: -0.70708144, y: 0.0059927376, z: 0.005992702, w: 0.70708144}
-  m_LocalPosition: {x: 0.00561, y: -0.01416, z: 0.00441}
+  m_LocalPosition: {x: 0.00762, y: -0.01416, z: 0.00312}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -546,8 +547,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.22039914, y: 0.028299905, z: 0.45338136}
+  m_Size: {x: 2, y: 2, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -577,7 +578,7 @@ Transform:
   m_GameObject: {fileID: 4829226940340780189}
   serializedVersion: 2
   m_LocalRotation: {x: -0.70708144, y: 0.0059927376, z: 0.005992702, w: 0.70708144}
-  m_LocalPosition: {x: 0.00131, y: -0.01416, z: -0.0003}
+  m_LocalPosition: {x: 0.00275, y: -0.01416, z: -0.00032}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -606,8 +607,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.3305987, y: 0.042449858, z: 0.45338136}
+  m_Size: {x: 3, y: 3, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -637,7 +638,7 @@ Transform:
   m_GameObject: {fileID: 5168172748127137698}
   serializedVersion: 2
   m_LocalRotation: {x: 0.70705646, y: 0.008435101, z: -0.008435101, w: 0.70705646}
-  m_LocalPosition: {x: 0.0016600022, y: 0.013080003, z: 0.00039999365}
+  m_LocalPosition: {x: 0.0027, y: 0.013080003, z: 0.0004}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -666,8 +667,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.3305987, y: 0.042449858, z: 0.45338136}
+  m_Size: {x: 3, y: 3, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -696,13 +697,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6670968347317573522}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.022625064, y: 0.7067447, z: 0.022624979, w: 0.7067448}
-  m_LocalPosition: {x: -0.011080003, y: 0.00019999772, z: 0.0005000055}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.0111, y: 0.00019999772, z: -0.0022}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1402781919718223820}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 3.667}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &2675044161101441227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -726,8 +727,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.3305987, y: 0.042449858, z: 0.45338136}
+  m_Size: {x: 3, y: 3, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -757,7 +758,7 @@ Transform:
   m_GameObject: {fileID: 7791368094455247801}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 0.0017949998, y: 0.00018999934, z: 0.010059999}
+  m_LocalPosition: {x: -0.0019, y: 0.00018999934, z: 0.0101}
   m_LocalScale: {x: 0.01, y: 0.010000003, z: 0.010000003}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -786,8 +787,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.3305987, y: 0.042449858, z: 0.45338136}
+  m_Size: {x: 3, y: 3, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
@@ -816,13 +817,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8248316550571411941}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.706992, y: 0.012738286, z: 0.7069921, w: -0.012738328}
-  m_LocalPosition: {x: 0.0112, y: 0.00014, z: -0.0012}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0112, y: 0.00014, z: 0.00151}
   m_LocalScale: {x: 0.010000003, y: 0.010000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1402781919718223820}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 182.064}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!114 &4585611632732093579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -846,8 +847,8 @@ MonoBehaviour:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: -0.196747, y: 0.024527907, z: 0.45338136}
-  m_Size: {x: 1.78537, y: 1.7334268, z: 0.9067627}
+  m_Offset: {x: -0.3305987, y: 0.042449858, z: 0.45338136}
+  m_Size: {x: 3, y: 3, z: 0.9067627}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
