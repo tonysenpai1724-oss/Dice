@@ -15,14 +15,17 @@ public class TurnManager : MonoBehaviour
     [Header("Refs")]
     public DiceQueue diceQueue;
 
+    public bool IsResettingBoard { get; private set; }
+    public bool IsResetPending { get; private set; }
+
     void Awake()
     {
         Instance = this;
+        ResetTurnCounter();
     }
 
     void Start()
     {
-        ResetTurnCounter();
         UpdateUI();
     }
 
@@ -32,11 +35,27 @@ public class TurnManager : MonoBehaviour
 
         if (turnsUntilReset <= 0)
         {
-            ResetBoard();
-            ResetTurnCounter();
+            IsResetPending = true;
+            UpdateUI();
+            return;
         }
 
         UpdateUI();
+    }
+
+    public void ResetBoardAfterQueue()
+    {
+        if (IsResettingBoard || !IsResetPending)
+            return;
+
+        IsResettingBoard = true;
+        IsResetPending = false;
+
+        ResetBoard();
+        ResetTurnCounter();
+        UpdateUI();
+
+        IsResettingBoard = false;
     }
 
     void UpdateUI()

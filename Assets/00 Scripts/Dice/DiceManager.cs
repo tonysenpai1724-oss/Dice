@@ -196,6 +196,44 @@ public class DiceManager : MonoBehaviour
         SpawnStartBoard();
     }
 
+    public bool IsBoardStable(
+        float velocityThreshold,
+        float angularVelocityThreshold
+    )
+    {
+        for (int i = boardDices.Count - 1; i >= 0; i--)
+        {
+            Dice dice =
+                boardDices[i];
+
+            if (dice == null)
+            {
+                boardDices.RemoveAt(i);
+                continue;
+            }
+
+            if (!dice.gameObject.activeInHierarchy)
+                continue;
+
+            if (dice.state == DiceState.Merging ||
+                dice.state == DiceState.FlyingCombo)
+                return false;
+
+            if (dice.rb == null)
+                continue;
+
+            if (dice.rb.linearVelocity.sqrMagnitude >
+                velocityThreshold * velocityThreshold)
+                return false;
+
+            if (dice.rb.angularVelocity.sqrMagnitude >
+                angularVelocityThreshold * angularVelocityThreshold)
+                return false;
+        }
+
+        return true;
+    }
+
     void ReturnBoardDice(
         Dice dice
     )

@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class DiceThrowController : MonoBehaviour
 {
@@ -12,9 +13,19 @@ public class DiceThrowController : MonoBehaviour
     [Header("Shoot")]
     public float shootForce = 12f;
 
+    [Header("Board Stable")]
+    public float stableTimeRequired = 0.35f;
+    public float stopVelocityThreshold = 0.05f;
+    public float stopAngularVelocityThreshold = 0.05f;
+    public float maxStableWaitTime = 5f;
+
+    [Header("Queue")]
+    public DiceQueue diceQueue;
+
     Dice currentDice;
 
     bool dragging;
+    bool waitingForBoard;
 
     void Start()
     {
@@ -25,6 +36,8 @@ public class DiceThrowController : MonoBehaviour
     {
         if (currentDice == null)
             return;
+
+        RotateCurrentDiceToMouse();
 
         if (
             Mouse.current.leftButton.wasPressedThisFrame
@@ -46,6 +59,9 @@ public class DiceThrowController : MonoBehaviour
 
     void SpawnCurrentDice()
     {
+        if (currentDice != null)
+            return;
+
         currentDice =
             DiceManager.Instance.SpawnDice(
                 spawnLevel,
@@ -57,8 +73,33 @@ public class DiceThrowController : MonoBehaviour
             Vector3.zero;
     }
 
+    void RotateCurrentDiceToMouse()
+    {
+        if (Camera.main == null)
+            return;
+
+        Vector3 target =
+            GetMouseWorldPosition();
+
+        Vector3 dir =
+            target - currentDice.transform.position;
+        dir.y = 0f;
+
+        if (dir.sqrMagnitude < 0.0001f)
+            return;
+
+        currentDice.transform.rotation =
+            Quaternion.LookRotation(
+                dir.normalized,
+                Vector3.up
+            );
+    }
+
     void Shoot()
     {
+        if (waitingForBoard)
+            return;
+
         Vector3 target =
             GetMouseWorldPosition();
 
@@ -79,10 +120,58 @@ public class DiceThrowController : MonoBehaviour
 
         currentDice = null;
 
-        Invoke(
-            nameof(SpawnCurrentDice),
-            1f
+        StartCoroutine(
+            WaitForBoardThenProcessQueue()
         );
+    }
+
+    IEnumerator WaitForBoardThenProcessQueue()
+    {
+        waitingForBoard = true;
+
+        float stableTimer = 0f;
+        float waitTimer = 0f;
+
+        while (stableTimer < stableTimeRequired &&
+            waitTimer < maxStableWaitTime)
+        {
+            waitTimer += Time.deltaTime;
+
+            if (DiceManager.Instance.IsBoardStable(
+                stopVelocityThreshold,
+                stopAngularVelocityThreshold
+            ))
+            {
+                stableTimer += Time.deltaTime;
+            }
+            else
+            {
+                stableTimer = 0f;
+            }
+
+            yield return null;
+        }
+
+        DiceQueue queue =
+            diceQueue != null
+            ? diceQueue
+            : DiceManager.Instance.diceQueue;
+
+        if (queue != null)
+        {
+            yield return StartCoroutine(
+                queue.ProcessQueue()
+            );
+        }
+
+        if (TurnManager.Instance != null &&
+            TurnManager.Instance.IsResetPending)
+        {
+            TurnManager.Instance.ResetBoardAfterQueue();
+        }
+
+        waitingForBoard = false;
+        SpawnCurrentDice();
     }
 
     Vector3 GetMouseWorldPosition()

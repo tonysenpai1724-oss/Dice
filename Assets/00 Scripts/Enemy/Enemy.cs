@@ -26,6 +26,7 @@ public class Enemy : MonoBehaviour
         Debug.Log("Enemy Died");
     }
 }
+
 public class EnemyData : MonoBehaviour
 {
     public int hp;
