@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 937a0f1e92c4c8744955d6383fe275ff, type: 3}
-  m_Name: Dice1 2
+  m_Name: Dice2
   m_EditorClassIdentifier: Assembly-CSharp::DiceData
   diceName: Dice 2
   level: 2
   damage: 2
   diceMaterial: {fileID: 2100000, guid: 32b5765d7ebf39143bff10f34d9935d8, type: 2}
-  decalMaterial: {fileID: 2100000, guid: 9c17275b6541d9148b9f64bb8a61853d, type: 2}
+  decalMaterial:
+  - {fileID: 2100000, guid: 9c17275b6541d9148b9f64bb8a61853d, type: 2}
+  diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}

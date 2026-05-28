@@ -4,19 +4,32 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public int hp;
+    public int currentHp;
+    public int damage;
 
+    public void SetHp(int hp, int damage)
+    {
+        this.hp = hp;
+        this.damage = damage;
+    }
     public void TakeDamage(int amount)
     {
-        hp -= amount;
+        currentHp -= amount;
 
-        if (hp <= 0)
+        if (currentHp <= 0)
         {
             Die();
         }
     }
-
     void Die()
     {
-        Destroy(gameObject);
+        Debug.Log("Enemy Died");
     }
+}
+public class EnemyData : MonoBehaviour
+{
+    public int hp;
+    public int damage;
+
+
 }

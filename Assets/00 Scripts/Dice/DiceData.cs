@@ -1,4 +1,7 @@
 using UnityEngine;
+using TMPro;
+using System.Collections.Generic;
+using System.Collections;
 
 [CreateAssetMenu(menuName = "RuneDice/Dice")]
 public class DiceData : ScriptableObject
@@ -13,5 +16,6 @@ public class DiceData : ScriptableObject
 
     public Material diceMaterial;
 
-    public Material decalMaterial;
+    public List<Material> decalMaterial;
+    public Sprite diceSprite;
 }

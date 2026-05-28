@@ -35,7 +35,21 @@ public class DiceManager : MonoBehaviour
     public Vector2 comboSpinTurnsX = new Vector2(1.5f, 3f);
     public Vector2 comboSpinTurnsY = new Vector2(0.5f, 1.5f);
     public Vector2 comboSpinTurnsZ = new Vector2(1.5f, 3f);
-    public Transform point;
+    //  public Transform point;
+    [Header("Stack")]
+    public Dice stackDicePrefab;
+
+    public Transform stackRoot;
+
+    public float stackSpacing = 0.65f;
+
+    List<Dice> stackDices =
+        new List<Dice>();
+
+    List<Dice> boardDices =
+        new List<Dice>();
+
+    public DiceQueue diceQueue;
     void Awake()
     {
         Instance = this;
@@ -118,7 +132,8 @@ public class DiceManager : MonoBehaviour
 
     public Dice SpawnDice(
         int level,
-        Vector3 pos
+        Vector3 pos,
+        bool registerOnBoard = true
     )
     {
         Quaternion rotation =
@@ -140,7 +155,59 @@ public class DiceManager : MonoBehaviour
             diceDatabase[level - 1]
         );
 
+        if (registerOnBoard)
+        {
+            RegisterBoardDice(d);
+        }
+
         return d;
+    }
+
+    public void RegisterBoardDice(
+        Dice dice
+    )
+    {
+        if (dice == null)
+            return;
+
+        if (!boardDices.Contains(dice))
+        {
+            boardDices.Add(dice);
+        }
+    }
+
+    public void ResetBoard()
+    {
+        StopAllCoroutines();
+
+        for (int i = boardDices.Count - 1; i >= 0; i--)
+        {
+            if (boardDices[i] == null)
+            {
+                boardDices.RemoveAt(i);
+                continue;
+            }
+
+            ReturnBoardDice(
+                boardDices[i]
+            );
+        }
+
+        SpawnStartBoard();
+    }
+
+    void ReturnBoardDice(
+        Dice dice
+    )
+    {
+        if (dice == null)
+            return;
+
+        boardDices.Remove(dice);
+
+        ObjectPool.Instance.Return(
+            dice.gameObject
+        );
     }
 
     #endregion
@@ -182,6 +249,14 @@ public class DiceManager : MonoBehaviour
         a.FreezeForMerge();
         b.FreezeForMerge();
 
+        diceQueue.AddDice(
+    diceDatabase[a.Level - 1]
+);
+
+        diceQueue.AddDice(
+            diceDatabase[b.Level - 1]
+        );
+
         Vector3 mergePos =
             (a.transform.position +
             b.transform.position) * 0.5f;
@@ -194,13 +269,9 @@ public class DiceManager : MonoBehaviour
                 diceDatabase.Count
             );
 
-        ObjectPool.Instance.Return(
-            a.gameObject
-        );
+        ReturnBoardDice(a);
 
-        ObjectPool.Instance.Return(
-            b.gameObject
-        );
+        ReturnBoardDice(b);
 
         Dice merged =
             SpawnDice(
@@ -220,58 +291,7 @@ public class DiceManager : MonoBehaviour
 
     #region COMBO
     public float maxComboDistance = 4f;
-    // void TryComboChain(Dice dice)
-    // {
-    //     if (dice == null)
-    //         return;
 
-    //     Dice target =
-    //         FindNearestSameLevelDice(dice);
-
-    //     // NO TARGET
-    //     if (target == null)
-    //     {
-    //         dice.state = DiceState.Idle;
-
-    //         dice.rb.linearVelocity =
-    //             Vector3.zero;
-
-    //         dice.rb.angularVelocity =
-    //             Vector3.zero;
-
-    //         return;
-    //     }
-
-    //     Vector3 targetPos =
-    //         target.transform.position;
-
-    //     float dist =
-    //         Vector3.Distance(
-    //             dice.transform.position,
-    //             targetPos
-    //         );
-
-    //     // LIMIT RANGE
-    //     if (dist > maxComboDistance)
-    //     {
-    //         Vector3 dir =
-    //             (targetPos -
-    //             dice.transform.position)
-    //             .normalized;
-
-    //         targetPos =
-    //             dice.transform.position +
-    //             dir * maxComboDistance;
-    //     }
-
-    //     StartCoroutine(
-    //         ComboJumpRoutine(
-    //             dice,
-    //             target,
-    //             targetPos
-    //         )
-    //     );
-    // }
     void TryComboChain(Dice dice)
     {
         if (dice == null)
@@ -355,68 +375,7 @@ public class DiceManager : MonoBehaviour
             )
         );
     }
-    // IEnumerator ComboJumpRoutine(
-    //     Dice dice,
-    //     Dice target, Vector3 targetPos
-    // )
-    // {
-    //     if (dice == null || target == null)
-    //         yield break;
 
-    //     dice.state =
-    //         DiceState.FlyingCombo;
-    //     dice.canMerge = true;
-
-    //     Vector3 start =
-    //         dice.transform.position;
-
-    //     Vector3 end = targetPos;
-
-    //     float t = 0f;
-
-    //     while (t < 1f)
-    //     {
-    //         if (dice == null || target == null)
-    //             yield break;
-
-    //         t +=
-    //             Time.deltaTime /
-    //             comboDuration;
-
-    //         Vector3 pos =
-    //             Vector3.Lerp(
-    //                 start,
-    //                 end,
-    //                 t
-    //             );
-
-    //         pos.y +=
-    //             Mathf.Sin(
-    //                 t * Mathf.PI
-    //             ) * comboArcHeight;
-
-    //         dice.transform.position = pos;
-
-    //         yield return null;
-    //     }
-
-    //     dice.state = DiceState.Idle;
-
-    //     if (target != null)
-    //     {
-    //         float distToTarget =
-    //             Vector3.Distance(
-    //                 dice.transform.position,
-    //                 target.transform.position
-    //             );
-
-    //         // close enough
-    //         if (distToTarget <= 1f)
-    //         {
-    //             TryMerge(dice, target);
-    //         }
-    //     }
-    // }
     IEnumerator ComboJumpRoutine(
      Dice dice,
      Dice target,
@@ -581,17 +540,20 @@ public class DiceManager : MonoBehaviour
         Dice source
     )
     {
-        Dice[] all =
-            FindObjectsOfType<Dice>();
-
         Dice nearest = null;
 
         float best =
             Mathf.Infinity;
 
-        foreach (Dice d in all)
+        foreach (Dice d in boardDices)
         {
+            if (d == null)
+                continue;
+
             if (d == source)
+                continue;
+
+            if (!d.gameObject.activeInHierarchy)
                 continue;
 
             if (d.Level != source.Level)
@@ -784,5 +746,65 @@ public class DiceManager : MonoBehaviour
         );
     }
     #endregion
+    void AddToStack(int level)
+    {
+        Dice d =
+            Instantiate(
+                stackDicePrefab,
+                stackRoot
+            );
+
+        d.Setup(
+            diceDatabase[level - 1]
+        );
+
+        // DISABLE GAMEPLAY
+        d.enabled = false;
+
+        // DISABLE PHYSICS
+        if (d.rb != null)
+        {
+            d.rb.isKinematic = true;
+            d.rb.linearVelocity =
+                Vector3.zero;
+
+            d.rb.angularVelocity =
+                Vector3.zero;
+        }
+
+        // DISABLE COLLISION
+        if (d.cachedCollider != null)
+        {
+            d.cachedCollider.enabled =
+                false;
+        }
+
+        int index =
+            stackDices.Count;
+
+        float offsetX =
+            (index % 2 == 0)
+            ? -0.08f
+            : 0.08f;
+
+        d.transform.localPosition =
+            new Vector3(
+                offsetX,
+                index * stackSpacing,
+                0f
+            );
+
+        d.transform.localRotation =
+            Quaternion.Euler(
+                Random.Range(-7f, 7f),
+                Random.Range(0f, 360f),
+                Random.Range(-7f, 7f)
+            );
+
+        d.transform.localScale =
+            Vector3.one * 0.9f;
+
+        stackDices.Add(d);
+    }
 
 }

@@ -16,4 +16,6 @@ MonoBehaviour:
   level: 3
   damage: 3
   diceMaterial: {fileID: 2100000, guid: b79622d702f28994fad7e152e3c149fb, type: 2}
-  decalMaterial: {fileID: 2100000, guid: 30e579b14dd0f86449fb262e908de8cd, type: 2}
+  decalMaterial:
+  - {fileID: 2100000, guid: 30e579b14dd0f86449fb262e908de8cd, type: 2}
+  diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
