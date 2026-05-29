@@ -51,6 +51,7 @@ public class Dice : MonoBehaviour
         RigidbodyConstraints.FreezeRotationZ;
     readonly RigidbodyConstraints flyingConstraints =
         RigidbodyConstraints.None;
+    const float mergeMotionThresholdSqr = 0.01f;
 
     public int Level => data.level;
     public bool canMerge;
@@ -64,7 +65,7 @@ public class Dice : MonoBehaviour
 
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode =
-            CollisionDetectionMode.Continuous;
+            CollisionDetectionMode.ContinuousDynamic;
         ApplyPhysicsSettings();
 
         ApplyGroundedConstraints();
@@ -173,6 +174,32 @@ public class Dice : MonoBehaviour
     {
         rb.constraints =
             boardMoveConstraints;
+    }
+
+    void FixedUpdate()
+    {
+        if (!gameObject.activeInHierarchy)
+            return;
+
+        if (!canMerge)
+            return;
+
+        if (state != DiceState.Shot)
+            return;
+
+        if (isMerging)
+            return;
+
+        if (rb == null)
+            return;
+
+        if (rb.linearVelocity.sqrMagnitude < mergeMotionThresholdSqr)
+            return;
+
+        if (DiceManager.Instance != null)
+        {
+            DiceManager.Instance.TryMergeNearby(this);
+        }
     }
 
     void ApplyPhysicsSettings()
@@ -314,7 +341,7 @@ public class Dice : MonoBehaviour
         if (!gameObject.activeInHierarchy)
             return;
         Dice other =
-            col.collider.GetComponent<Dice>();
+            col.collider.GetComponentInParent<Dice>();
 
         if (other == null)
             return;
@@ -328,8 +355,24 @@ public class Dice : MonoBehaviour
         if (other.Level != Level)
             return;
 
-        // IMPORTANT
-        if (!canMerge && !other.canMerge)
+        if (rb == null || other.rb == null)
+            return;
+
+        float selfMotion =
+            rb.linearVelocity.sqrMagnitude +
+            rb.angularVelocity.sqrMagnitude;
+
+        float otherMotion =
+            other.rb.linearVelocity.sqrMagnitude +
+            other.rb.angularVelocity.sqrMagnitude;
+
+        bool hasMergeAuthority =
+            canMerge ||
+            other.canMerge ||
+            selfMotion >= mergeMotionThresholdSqr ||
+            otherMotion >= mergeMotionThresholdSqr;
+
+        if (!hasMergeAuthority)
             return;
 
         DiceManager.Instance.TryMerge(this, other);

@@ -197,12 +197,24 @@ public class DiceManager : MonoBehaviour
                 pos,
                 rotation
             );
-
         Dice d = obj.GetComponent<Dice>();
 
         d.Setup(
             diceDatabase[level - 1]
         );
+
+        // FORCE STABLE
+        d.transform.position = pos;
+
+        d.rb.linearVelocity = Vector3.zero;
+        d.rb.angularVelocity = Vector3.zero;
+
+        d.rb.position = pos;
+        d.rb.rotation = d.GetUprightRotation();
+
+        d.rb.Sleep();
+
+        d.ApplyGroundedConstraints();
 
         if (registerOnBoard)
         {
@@ -210,6 +222,18 @@ public class DiceManager : MonoBehaviour
         }
 
         return d;
+        // Dice d = obj.GetComponent<Dice>();
+
+        // d.Setup(
+        //     diceDatabase[level - 1]
+        // );
+
+        // if (registerOnBoard)
+        // {
+        //     RegisterBoardDice(d);
+        // }
+
+        // return d;
     }
 
     public void RegisterBoardDice(
@@ -356,6 +380,87 @@ public class DiceManager : MonoBehaviour
         );
     }
 
+    public bool TryMergeNearby(
+        Dice source
+    )
+    {
+        if (source == null)
+            return false;
+
+        if (!source.gameObject.activeInHierarchy)
+            return false;
+
+        if (source.isMerging)
+            return false;
+
+        if (source.state == DiceState.Merging)
+            return false;
+
+        if (source.cachedCollider == null)
+            return false;
+
+        Vector3 center =
+            source.cachedCollider.bounds.center;
+
+        float radius =
+            Mathf.Max(
+                source.cachedCollider.bounds.extents.x,
+                source.cachedCollider.bounds.extents.z
+            ) * 1.15f + 0.1f;
+
+        Collider[] hits =
+            Physics.OverlapSphere(
+                center,
+                radius
+            );
+
+        Dice nearest = null;
+        float bestDist = float.PositiveInfinity;
+
+        foreach (Collider hit in hits)
+        {
+            Dice other =
+                hit.GetComponentInParent<Dice>();
+
+            if (other == null)
+                continue;
+
+            if (other == source)
+                continue;
+
+            if (!other.gameObject.activeInHierarchy)
+                continue;
+
+            if (other.isMerging)
+                continue;
+
+            if (other.Level != source.Level)
+                continue;
+
+            float dist =
+                Vector3.Distance(
+                    source.transform.position,
+                    other.transform.position
+                );
+
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                nearest = other;
+            }
+        }
+
+        if (nearest == null)
+            return false;
+
+        TryMerge(
+            source,
+            nearest
+        );
+
+        return true;
+    }
+
     IEnumerator MergeRoutine(
         Dice a,
         Dice b
@@ -401,7 +506,6 @@ public class DiceManager : MonoBehaviour
                 FindClearPosition(mergePos)
             );
         comboChainMap[merged] = chain;
-        comboChainMap[merged] = 1;
 
         merged.PlaceUpright(
             merged.transform.position
@@ -423,8 +527,7 @@ public class DiceManager : MonoBehaviour
             )
             {
                 fxPos.y =
-                    merged.cachedCollider.bounds.min.y +
-                    0.02f;
+                   11.5f;
             }
 
             GameObject fx =

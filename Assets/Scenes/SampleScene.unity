@@ -1499,11 +1499,11 @@ MonoBehaviour:
   comboSpinTurnsX: {x: 4, y: 7}
   comboSpinTurnsY: {x: 3, y: 7}
   comboSpinTurnsZ: {x: 4, y: 7}
-  comboDistancePerChain: 2
+  comboDistancePerChain: 1.5
   maxComboDistanceLimit: 30
   diceQueue: {fileID: 961475775}
-  comboArcPerChain: 3.5
-  maxComboArcHeight: 50
+  comboArcPerChain: 3
+  maxComboArcHeight: 20
   comboDurationPerChain: 0.03
   maxComboDuration: 0.75
   maxComboDistance: 6
