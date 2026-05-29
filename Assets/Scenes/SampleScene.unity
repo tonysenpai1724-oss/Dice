@@ -904,7 +904,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 1
-  m_Color: {r: 0.5, g: 0.4972177, b: 0.49292454, a: 1}
+  m_Color: {r: 0.9843137, g: 0.96862745, b: 0.8392157, a: 1}
   m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
@@ -948,8 +948,8 @@ Light:
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 5000
-  m_UseColorTemperature: 1
+  m_ColorTemperature: 10236
+  m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
@@ -967,13 +967,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.69175, y: -0.2048877, z: 0.25248608, w: 0.64478976}
-  m_LocalPosition: {x: -9.4, y: 37, z: -3.2}
+  m_LocalRotation: {x: 0.6032009, y: 0.026238445, z: 0.3158854, w: 0.7318994}
+  m_LocalPosition: {x: -28.2, y: 15.8, z: 1.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 95.41998, y: -64.278015, z: -26.494995}
+  m_LocalEulerAnglesHint: {x: 119.95801, y: -122.856, z: -98.375}
 --- !u!114 &410087042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1460,6 +1460,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 1634904172}
   spawnLevel: 1
   shootForce: 100
+  minLaunchAngle: 15
   stableTimeRequired: 0.35
   stopVelocityThreshold: 0.05
   stopAngularVelocityThreshold: 0.05
@@ -1489,6 +1490,7 @@ MonoBehaviour:
   minStartLevel: 1
   maxStartLevel: 4
   spawnPadding: 3
+  sideSpawnPercent: 0.6
   topSpawnPercent: 0.6
   diceSpacingRadius: 0.95
   spawnSearchSteps: 18
@@ -1496,14 +1498,14 @@ MonoBehaviour:
   comboArcHeight: 4
   comboDuration: 0.7
   comboSideScatter: 0.45
-  comboSpinTurnsX: {x: 4, y: 7}
-  comboSpinTurnsY: {x: 3, y: 7}
-  comboSpinTurnsZ: {x: 4, y: 7}
+  comboSpinTurnsX: {x: 1265, y: 2530}
+  comboSpinTurnsY: {x: 210, y: 630}
+  comboSpinTurnsZ: {x: 1265, y: 2530}
   comboDistancePerChain: 1.5
   maxComboDistanceLimit: 30
   diceQueue: {fileID: 961475775}
   comboArcPerChain: 3
-  maxComboArcHeight: 20
+  maxComboArcHeight: 12
   comboDurationPerChain: 0.03
   maxComboDuration: 0.75
   maxComboDistance: 6

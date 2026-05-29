@@ -51,7 +51,6 @@ public class Dice : MonoBehaviour
         RigidbodyConstraints.FreezeRotationZ;
     readonly RigidbodyConstraints flyingConstraints =
         RigidbodyConstraints.None;
-    const float mergeMotionThresholdSqr = 0.01f;
 
     public int Level => data.level;
     public bool canMerge;
@@ -193,7 +192,7 @@ public class Dice : MonoBehaviour
         if (rb == null)
             return;
 
-        if (rb.linearVelocity.sqrMagnitude < mergeMotionThresholdSqr)
+        if (rb.linearVelocity.sqrMagnitude < 0.01f)
             return;
 
         if (DiceManager.Instance != null)
@@ -355,24 +354,8 @@ public class Dice : MonoBehaviour
         if (other.Level != Level)
             return;
 
-        if (rb == null || other.rb == null)
-            return;
-
-        float selfMotion =
-            rb.linearVelocity.sqrMagnitude +
-            rb.angularVelocity.sqrMagnitude;
-
-        float otherMotion =
-            other.rb.linearVelocity.sqrMagnitude +
-            other.rb.angularVelocity.sqrMagnitude;
-
-        bool hasMergeAuthority =
-            canMerge ||
-            other.canMerge ||
-            selfMotion >= mergeMotionThresholdSqr ||
-            otherMotion >= mergeMotionThresholdSqr;
-
-        if (!hasMergeAuthority)
+        // IMPORTANT
+        if (!canMerge && !other.canMerge)
             return;
 
         DiceManager.Instance.TryMerge(this, other);

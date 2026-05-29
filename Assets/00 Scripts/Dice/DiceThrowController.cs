@@ -12,6 +12,8 @@ public class DiceThrowController : MonoBehaviour
 
     [Header("Shoot")]
     public float shootForce = 12f;
+    [Range(0f, 89f)]
+    public float minLaunchAngle = 15f;
 
     [Header("Board Stable")]
     public float stableTimeRequired = 0.35f;
@@ -73,26 +75,41 @@ public class DiceThrowController : MonoBehaviour
             Vector3.zero;
     }
 
+    // void RotateCurrentDiceToMouse()
+    // {
+    //     if (Camera.main == null)
+    //         return;
+
+    //     Vector3 aimDir =
+    //         GetLookDirection();
+
+    //     if (aimDir.sqrMagnitude < 0.0001f)
+    //         return;
+
+    //     currentDice.transform.rotation =
+    //         Quaternion.LookRotation(
+    //             aimDir,
+    //             Vector3.up
+    //         );
+    // }
     void RotateCurrentDiceToMouse()
     {
-        if (Camera.main == null)
+        if (Camera.main == null || currentDice == null)
             return;
 
-        Vector3 target =
-            GetMouseWorldPosition();
-
-        Vector3 dir =
-            target - currentDice.transform.position;
-        dir.y = 0f;
-
-        if (dir.sqrMagnitude < 0.0001f)
+        Vector3 lookDir = GetLookDirection();
+        if (lookDir.sqrMagnitude < 0.0001f)
             return;
+
+        float clampedYaw = GetClampedYaw(lookDir);
 
         currentDice.transform.rotation =
-            Quaternion.LookRotation(
-                dir.normalized,
-                Vector3.up
-            );
+            Quaternion.Euler(0f, clampedYaw, 0f);
+    }
+    float GetClampedYaw(Vector3 lookDir)
+    {
+        float rawYaw = Mathf.Atan2(lookDir.x, lookDir.z) * Mathf.Rad2Deg;
+        return Mathf.Clamp(rawYaw, -65f, 65f);
     }
 
     void Shoot()
@@ -100,21 +117,18 @@ public class DiceThrowController : MonoBehaviour
         if (waitingForBoard)
             return;
 
-        Vector3 target =
-            GetMouseWorldPosition();
+        Vector3 launchDir =
+            GetAimDirection();
+        if (launchDir.sqrMagnitude < 0.0001f)
+            return;
 
-        Vector3 dir =
-            target -
-            currentDice.transform.position;
         TurnManager.Instance.AddTurn();
         DiceManager.Instance.RegisterBoardDice(
             currentDice
         );
 
-        dir.y = 0f;
-
         currentDice.Shoot(
-            dir,
+            launchDir,
             shootForce
         );
 
@@ -176,6 +190,11 @@ public class DiceThrowController : MonoBehaviour
 
     Vector3 GetMouseWorldPosition()
     {
+        float boardY =
+            DiceManager.Instance != null
+                ? DiceManager.Instance.GetBoardSurfaceY()
+                : 0f;
+
         Vector2 mousePos =
             Mouse.current.position.ReadValue();
 
@@ -187,7 +206,11 @@ public class DiceThrowController : MonoBehaviour
         Plane plane =
             new Plane(
                 Vector3.up,
-                Vector3.zero
+                new Vector3(
+                    0f,
+                    boardY,
+                    0f
+                )
             );
 
         if (plane.Raycast(ray, out float dist))
@@ -196,5 +219,79 @@ public class DiceThrowController : MonoBehaviour
         }
 
         return Vector3.zero;
+    }
+
+    // Vector3 GetAimDirection()
+    // {
+    //     if (currentDice == null)
+    //         return Vector3.forward;
+
+    //     Vector3 target =
+    //         GetMouseWorldPosition();
+
+    //     Vector3 flatDir =
+    //         target - currentDice.transform.position;
+    //     flatDir.y = 0f;
+
+    //     if (flatDir.sqrMagnitude < 0.0001f)
+    //         flatDir = currentDice.transform.forward;
+
+    //     flatDir.Normalize();
+
+    //     Vector3 launchDir =
+    //         (
+    //             flatDir * Mathf.Cos(minLaunchAngle * Mathf.Deg2Rad) +
+    //             Vector3.up * Mathf.Sin(minLaunchAngle * Mathf.Deg2Rad)
+    //         ).normalized;
+
+    //     return launchDir;
+    // }
+    Vector3 GetAimDirection()
+    {
+        if (currentDice == null)
+            return Vector3.forward;
+
+        Vector3 target = GetMouseWorldPosition();
+
+        Vector3 flatDir = target - currentDice.transform.position;
+        flatDir.y = 0f;
+
+        if (flatDir.sqrMagnitude < 0.0001f)
+            flatDir = currentDice.transform.forward;
+
+        flatDir.Normalize();
+
+        // 🔥 clamp yaw giống hệt rotation
+        float clampedYaw = GetClampedYaw(flatDir);
+
+        Vector3 dir =
+            Quaternion.Euler(0f, clampedYaw, 0f) * Vector3.forward;
+
+        // giữ arc ném
+        Vector3 launchDir =
+            (dir * Mathf.Cos(minLaunchAngle * Mathf.Deg2Rad) +
+             Vector3.up * Mathf.Sin(minLaunchAngle * Mathf.Deg2Rad)).normalized;
+
+        return launchDir;
+    }
+
+    Vector3 GetLookDirection()
+    {
+        if (currentDice == null)
+            return Vector3.forward;
+
+        Vector3 target =
+            GetMouseWorldPosition();
+
+        Vector3 flatDir =
+            target - currentDice.transform.position;
+        flatDir.y = 0f;
+
+        if (flatDir.sqrMagnitude < 0.0001f)
+            flatDir = currentDice.transform.forward;
+
+        flatDir.Normalize();
+
+        return flatDir;
     }
 }

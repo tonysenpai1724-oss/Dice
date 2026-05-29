@@ -24,6 +24,8 @@ public class DiceManager : MonoBehaviour
     public int maxStartLevel = 3;
     public float spawnPadding = 1.25f;
     [Range(0.1f, 1f)]
+    public float sideSpawnPercent = 0.6f;
+    [Range(0.1f, 1f)]
     public float topSpawnPercent = 0.6f;
     public float diceSpacingRadius = 0.95f;
     public int spawnSearchSteps = 18;
@@ -122,15 +124,19 @@ public class DiceManager : MonoBehaviour
         int maxAttempts = startSpawnCount * 12;
         int spawned = 0;
         int attempts = 0;
+        float sideMarginPercent =
+            (1f - sideSpawnPercent) * 0.5f;
         float minX =
-            Mathf.Min(
+            Mathf.Lerp(
                 b.min.x + spawnPadding,
-                b.max.x - spawnPadding
+                b.max.x - spawnPadding,
+                sideMarginPercent
             );
         float maxX =
-            Mathf.Max(
+            Mathf.Lerp(
                 b.min.x + spawnPadding,
-                b.max.x - spawnPadding
+                b.max.x - spawnPadding,
+                1f - sideMarginPercent
             );
         float minZ =
             Mathf.Lerp(
@@ -904,9 +910,9 @@ public class DiceManager : MonoBehaviour
         // NATURAL SPIN
         Vector3 angularSpin =
      new Vector3(
-         Random.Range(1265f, 2530f),
-         Random.Range(210f, 630f),
-         Random.Range(1265f, 2530f)
+         Random.Range(comboSpinTurnsX.x, comboSpinTurnsX.y),
+         Random.Range(comboSpinTurnsY.x, comboSpinTurnsY.y),
+         Random.Range(comboSpinTurnsZ.x, comboSpinTurnsZ.y)
      );
         // OCCASIONAL CRAZY SPIN
         if (Random.value < 0.2f)
@@ -1066,7 +1072,7 @@ public class DiceManager : MonoBehaviour
         )
         {
             finalPos.y =
-                11.5f;
+                12f;
         }
 
         dice.transform.position =
@@ -1240,12 +1246,12 @@ public class DiceManager : MonoBehaviour
         return nearest;
     }
 
-    float GetBoardSurfaceY()
+    public float GetBoardSurfaceY()
     {
         if (boardCollider == null)
             return 0.5f;
 
-        return boardCollider.bounds.max.y + 1f;
+        return boardCollider.bounds.max.y + 1.5f;
     }
 
     bool IsOccupied(
