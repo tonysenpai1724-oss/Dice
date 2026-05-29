@@ -12,13 +12,22 @@ public enum DiceState
     FlyingCombo,
     Merging
 }
-
+public enum DiceType
+{
+    Normal,
+    Bomb,
+    Heal,
+    Shield,
+    Buff,
+    Gold
+}
 
 public class Dice : MonoBehaviour
 {
     [Header("Data")]
     public DiceData data;
     public bool isMerging;
+    public DiceType type;
 
     [Header("Components")]
     public Rigidbody rb;
@@ -84,6 +93,7 @@ public class Dice : MonoBehaviour
         meshRenderer.material = data.diceMaterial;
         CacheOutlineMaterial();
         ApplyOutlineColor(data.baseOutlineColor);
+        this.type = data.type;
 
         foreach (var d in decals)
         {
@@ -192,9 +202,6 @@ public class Dice : MonoBehaviour
         if (rb == null)
             return;
 
-        if (rb.linearVelocity.sqrMagnitude < 0.01f)
-            return;
-
         if (DiceManager.Instance != null)
         {
             DiceManager.Instance.TryMergeNearby(this);
@@ -301,7 +308,6 @@ public class Dice : MonoBehaviour
             return;
 
         isHovered = hovered;
-        Debug.Log("Hover state: " + isHovered);
 
         ApplyOutlineColor(
             isHovered
@@ -312,7 +318,6 @@ public class Dice : MonoBehaviour
 
     void OnMouseEnter()
     {
-        Debug.Log("Mouse Enter");
         SetHoverState(true);
     }
 
@@ -335,10 +340,25 @@ public class Dice : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
+        TryMergeCollision(col);
+    }
+
+    void OnCollisionStay(Collision col)
+    {
+        TryMergeCollision(col);
+    }
+
+    void TryMergeCollision(Collision col)
+    {
         if (state == DiceState.Merging)
             return;
+
         if (!gameObject.activeInHierarchy)
             return;
+
+        if (DiceManager.Instance == null)
+            return;
+
         Dice other =
             col.collider.GetComponentInParent<Dice>();
 
@@ -354,13 +374,11 @@ public class Dice : MonoBehaviour
         if (other.Level != Level)
             return;
 
-        // IMPORTANT
         if (!canMerge && !other.canMerge)
             return;
 
         DiceManager.Instance.TryMerge(this, other);
     }
-
 
 }
 

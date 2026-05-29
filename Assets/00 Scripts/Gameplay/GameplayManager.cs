@@ -13,6 +13,7 @@ public class GameplayManager : Singleton<GameplayManager>
     [SerializeField, ReadOnly] protected EGamePlayState state;
     public EGamePlayState LastState { get; private set; }
     public bool winGame { get; private set; }
+    public bool IsGameEnded => state == EGamePlayState.GameOver;
     public int CurrentLevel { get; set; }
     public int LevelTime { get; private set; }
     public int Score { get; private set; }
@@ -38,6 +39,7 @@ public class GameplayManager : Singleton<GameplayManager>
     }
     public void StartGame()
     {
+        winGame = false;
         SetState(EGamePlayState.Running);
     }
     private void Update()
@@ -78,33 +80,40 @@ public class GameplayManager : Singleton<GameplayManager>
 
     public void EndGame(bool win)
     {
+        if (IsGameEnded)
+            return;
+
         DebugCustom.LogColor("End Game");
         winGame = win;
+        SetState(EGamePlayState.GameOver);
+
         if (winGame)
         {
-            IPlayerInfoController.Instance.WinLevel();
-            IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
-            if (GameManager.Instance.GameType == EGameType.Endless)
-                IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.WinEndlessStage);
-            IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
+            //   IPlayerInfoController.Instance.WinLevel();
+            // IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
+            // if (GameManager.Instance.GameType == EGameType.Endless)
+            //     IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.WinEndlessStage);
+            // IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
 
-            PackReward = new PackageResource();
-            PackReward.AddResource(new CommonResource(ECommonResource.Coin, 15));
-            PackReward.AddResource(new CommonResource(ECommonResource.Gem, 10));
-            PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, 1));
+            // PackReward = new PackageResource();
+            // PackReward.AddResource(new CommonResource(ECommonResource.Coin, 15));
+            // PackReward.AddResource(new CommonResource(ECommonResource.Gem, 10));
+            // PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, 1));
 
-            PackReward.ReceiveResource(EResourceFrom.ReviveIngame);
-            UIManager.Instance.ShowPopupEndGame();
+            // PackReward.ReceiveResource(EResourceFrom.ReviveIngame);
+            //  UIManager.Instance.ShowPopupEndGame();
+            DebugCustom.LogColor("Win Game");
         }
         else
         {
-            if (GameManager.Instance.GameType == EGameType.Endless)
-            {
-                PackReward = new PackageResource();
-                PackReward.AddResource(new CommonResource(ECommonResource.Coin, Score));
-                PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, Score / 10));
-            }
-            UIManager.Instance.ShowPopupEndGame();
+            // if (GameManager.Instance.GameType == EGameType.Endless)
+            // {
+            //     PackReward = new PackageResource();
+            //     PackReward.AddResource(new CommonResource(ECommonResource.Coin, Score));
+            //     PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, Score / 10));
+            // }
+            DebugCustom.LogColor("Lose Game");
+            //  UIManager.Instance.ShowPopupEndGame();
         }
     }
     public void OnClick(Vector3 pos)

@@ -91,11 +91,17 @@ public class DiceQueue : MonoBehaviour
 
             if (first != null)
             {
+                DiceData diceData = first.data;
+
                 yield return MoveItem(
                     first.transform,
                     first.transform.position + consumeOffset,
                     itemMoveDuration
                 );
+
+                if (EnemyManager.Instance != null)
+                    EnemyManager.Instance.PlayerAttack(diceData);
+
                 yield return new WaitForSeconds(delayDestoyTime);
                 Destroy(
                     first.gameObject
@@ -111,6 +117,9 @@ public class DiceQueue : MonoBehaviour
                 );
             }
         }
+
+        if (EnemyManager.Instance != null)
+            yield return EnemyManager.Instance.EnemyTurn();
 
         processing = false;
     }

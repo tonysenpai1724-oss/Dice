@@ -256,7 +256,7 @@ Rigidbody:
   m_GameObject: {fileID: 1093223856310752240}
   serializedVersion: 5
   m_Mass: 0.8
-  m_LinearDamping: 1
+  m_LinearDamping: 3
   m_AngularDamping: 10
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -288,6 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NormalDice
   data: {fileID: 11400000, guid: 4233f9e583ac95943a09a8428e0a2d22, type: 2}
   isMerging: 0
+  type: 0
   rb: {fileID: 8306218777647176642}
   cachedCollider: {fileID: 0}
   meshRenderer: {fileID: 3696985381103359607}
@@ -306,10 +307,10 @@ MonoBehaviour:
   - {fileID: 1598238015155596350}
   - {fileID: 3287491763202498105}
   rbMass: 0.8
-  rbDrag: 1
-  rbAngularDrag: 0.4
+  rbDrag: 3
+  rbAngularDrag: 10
   rbMaxAngularVelocity: 35
-  dicePhysicMaterial: {fileID: 0}
+  dicePhysicMaterial: {fileID: 13400000, guid: fd08e4205b8eb0b46857172532e12e21, type: 2}
   state: 0
   canMerge: 0
 --- !u!1 &1146761482871460734

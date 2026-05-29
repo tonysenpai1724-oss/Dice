@@ -36,6 +36,9 @@ public class DiceThrowController : MonoBehaviour
 
     void Update()
     {
+        if (IsGameEnded())
+            return;
+
         if (currentDice == null)
             return;
 
@@ -61,6 +64,9 @@ public class DiceThrowController : MonoBehaviour
 
     void SpawnCurrentDice()
     {
+        if (IsGameEnded())
+            return;
+
         if (currentDice != null)
             return;
 
@@ -114,7 +120,7 @@ public class DiceThrowController : MonoBehaviour
 
     void Shoot()
     {
-        if (waitingForBoard)
+        if (waitingForBoard || IsGameEnded())
             return;
 
         Vector3 launchDir =
@@ -185,7 +191,15 @@ public class DiceThrowController : MonoBehaviour
         }
 
         waitingForBoard = false;
-        SpawnCurrentDice();
+
+        if (!IsGameEnded())
+            SpawnCurrentDice();
+    }
+
+    bool IsGameEnded()
+    {
+        return GameplayManager.Instance != null &&
+            GameplayManager.Instance.IsGameEnded;
     }
 
     Vector3 GetMouseWorldPosition()

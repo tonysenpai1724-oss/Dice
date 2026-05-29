@@ -38,6 +38,11 @@ public class DiceManager : MonoBehaviour
     public Vector2 comboSpinTurnsX = new Vector2(1.5f, 3f);
     public Vector2 comboSpinTurnsY = new Vector2(0.5f, 1.5f);
     public Vector2 comboSpinTurnsZ = new Vector2(1.5f, 3f);
+
+    [Header("Merge")]
+    public float mergeDetectRadiusMultiplier = 1.65f;
+    public float mergeDetectRadiusPadding = 0.15f;
+
     [Header("Combo Distance Scaling")]
     public float comboDistancePerChain = 1.5f;
     public float maxComboDistanceLimit = 12f;
@@ -377,6 +382,13 @@ public class DiceManager : MonoBehaviour
         if (!b.gameObject.activeInHierarchy)
             return;
 
+        if (a.Level != b.Level)
+            return;
+
+        if (a.state == DiceState.Merging ||
+            b.state == DiceState.Merging)
+            return;
+
         // LOCK IMMEDIATELY
         a.isMerging = true;
         b.isMerging = true;
@@ -412,7 +424,8 @@ public class DiceManager : MonoBehaviour
             Mathf.Max(
                 source.cachedCollider.bounds.extents.x,
                 source.cachedCollider.bounds.extents.z
-            ) * 1.15f + 0.1f;
+            ) * mergeDetectRadiusMultiplier +
+            mergeDetectRadiusPadding;
 
         Collider[] hits =
             Physics.OverlapSphere(
@@ -438,6 +451,10 @@ public class DiceManager : MonoBehaviour
                 continue;
 
             if (other.isMerging)
+                continue;
+
+            if (other.state == DiceState.Merging ||
+                other.state == DiceState.FlyingCombo)
                 continue;
 
             if (other.Level != source.Level)
@@ -636,21 +653,19 @@ public class DiceManager : MonoBehaviour
         //         dice.transform.position +
         //         dir * maxComboDistance;
         // }
-        float overshoot = 1f + comboCount * 0.15f;
-
         if (dist > dynamicMaxComboDistance)
         {
             targetPos =
                 dice.transform.position +
-                dir * dynamicMaxComboDistance * overshoot;
+                dir * dynamicMaxComboDistance;
         }
         else
         {
-            // stop BEFORE target center
             targetPos =
-                target.transform.position -
-                dir * 0.7f;
+                target.transform.position;
         }
+
+        targetPos.y = GetBoardSurfaceY();
 
         StartCoroutine(
             ComboJumpRoutine(
@@ -1035,10 +1050,16 @@ public class DiceManager : MonoBehaviour
                     target.transform.position
                 );
 
-            if (distToTarget <= 1f)
+            float mergeDistance =
+                Mathf.Max(1.2f, diceSpacingRadius * 1.25f);
+
+            if (distToTarget <= mergeDistance &&
+                target.Level == dice.Level &&
+                !target.isMerging &&
+                !dice.isMerging)
             {
                 comboChainMap[target] =
-    comboCount;
+                    comboCount;
 
                 TryMerge(
                     dice,
@@ -1227,7 +1248,8 @@ public class DiceManager : MonoBehaviour
             if (d.Level != source.Level)
                 continue;
 
-            if (d.state == DiceState.Merging)
+            if (d.state == DiceState.Merging ||
+                d.state == DiceState.FlyingCombo)
                 continue;
 
             float dist =
