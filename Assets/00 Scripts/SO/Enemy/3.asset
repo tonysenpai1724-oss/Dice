@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: 3
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  hp: 50
+  hp: 300
   damage: 3
   type: 2
   sprite: {fileID: 21300000, guid: 5b4dc4dba7ea85f46ac5d3f0f19f875d, type: 3}

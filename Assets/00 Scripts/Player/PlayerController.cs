@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI hpText;
     void Start()
     {
-        SetHp(50, 50);
+        SetHp(1000, 1000);
         if (hpText != null)
         {
             hpText.text = currentHp.ToString() + "/" + hp.ToString();

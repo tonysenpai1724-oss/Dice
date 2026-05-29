@@ -132,6 +132,7 @@ public class DiceThrowController : MonoBehaviour
         DiceManager.Instance.RegisterBoardDice(
             currentDice
         );
+        DiceManager.Instance.SetBoardMergeEnabled(true);
 
         currentDice.Shoot(
             launchDir,
@@ -191,6 +192,7 @@ public class DiceThrowController : MonoBehaviour
         }
 
         waitingForBoard = false;
+        DiceManager.Instance.SetBoardMergeEnabled(false);
 
         if (!IsGameEnded())
             SpawnCurrentDice();

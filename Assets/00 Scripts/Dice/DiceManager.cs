@@ -39,10 +39,6 @@ public class DiceManager : MonoBehaviour
     public Vector2 comboSpinTurnsY = new Vector2(0.5f, 1.5f);
     public Vector2 comboSpinTurnsZ = new Vector2(1.5f, 3f);
 
-    [Header("Merge")]
-    public float mergeDetectRadiusMultiplier = 1.65f;
-    public float mergeDetectRadiusPadding = 0.15f;
-
     [Header("Combo Distance Scaling")]
     public float comboDistancePerChain = 1.5f;
     public float maxComboDistanceLimit = 12f;
@@ -260,6 +256,30 @@ public class DiceManager : MonoBehaviour
         }
     }
 
+    public void SetBoardMergeEnabled(bool enabled)
+    {
+        for (int i = boardDices.Count - 1; i >= 0; i--)
+        {
+            Dice dice = boardDices[i];
+
+            if (dice == null)
+            {
+                boardDices.RemoveAt(i);
+                continue;
+            }
+
+            if (!dice.gameObject.activeInHierarchy)
+                continue;
+
+            if (dice.isMerging ||
+                dice.state == DiceState.Merging ||
+                dice.state == DiceState.FlyingCombo)
+                continue;
+
+            dice.canMerge = enabled;
+        }
+    }
+
     public void ResetBoard()
     {
         StopAllCoroutines();
@@ -396,92 +416,6 @@ public class DiceManager : MonoBehaviour
         StartCoroutine(
             MergeRoutine(a, b)
         );
-    }
-
-    public bool TryMergeNearby(
-        Dice source
-    )
-    {
-        if (source == null)
-            return false;
-
-        if (!source.gameObject.activeInHierarchy)
-            return false;
-
-        if (source.isMerging)
-            return false;
-
-        if (source.state == DiceState.Merging)
-            return false;
-
-        if (source.cachedCollider == null)
-            return false;
-
-        Vector3 center =
-            source.cachedCollider.bounds.center;
-
-        float radius =
-            Mathf.Max(
-                source.cachedCollider.bounds.extents.x,
-                source.cachedCollider.bounds.extents.z
-            ) * mergeDetectRadiusMultiplier +
-            mergeDetectRadiusPadding;
-
-        Collider[] hits =
-            Physics.OverlapSphere(
-                center,
-                radius
-            );
-
-        Dice nearest = null;
-        float bestDist = float.PositiveInfinity;
-
-        foreach (Collider hit in hits)
-        {
-            Dice other =
-                hit.GetComponentInParent<Dice>();
-
-            if (other == null)
-                continue;
-
-            if (other == source)
-                continue;
-
-            if (!other.gameObject.activeInHierarchy)
-                continue;
-
-            if (other.isMerging)
-                continue;
-
-            if (other.state == DiceState.Merging ||
-                other.state == DiceState.FlyingCombo)
-                continue;
-
-            if (other.Level != source.Level)
-                continue;
-
-            float dist =
-                Vector3.Distance(
-                    source.transform.position,
-                    other.transform.position
-                );
-
-            if (dist < bestDist)
-            {
-                bestDist = dist;
-                nearest = other;
-            }
-        }
-
-        if (nearest == null)
-            return false;
-
-        TryMerge(
-            source,
-            nearest
-        );
-
-        return true;
     }
 
     IEnumerator MergeRoutine(
@@ -1437,6 +1371,7 @@ public class DiceManager : MonoBehaviour
         //     ignore
         // );
     }
+
     #endregion
 
 

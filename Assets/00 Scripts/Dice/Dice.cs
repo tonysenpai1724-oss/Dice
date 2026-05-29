@@ -187,25 +187,6 @@ public class Dice : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!gameObject.activeInHierarchy)
-            return;
-
-        if (!canMerge)
-            return;
-
-        if (state != DiceState.Shot)
-            return;
-
-        if (isMerging)
-            return;
-
-        if (rb == null)
-            return;
-
-        if (DiceManager.Instance != null)
-        {
-            DiceManager.Instance.TryMergeNearby(this);
-        }
     }
 
     void ApplyPhysicsSettings()
