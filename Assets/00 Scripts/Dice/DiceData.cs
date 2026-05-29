@@ -20,4 +20,5 @@ public class DiceData : ScriptableObject
     public Sprite diceSprite;
     public Color baseOutlineColor;
     public Color targetColor;
+    public GameObject hitEffectPrefab;
 }

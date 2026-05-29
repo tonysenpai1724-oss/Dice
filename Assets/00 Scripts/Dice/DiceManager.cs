@@ -36,6 +36,10 @@ public class DiceManager : MonoBehaviour
     public Vector2 comboSpinTurnsX = new Vector2(1.5f, 3f);
     public Vector2 comboSpinTurnsY = new Vector2(0.5f, 1.5f);
     public Vector2 comboSpinTurnsZ = new Vector2(1.5f, 3f);
+    [Header("Combo Distance Scaling")]
+    public float comboDistancePerChain = 1.5f;
+    public float maxComboDistanceLimit = 12f;
+    Dictionary<Dice, float> comboLastTime = new Dictionary<Dice, float>();
     //  public Transform point;
     [Header("Stack")]
 
@@ -379,7 +383,12 @@ public class DiceManager : MonoBehaviour
                 1,
                 diceDatabase.Count
             );
+        int chain = 1;
 
+        if (comboChainMap.ContainsKey(a))
+        {
+            chain = comboChainMap[a];
+        }
 
         ReturnBoardDice(a);
 
@@ -391,10 +400,43 @@ public class DiceManager : MonoBehaviour
                 nextLevel,
                 FindClearPosition(mergePos)
             );
+        comboChainMap[merged] = chain;
+        comboChainMap[merged] = 1;
 
         merged.PlaceUpright(
             merged.transform.position
         );
+        // =========================
+        // HIT EFFECT
+        // =========================
+
+        if (
+    merged.data != null &&
+    merged.data.hitEffectPrefab != null
+)
+        {
+            Vector3 fxPos =
+                merged.transform.position;
+
+            if (
+                merged.cachedCollider != null
+            )
+            {
+                fxPos.y =
+                    merged.cachedCollider.bounds.min.y +
+                    0.02f;
+            }
+
+            GameObject fx =
+                Instantiate(
+                    merged.data.hitEffectPrefab,
+                    fxPos,
+                    Quaternion.identity
+                );
+
+            Destroy(fx, 1f);
+        }
+
 
 
         TryComboChain(merged);
@@ -420,7 +462,7 @@ public class DiceManager : MonoBehaviour
             Vector3 randomTargetPos =
                 FindRandomClearPositionWithinRadius(
                     dice.transform.position,
-                    maxComboDistance * 0.5f,
+                    maxComboDistance,
                     dice
                 );
 
@@ -456,6 +498,19 @@ public class DiceManager : MonoBehaviour
                 target.transform.position -
                 dice.transform.position
             ).normalized;
+        int comboCount = 1;
+
+        if (comboChainMap.ContainsKey(dice))
+        {
+            comboCount = comboChainMap[dice];
+        }
+
+        float dynamicMaxComboDistance =
+            Mathf.Min(
+                maxComboDistance +
+                comboCount * comboDistancePerChain,
+                maxComboDistanceLimit
+            );
 
         float dist =
             Vector3.Distance(
@@ -466,11 +521,19 @@ public class DiceManager : MonoBehaviour
         Vector3 targetPos;
 
         // OUT OF RANGE
-        if (dist > maxComboDistance)
+        // if (dist > maxComboDistance)
+        // {
+        //     targetPos =
+        //         dice.transform.position +
+        //         dir * maxComboDistance;
+        // }
+        float overshoot = 1f + comboCount * 0.15f;
+
+        if (dist > dynamicMaxComboDistance)
         {
             targetPos =
                 dice.transform.position +
-                dir * maxComboDistance;
+                dir * dynamicMaxComboDistance * overshoot;
         }
         else
         {
@@ -715,6 +778,14 @@ public class DiceManager : MonoBehaviour
             targetPos;
         int comboCount = 1;
 
+        if (comboChainMap.ContainsKey(dice))
+        {
+            comboCount = comboChainMap[dice] + 1;
+        }
+
+        comboChainMap[dice] = comboCount;
+        comboLastTime[dice] = Time.time;
+
         // RANDOM SIDE ARC
         Vector3 sideOffset =
             Vector3.Cross(
@@ -741,6 +812,12 @@ public class DiceManager : MonoBehaviour
         }
 
         float t = 0f;
+        float dynamicDuration =
+    Mathf.Min(
+        comboDuration +
+        comboCount * comboDurationPerChain,
+        maxComboDuration
+    );
 
         while (t < 1f)
         {
@@ -755,9 +832,7 @@ public class DiceManager : MonoBehaviour
                 break;
             }
 
-            t +=
-                Time.deltaTime /
-                comboDuration;
+            t += Time.deltaTime / dynamicDuration;
 
             Vector3 end =
                 targetPos;
@@ -779,14 +854,14 @@ public class DiceManager : MonoBehaviour
 
 
 
-            if (comboChainMap.ContainsKey(dice))
-            {
-                comboCount =
-                    comboChainMap[dice] + 1;
-            }
+            // if (comboChainMap.ContainsKey(dice))
+            // {
+            //     comboCount =
+            //         comboChainMap[dice] + 1;
+            // }
 
-            comboChainMap[dice] =
-                comboCount;
+            // comboChainMap[dice] =
+            //     comboCount;
 
             // =========================
             // DYNAMIC ARC
@@ -802,11 +877,11 @@ public class DiceManager : MonoBehaviour
 
             // NATURAL ARC
             float arc =
-                1f -
-                Mathf.Pow(
-                    2f * t - 1f,
-                    2f
-                );
+     Mathf.Sin(t * Mathf.PI);
+
+            arc = Mathf.Clamp01(arc);
+
+            arc = Mathf.Pow(arc, 0.7f);
 
             pos.y +=
                 arc * dynamicArcHeight;
@@ -862,6 +937,11 @@ public class DiceManager : MonoBehaviour
                 );
                 yield break;
             }
+        }
+        comboChainMap.Remove(dice);
+        if (target != null)
+        {
+            comboChainMap.Remove(target);
         }
 
 
@@ -944,7 +1024,7 @@ public class DiceManager : MonoBehaviour
 
         dice.state =
             DiceState.Idle;
-        comboChainMap.Remove(dice);
+
         StartCoroutine(
             RecoverUprightRoutine(dice)
         );
@@ -1175,8 +1255,9 @@ public class DiceManager : MonoBehaviour
 
         for (int i = 0; i < 24; i++)
         {
-            Vector2 circle =
-                Random.insideUnitCircle;
+            Vector2 circle = Random.insideUnitCircle.normalized * Random.Range(0.4f, 1f);
+            // Vector2 circle =
+            //     Random.insideUnitCircle;
 
             if (circle.sqrMagnitude < 0.001f)
                 continue;
@@ -1218,11 +1299,12 @@ public class DiceManager : MonoBehaviour
                 fallback = candidate;
             }
         }
+        return fallback;
 
-        return FindClearPosition(
-            fallback,
-            ignore
-        );
+        // return FindClearPosition(
+        //     fallback,
+        //     ignore
+        // );
     }
     #endregion
 

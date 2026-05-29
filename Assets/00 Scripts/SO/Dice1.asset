@@ -21,3 +21,4 @@ MonoBehaviour:
   diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
   baseOutlineColor: {r: 0.03773582, g: 0.03720182, b: 0.03720182, a: 1}
   targetColor: {r: 0.9811321, g: 0.9579922, b: 0.9579922, a: 0}
+  hitEffectPrefab: {fileID: 624991892361620210, guid: fa5cadda581724947b2860ab128b921f, type: 3}
