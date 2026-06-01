@@ -58,6 +58,9 @@ public class Dice : MonoBehaviour
         RigidbodyConstraints.FreezePositionY |
         RigidbodyConstraints.FreezeRotationX |
         RigidbodyConstraints.FreezeRotationZ;
+    readonly RigidbodyConstraints landingConstraints =
+        RigidbodyConstraints.FreezeRotationX |
+        RigidbodyConstraints.FreezeRotationZ;
     readonly RigidbodyConstraints flyingConstraints =
         RigidbodyConstraints.None;
 
@@ -183,6 +186,12 @@ public class Dice : MonoBehaviour
     {
         rb.constraints =
             boardMoveConstraints;
+    }
+
+    public void ApplyLandingConstraints()
+    {
+        rb.constraints =
+            landingConstraints;
     }
 
     void FixedUpdate()

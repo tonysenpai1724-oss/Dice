@@ -206,6 +206,7 @@ public class DiceManager : MonoBehaviour
             );
         Dice d = obj.GetComponent<Dice>();
 
+
         d.Setup(
             diceDatabase[level - 1]
         );
@@ -455,6 +456,7 @@ public class DiceManager : MonoBehaviour
         ReturnBoardDice(a);
 
         ReturnBoardDice(b);
+        
 
 
         Dice merged =
@@ -462,16 +464,7 @@ public class DiceManager : MonoBehaviour
                 nextLevel,
                 FindClearPosition(mergePos)
             );
-        comboChainMap[merged] = chain;
-
-        merged.PlaceUpright(
-            merged.transform.position
-        );
-        // =========================
-        // HIT EFFECT
-        // =========================
-
-        if (
+               if (
     merged.data != null &&
     merged.data.hitEffectPrefab != null
 )
@@ -496,6 +489,15 @@ public class DiceManager : MonoBehaviour
 
             Destroy(fx, 1f);
         }
+
+        comboChainMap[merged] = chain;
+
+        merged.PlaceUpright(
+            merged.transform.position
+        );
+        // =========================
+        // HIT EFFECT
+        // =========================
 
 
 
@@ -827,13 +829,28 @@ public class DiceManager : MonoBehaviour
         dice.rb.angularVelocity =
             Vector3.zero;
 
-        dice.SetCollisionEnabled(false);
+        // Keep collider enabled so jumping dice can collide with other dice
+        // dice.SetCollisionEnabled(false);
 
         Vector3 start =
             dice.transform.position;
 
+        // Calculate final safe destination (where it should end up after bouncing)
+        Vector3 finalDestination = targetPos;
+        finalDestination.y = GetBoardSurfaceY();
+        finalDestination = FindClearPosition(finalDestination, dice);
+
+        // Bounces will carry forward momentum in the jump direction (dir)
+        Vector3 jumpDir = dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward;
+        float originalDist = Vector3.Distance(start, finalDestination);
+        float actualBounceDistance = Mathf.Min(2.8f, originalDist * 0.55f);
+
+        // The main jump ends slightly before the finalDestination
+        Vector3 mainJumpEnd = finalDestination - jumpDir * actualBounceDistance;
+        mainJumpEnd.y = GetBoardSurfaceY();
+
         Vector3 finalPos =
-            targetPos;
+            mainJumpEnd;
         int comboCount = 1;
 
         if (comboChainMap.ContainsKey(dice))
@@ -893,7 +910,7 @@ public class DiceManager : MonoBehaviour
             t += Time.deltaTime / dynamicDuration;
 
             Vector3 end =
-                targetPos;
+                mainJumpEnd;
 
             finalPos = end;
 
@@ -1009,36 +1026,7 @@ public class DiceManager : MonoBehaviour
         }
 
 
-        // GROUND ALIGN
-        Collider col =
-            dice.GetComponent<Collider>();
-
-        float bottomOffset =
-            dice.transform.position.y -
-            col.bounds.min.y;
-
-        if (
-            Physics.Raycast(
-                finalPos + Vector3.up * 3f,
-                Vector3.down,
-                out RaycastHit hit,
-                10f
-            )
-        )
-        {
-            finalPos.y =
-                12f;
-        }
-
-        dice.transform.position =
-     finalPos;
-
-        dice.rb.position =
-            finalPos;
-
-        Physics.SyncTransforms();
-
-        // UPRIGHT RECOVERY
+        // UPRIGHT RECOVERY & BOUNCING LANDING WITH FORWARD MOMENTUM
         Quaternion targetRot =
             Quaternion.Euler(
                 0f,
@@ -1046,52 +1034,88 @@ public class DiceManager : MonoBehaviour
                 0f
             );
 
-        float recover = 0f;
-
         Quaternion startRot =
             dice.transform.rotation;
 
-        while (recover < 1f)
+        // Premium realistic landing bounces (3 hops) carrying forward momentum
+        int numBounces = 3;
+        float[] bounceHeights = new float[] { 1.2f, 0.6f, 0.25f };
+        float[] bounceDurations = new float[] { 0.35f, 0.25f, 0.18f };
+        float totalBounceDuration = 0f;
+        foreach (float bd in bounceDurations) totalBounceDuration += bd;
+
+        float elapsedBounceTime = 0f;
+        Vector3 horizontalStart = mainJumpEnd;
+        Vector3 horizontalEnd = finalDestination;
+
+        for (int bIndex = 0; bIndex < numBounces; bIndex++)
         {
-            recover +=
-                Time.deltaTime * 6f;
+            float bounceDuration = bounceDurations[bIndex];
+            float bounceHeight = bounceHeights[bIndex];
+            float bt = 0f;
 
-            float eased =
-                1f -
-                Mathf.Pow(
-                    1f - recover,
-                    3f
-                );
+            while (bt < 1f)
+            {
+                if (dice == null)
+                    yield break;
 
-            dice.transform.rotation =
-                Quaternion.Slerp(
+                bt += Time.deltaTime / bounceDuration;
+                elapsedBounceTime += Time.deltaTime;
+                float currentBounceT = Mathf.Clamp01(elapsedBounceTime / totalBounceDuration);
+
+                // Smoothly progress forward along dir using a quadratic ease-out
+                float forwardEase = 1f - Mathf.Pow(1f - currentBounceT, 2f);
+                Vector3 horizontalPos = Vector3.Lerp(horizontalStart, horizontalEnd, forwardEase);
+
+                // Calculate vertical bouncing arc
+                float heightSin = Mathf.Sin(Mathf.Clamp01(bt) * Mathf.PI);
+                float currentY = GetBoardSurfaceY() + heightSin * bounceHeight;
+
+                Vector3 pos = new Vector3(horizontalPos.x, currentY, horizontalPos.z);
+                dice.transform.position = pos;
+
+                // Smoothly slerp rotation towards target upright rotation across total bounces
+                dice.transform.rotation = Quaternion.Slerp(
                     startRot,
                     targetRot,
-                    eased
+                    1f - Mathf.Pow(1f - currentBounceT, 3f) // cubic ease-out
                 );
 
-            yield return null;
+                yield return null;
+            }
         }
 
-        dice.transform.rotation =
-            targetRot;
+        if (dice != null)
+        {
+            dice.transform.position = finalDestination;
+            dice.transform.rotation = targetRot;
 
-        dice.rb.isKinematic = false;
+            dice.rb.position = finalDestination;
+            dice.rb.rotation = targetRot;
+            Physics.SyncTransforms();
 
-        dice.rb.linearVelocity =
-            Vector3.down * 1.5f;
+            dice.rb.isKinematic = false;
 
-        dice.rb.angularVelocity =
-            Vector3.zero;
+            dice.rb.linearVelocity =
+                Vector3.zero;
 
-        dice.SetCollisionEnabled(true);
+            dice.rb.angularVelocity =
+                Vector3.zero;
 
-        dice.state =
-            DiceState.Idle;
+            dice.rb.Sleep();
 
-        StartCoroutine(
-            RecoverUprightRoutine(dice)
-        );
+            dice.rb.angularVelocity =
+                Vector3.zero;
+
+            dice.SetCollisionEnabled(true);
+
+            dice.state =
+                DiceState.Idle;
+
+            StartCoroutine(
+                RecoverUprightRoutine(dice)
+            );
+        }
     }
     IEnumerator RecoverUprightRoutine(
     Dice dice
@@ -1207,24 +1231,24 @@ public class DiceManager : MonoBehaviour
         if (boardCollider == null)
             return 0.5f;
 
-        return boardCollider.bounds.max.y + 1.5f;
+        return boardCollider.bounds.max.y + 1f;
     }
 
-    bool IsOccupied(
-        Vector3 position,
-        Dice ignore
-    )
+    bool IsOccupied(Vector3 position, Dice ignore)
     {
+        Vector3 halfExtents =
+            new Vector3(0.45f, 0.45f, 0.45f);
+
         Collider[] hits =
-            Physics.OverlapSphere(
+            Physics.OverlapBox(
                 position,
-                diceSpacingRadius
+                halfExtents,
+                Quaternion.identity
             );
 
         foreach (Collider hit in hits)
         {
-            Dice d =
-                hit.GetComponent<Dice>();
+            Dice d = hit.GetComponent<Dice>();
 
             if (d == null)
                 continue;
@@ -1235,15 +1259,11 @@ public class DiceManager : MonoBehaviour
             if (!d.gameObject.activeInHierarchy)
                 continue;
 
-            if (d.state == DiceState.Merging)
-                continue;
-
             return true;
         }
 
         return false;
     }
-
     Vector3 FindClearPosition(
         Vector3 center,
         Dice ignore = null
