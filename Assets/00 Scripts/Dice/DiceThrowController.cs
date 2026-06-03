@@ -70,9 +70,11 @@ public class DiceThrowController : MonoBehaviour
         if (currentDice != null)
             return;
 
+        DiceData data = DiceManager.Instance.GetDiceDataByLevel(spawnLevel);
+
         currentDice =
             DiceManager.Instance.SpawnDice(
-                spawnLevel,
+                data,
                 spawnPoint.position,
                 false
             );
@@ -81,23 +83,7 @@ public class DiceThrowController : MonoBehaviour
             Vector3.zero;
     }
 
-    // void RotateCurrentDiceToMouse()
-    // {
-    //     if (Camera.main == null)
-    //         return;
 
-    //     Vector3 aimDir =
-    //         GetLookDirection();
-
-    //     if (aimDir.sqrMagnitude < 0.0001f)
-    //         return;
-
-    //     currentDice.transform.rotation =
-    //         Quaternion.LookRotation(
-    //             aimDir,
-    //             Vector3.up
-    //         );
-    // }
     void RotateCurrentDiceToMouse()
     {
         if (Camera.main == null || currentDice == null)
@@ -237,31 +223,7 @@ public class DiceThrowController : MonoBehaviour
         return Vector3.zero;
     }
 
-    // Vector3 GetAimDirection()
-    // {
-    //     if (currentDice == null)
-    //         return Vector3.forward;
 
-    //     Vector3 target =
-    //         GetMouseWorldPosition();
-
-    //     Vector3 flatDir =
-    //         target - currentDice.transform.position;
-    //     flatDir.y = 0f;
-
-    //     if (flatDir.sqrMagnitude < 0.0001f)
-    //         flatDir = currentDice.transform.forward;
-
-    //     flatDir.Normalize();
-
-    //     Vector3 launchDir =
-    //         (
-    //             flatDir * Mathf.Cos(minLaunchAngle * Mathf.Deg2Rad) +
-    //             Vector3.up * Mathf.Sin(minLaunchAngle * Mathf.Deg2Rad)
-    //         ).normalized;
-
-    //     return launchDir;
-    // }
     Vector3 GetAimDirection()
     {
         if (currentDice == null)

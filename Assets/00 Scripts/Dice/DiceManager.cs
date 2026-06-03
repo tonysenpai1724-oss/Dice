@@ -112,6 +112,10 @@ public class DiceManager : MonoBehaviour
             }
         }
     }
+    public DiceData GetDiceDataByLevel(int level)
+    {
+        return diceDatabase.Find(x => x.level == level);
+    }
     #region SPAWN
     [Button]
 
@@ -177,17 +181,18 @@ public class DiceManager : MonoBehaviour
                     minStartLevel,
                     maxStartLevel + 1
                 );
+            DiceData data = GetRandomDiceDataByLevel(level);
 
             if (IsOccupied(pos, null))
                 continue;
 
-            SpawnDice(level, pos);
+            SpawnDice(data, pos);
             spawned++;
         }
     }
 
     public Dice SpawnDice(
-        int level,
+        DiceData data,
         Vector3 pos,
         bool registerOnBoard = true
     )
@@ -205,11 +210,12 @@ public class DiceManager : MonoBehaviour
                 rotation
             );
         Dice d = obj.GetComponent<Dice>();
+        d.Setup(data);
 
 
-        d.Setup(
-            diceDatabase[level - 1]
-        );
+        // d.Setup(
+        //     diceDatabase[level - 1]
+        // );
 
         // FORCE STABLE
         d.transform.position = pos;
@@ -230,18 +236,13 @@ public class DiceManager : MonoBehaviour
         }
 
         return d;
-        // Dice d = obj.GetComponent<Dice>();
 
-        // d.Setup(
-        //     diceDatabase[level - 1]
-        // );
-
-        // if (registerOnBoard)
-        // {
-        //     RegisterBoardDice(d);
-        // }
-
-        // return d;
+    }
+    DiceData GetDiceData(int level, DiceType type)
+    {
+        return diceDatabase.Find(x =>
+            x.level == level &&
+            x.type == type);
     }
 
     public void RegisterBoardDice(
@@ -300,6 +301,19 @@ public class DiceManager : MonoBehaviour
 
         SpawnStartBoard();
     }
+    public DiceData GetRandomDiceDataByLevel(int level)
+    {
+        List<DiceData> list = diceDatabase.FindAll(
+            x => x.level == level
+        );
+
+        if (list.Count == 0)
+            return null;
+
+        return list[
+            Random.Range(0, list.Count)
+        ];
+    }
 
     public bool IsBoardStable(
         float velocityThreshold,
@@ -357,32 +371,6 @@ public class DiceManager : MonoBehaviour
 
     #region MERGE
 
-    // public void TryMerge(
-    //     Dice a,
-    //     Dice b
-    // )
-    // {
-    //     if (a == null || b == null)
-    //         return;
-
-    //     if (a == b)
-    //         return;
-
-    //     if (a.state == DiceState.Merging)
-    //         return;
-
-    //     if (b.state == DiceState.Merging)
-    //         return;
-    //     if (!a.gameObject.activeInHierarchy)
-    //         return;
-
-    //     if (!b.gameObject.activeInHierarchy)
-    //         return;
-
-    //     StartCoroutine(
-    //         MergeRoutine(a, b)
-    //     );
-    // }
     public void TryMerge(
     Dice a,
     Dice b
@@ -427,13 +415,8 @@ public class DiceManager : MonoBehaviour
         a.FreezeForMerge();
         b.FreezeForMerge();
 
-        diceQueue.AddDice(
-    diceDatabase[a.Level - 1]
-);
-
-        diceQueue.AddDice(
-            diceDatabase[b.Level - 1]
-        );
+        diceQueue.AddDice(a.data);
+        diceQueue.AddDice(b.data);
 
         Vector3 mergePos =
             (a.transform.position +
@@ -456,18 +439,32 @@ public class DiceManager : MonoBehaviour
         ReturnBoardDice(a);
 
         ReturnBoardDice(b);
-        
 
+
+
+        DiceData nextData =
+     GetDiceData(
+        a.Level + 1,
+        DiceType.Normal
+    );
+
+        if (nextData == null)
+        {
+            Debug.LogError(
+                $"Không tìm thấy data Level {a.Level + 1} Type {a.type}"
+            );
+            yield break;
+        }
 
         Dice merged =
             SpawnDice(
-                nextLevel,
+                nextData,
                 FindClearPosition(mergePos)
             );
-               if (
-    merged.data != null &&
-    merged.data.hitEffectPrefab != null
-)
+        if (
+            merged.data != null &&
+            merged.data.hitEffectPrefab != null
+            )
         {
             Vector3 fxPos =
                 merged.transform.position;
@@ -1237,7 +1234,7 @@ public class DiceManager : MonoBehaviour
     bool IsOccupied(Vector3 position, Dice ignore)
     {
         Vector3 halfExtents =
-            new Vector3(0.45f, 0.45f, 0.45f);
+            new Vector3(1f, 0.45f, 1f);
 
         Collider[] hits =
             Physics.OverlapBox(

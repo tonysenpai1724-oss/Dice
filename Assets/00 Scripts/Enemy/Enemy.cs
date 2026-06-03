@@ -1,6 +1,11 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
+using Spine.Unity;
+using Spine;
+
+
 
 public class Enemy : MonoBehaviour
 {
@@ -11,10 +16,18 @@ public class Enemy : MonoBehaviour
     public EnemyData data;
     public int distanceToPlayer;
     public int attackRange;
-    public Image image;
+    public SkeletonGraphic skeletonGraphic;
     public TextMeshProUGUI hpText;
+    [Header("anim")]
+    public string idleAnim = "IDLE";
+    public string moveAnim = "Move";
+    public string attackAnim = "Attack";
+    public string dieAnim = "DIE";
+    public string hurtAnim = "Hurt";
+    private Spine.TrackEntry currentTrack;
 
-    public void Setup(EnemyData newData)
+
+    public virtual void Setup(EnemyData newData)
     {
         data = newData;
         type = data.type;
@@ -22,47 +35,93 @@ public class Enemy : MonoBehaviour
         distanceToPlayer = Mathf.Max(0, data.startDistance);
         attackRange = data.type == EnemyType.Melee ? Mathf.Max(1, data.attackRange) : int.MaxValue;
 
-        if (image == null)
-            image = GetComponent<Image>();
-
-        if (image != null)
+        if (skeletonGraphic != null)
         {
-            image.sprite = data.sprite;
-            image.enabled = data.sprite != null;
+            skeletonGraphic.skeletonDataAsset = data.skeletonData;
+            skeletonGraphic.Initialize(true);
+            PlayAnimation(idleAnim, true);
+
+
         }
         if (hpText != null)
         {
             hpText.text = currentHp.ToString() + "/" + hp.ToString();
         }
     }
+    public void PlayAnimation(string animName, bool loop = false)
+    {
+        if (skeletonGraphic == null)
+            return;
 
-    public void SetHp(int hp, int damage)
+        currentTrack = skeletonGraphic.AnimationState.SetAnimation(
+            0,
+            animName,
+            loop
+        );
+    }
+
+
+    public virtual void SetHp(int hp, int damage)
     {
         this.hp = hp;
         this.damage = damage;
         currentHp = hp;
     }
 
-    public bool IsAlive()
+    public virtual bool IsAlive()
     {
         return currentHp > 0;
     }
 
-    public void TakeDamage(int amount)
+    public virtual void TakeDamage(int amount)
     {
         if (!IsAlive())
             return;
 
         currentHp -= amount;
-        hpText.text = currentHp.ToString() + "/" + hp.ToString();
+
+        if (hpText != null)
+            hpText.text = currentHp + "/" + hp;
+
+
 
         if (currentHp <= 0)
         {
             Die();
+            return;
+        }
+        PlayAnimation(hurtAnim, false);
+
+        if (skeletonGraphic != null)
+        {
+            skeletonGraphic.AnimationState.AddAnimation(
+                0,
+                idleAnim,
+                true,
+                0
+            );
+        }
+
+        // StartCoroutine(PlayHurtDelayed());
+    }
+    private IEnumerator PlayHurtDelayed()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        PlayAnimation(hurtAnim, false);
+
+        if (skeletonGraphic != null)
+        {
+            skeletonGraphic.AnimationState.AddAnimation(
+                0,
+                idleAnim,
+                true,
+                0
+            );
         }
     }
 
-    public bool CanAttack()
+    public virtual bool CanAttack()
     {
         if (!IsAlive())
             return false;
@@ -73,18 +132,33 @@ public class Enemy : MonoBehaviour
         return distanceToPlayer <= attackRange;
     }
 
-    public void MoveTowardPlayer(int amount)
+    public virtual void MoveTowardPlayer(int amount)
     {
         if (!IsAlive())
             return;
 
         distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
+
+        PlayAnimation(moveAnim, false);
+
+        currentTrack.Complete += _ =>
+        {
+            if (IsAlive())
+                PlayAnimation(idleAnim, true);
+        };
     }
 
-    void Die()
+    public virtual void Die()
     {
-        Debug.Log("Enemy Died");
-        EnemyManager.Instance?.RemoveEnemy(this);
+        PlayAnimation(dieAnim, false);
+
+        currentTrack.Complete += _ =>
+        {
+            Debug.Log("Enemy Died");
+            EnemyManager.Instance?.RemoveEnemy(this);
+            Destroy(gameObject);
+        };
+        //  EnemyManager.Instance?.RemoveEnemy(this);
     }
 }
 
@@ -94,7 +168,7 @@ public class EnemyData : ScriptableObject
     public int hp;
     public int damage;
     public EnemyType type;
-    public Sprite sprite;
+    public SkeletonDataAsset skeletonData;
     public int startDistance = 3;
     public int attackRange = 1;
 

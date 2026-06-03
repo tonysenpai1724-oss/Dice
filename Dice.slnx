@@ -13,6 +13,7 @@
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Unity.RenderPipelines.HighDefinition.Editor.csproj" />
   <Project Path="Unity.Microsoft.GDK.csproj" />
+  <Project Path="spine-unity-examples.csproj" />
   <Project Path="Unity.Burst.csproj" />
   <Project Path="Unity.Services.Core.Environments.Editor.csproj" />
   <Project Path="Unity.VisualScripting.Flow.Editor.csproj" />
@@ -69,6 +70,7 @@
   <Project Path="Unity.Services.Core.Device.csproj" />
   <Project Path="Unity.Services.Core.Analytics.csproj" />
   <Project Path="Unity.Purchasing.AppleStub.csproj" />
+  <Project Path="spine-unity-examples-editor.csproj" />
   <Project Path="Unity.Purchasing.SecurityStub.csproj" />
   <Project Path="Assembly-CSharp-Editor-firstpass.csproj" />
   <Project Path="Unity.CollabProxy.Editor.csproj" />

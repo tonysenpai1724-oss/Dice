@@ -15,6 +15,6 @@ MonoBehaviour:
   hp: 300
   damage: 2
   type: 1
-  sprite: {fileID: 21300000, guid: 5c60edf7341e5f842b5458b0f2339bb9, type: 3}
-  startDistance: 3
+  skeletonData: {fileID: 11400000, guid: b40952925ee9a8940954f73d0ed16014, type: 2}
+  startDistance: 7
   attackRange: 1

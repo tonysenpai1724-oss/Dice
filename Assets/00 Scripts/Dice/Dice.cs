@@ -15,6 +15,7 @@ public enum DiceState
 public enum DiceType
 {
     Normal,
+    Dodge,
     Bomb,
     Heal,
     Shield,
@@ -287,6 +288,7 @@ public class Dice : MonoBehaviour
             color
         );
     }
+
     public void SetHovered(bool value)
     {
         SetHoverState(value);

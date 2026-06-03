@@ -20,6 +20,12 @@ public class EnemyManager : Singleton<EnemyManager>
     public float enemyActionDelay = 0.15f;
 
     public List<Enemy> enemies = new();
+    [Header("Projectile")]
+    public RectTransform projectilePrefab;
+    public Transform projectileRoot;
+    public float projectileDuration = 0.3f;
+    public Vector3 projectileOffset = new Vector3(0, 4f, 0);
+    public float projectileRotationOffset;
 
     public void SpawnEnemies(List<EnemyData> enemyDatas)
     {
@@ -42,7 +48,50 @@ public class EnemyManager : Singleton<EnemyManager>
             SetEnemyPosition(enemy, enemies.Count - 1);
         }
     }
+    void SpawnProjectile(Enemy target, int damage)
+    {
+        if (projectilePrefab == null || target == null)
+            return;
 
+        RectTransform projectile =
+            Instantiate(projectilePrefab, projectileRoot);
+
+        RectTransform playerRect =
+            player.GetComponent<RectTransform>();
+
+        RectTransform targetRect =
+            target.GetComponent<RectTransform>();
+
+        // Spawn tại vị trí player
+        projectile.position = playerRect.position + projectileOffset;
+
+        // Tính hướng bay
+        Vector3 targetPos = targetRect.position;
+        targetPos.y += projectileRotationOffset; // Điều chỉnh độ cao nếu cần
+        Vector3 dir = targetPos - projectile.position;
+
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        // Nếu sprite gốc hướng lên
+        projectile.rotation = Quaternion.Euler(0, 0, angle - 90f);
+
+        projectile.DOMove(
+            targetPos,
+            projectileDuration
+        )
+        .SetEase(Ease.Linear)
+        .OnComplete(() =>
+        {
+            target.TakeDamage(damage);
+            Destroy(projectile.gameObject);
+        });
+    }
+    IEnumerator SpawnProjectileDelayed(Enemy target, int damage)
+    {
+        yield return new WaitForSeconds(0.35f);
+
+        SpawnProjectile(target, damage);
+    }
     public void ClearEnemies()
     {
         for (int i = enemies.Count - 1; i >= 0; i--)
@@ -83,8 +132,20 @@ public class EnemyManager : Singleton<EnemyManager>
             CheckWinGame();
             return;
         }
+        player.PlayAnimation(player.attackAnim, false);
+        StartCoroutine(SpawnProjectileDelayed(target, damage));
 
-        target.TakeDamage(damage);
+        if (player.skeletonGraphic != null)
+        {
+            player.skeletonGraphic.AnimationState.AddAnimation(
+                0,
+                player.idleAnim,
+                true,
+                0
+            );
+        }
+
+
         CheckWinGame();
     }
 
@@ -136,7 +197,19 @@ public class EnemyManager : Singleton<EnemyManager>
         if (player == null || enemy == null)
             return;
 
+        enemy.PlayAnimation(enemy.attackAnim, false);
+
         player.TakeDamage(enemy.damage);
+
+        if (enemy.skeletonGraphic != null)
+        {
+            enemy.skeletonGraphic.AnimationState.AddAnimation(
+                0,
+                enemy.idleAnim,
+                true,
+                0
+            );
+        }
     }
 
     void MoveEnemyTowardPlayer(Enemy enemy)
