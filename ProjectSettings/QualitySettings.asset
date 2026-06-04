@@ -30,7 +30,7 @@ QualitySettings:
     useLegacyDetailDistribution: 1
     adaptiveVsync: 0
     vSyncCount: 0
-    realtimeGICPUUsage: 75
+    realtimeGICPUUsage: 25
     adaptiveVsyncExtraA: 0
     adaptiveVsyncExtraB: 0
     lodBias: 0.3
@@ -330,7 +330,7 @@ QualitySettings:
     excludedTargetPlatforms:
     - WebGL
   - serializedVersion: 5
-    name: Level 6
+    name: Level 8
     pixelLightCount: 4
     shadows: 2
     shadowResolution: 2

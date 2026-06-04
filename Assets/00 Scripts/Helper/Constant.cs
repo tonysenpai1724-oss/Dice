@@ -18,7 +18,6 @@ public static class Constant
     public const string SCENE_MAIN_UI = "Main UI";
     public const string SCENE_GAME_PLAY = "Gameplay";
     public const string SCENE_GAME_PLAY_2 = "SampleScene";
-
     // Physic Layer
     public const string PHYSIC_LAYER_SLIDER_BAR = "Slider Bar";
     public const string PHYSIC_LAYER_PIN = "Pin";

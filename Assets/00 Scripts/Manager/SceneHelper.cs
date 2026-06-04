@@ -68,7 +68,6 @@ public class SceneHelper : Singleton<SceneHelper>
             yield return null;
         }
         yield return StartCoroutine(LoadingPanel.Instance.IEEndTransition());
-
         Debug.Log("ChangeScene Gameplay Done");
     }
 
