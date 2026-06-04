@@ -545,7 +545,8 @@ public class DiceManager : MonoBehaviour
                     dice,
                     null,
                     randomTargetPos,
-                    randomDir
+                    randomDir,
+                    true
                 )
             );
 
@@ -605,7 +606,8 @@ public class DiceManager : MonoBehaviour
                 dice,
                 target,
                 targetPos,
-                dir
+                dir,
+                dist > dynamicMaxComboDistance
             )
         );
     }
@@ -807,7 +809,8 @@ public class DiceManager : MonoBehaviour
         Dice dice,
         Dice target,
         Vector3 targetPos,
-        Vector3 dir
+        Vector3 dir,
+        bool shouldFullBounce
     )
     {
         if (dice == null)
@@ -832,10 +835,22 @@ public class DiceManager : MonoBehaviour
         Vector3 start =
             dice.transform.position;
 
-        // Calculate final safe destination (where it should end up after bouncing)
+        // If we have a valid merge target, land on it directly.
+        // Otherwise, keep the landing position clear so the combo can finish safely.
         Vector3 finalDestination = targetPos;
         finalDestination.y = GetBoardSurfaceY();
-        finalDestination = FindClearPosition(finalDestination, dice);
+
+        bool canAimForTarget =
+            target != null &&
+            target.gameObject.activeInHierarchy &&
+            target.Level == dice.Level &&
+            !target.isMerging;
+
+        if (!canAimForTarget)
+        {
+            finalDestination =
+                FindClearPosition(finalDestination, dice);
+        }
 
         // Bounces will carry forward momentum in the jump direction (dir)
         Vector3 jumpDir = dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward;
@@ -1034,10 +1049,20 @@ public class DiceManager : MonoBehaviour
         Quaternion startRot =
             dice.transform.rotation;
 
-        // Premium realistic landing bounces (3 hops) carrying forward momentum
-        int numBounces = 3;
-        float[] bounceHeights = new float[] { 1.2f, 0.6f, 0.25f };
-        float[] bounceDurations = new float[] { 0.35f, 0.25f, 0.18f };
+        int numBounces =
+            shouldFullBounce
+                ? 3
+                : 1;
+
+        float[] bounceHeights =
+            shouldFullBounce
+                ? new float[] { 1.2f, 0.6f, 0.25f }
+                : new float[] { 0.9f };
+
+        float[] bounceDurations =
+            shouldFullBounce
+                ? new float[] { 0.35f, 0.25f, 0.18f }
+                : new float[] { 0.3f };
         float totalBounceDuration = 0f;
         foreach (float bd in bounceDurations) totalBounceDuration += bd;
 

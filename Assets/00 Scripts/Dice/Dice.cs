@@ -16,11 +16,16 @@ public enum DiceType
 {
     Normal,
     Dodge,
-    Bomb,
+    Poison,
     Heal,
     Shield,
-    Buff,
-    Gold
+    Backstab,
+    Coin,
+    BlindStrike,
+    Stun,
+    Bomb
+
+
 }
 
 public class Dice : MonoBehaviour

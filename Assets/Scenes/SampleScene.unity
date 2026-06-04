@@ -2031,6 +2031,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceManager
   dicePrefab: {fileID: 3375883884255902782, guid: 619a2ae4ad28acd47894c63a17e14615, type: 3}
   diceDatabase:
+  - {fileID: 11400000, guid: 9b60c657fe2af5a4397e33ee38ce07a3, type: 2}
+  - {fileID: 11400000, guid: 812b4f6583c304047b38637a512f8dc8, type: 2}
   - {fileID: 11400000, guid: 4233f9e583ac95943a09a8428e0a2d22, type: 2}
   - {fileID: 11400000, guid: 83b07d7e88c43694183b7861f3e092e7, type: 2}
   - {fileID: 11400000, guid: e13637da6c6dcd540872d169b5281974, type: 2}
@@ -5213,6 +5215,7 @@ MonoBehaviour:
   attackAnim: Attack
   dieAnim: DIE
   hurtAnim: Hurt
+  data: {fileID: 0}
 --- !u!222 &1738684971
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5834,6 +5837,7 @@ MonoBehaviour:
   attackAnim: Attack
   dieAnim: Die
   hurtAnim: Hurt
+  data: {fileID: 11400000, guid: 12a5bfc4dc4e00d4784cb60dfc32d9b0, type: 2}
 --- !u!114 &1969907885
 MonoBehaviour:
   m_ObjectHideFlags: 0

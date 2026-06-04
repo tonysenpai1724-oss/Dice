@@ -20,9 +20,25 @@ public class PlayerController : MonoBehaviour
     public string dieAnim = "Die";
     public string hurtAnim = "Hurt";
     private Spine.TrackEntry currentTrack;
+
+    public HeroData data;
+    public void Setup(HeroData newData)
+    {
+        data = newData;
+        hp = data.hp;
+        currentHp = data.hp;
+
+        if (skeletonGraphic != null)
+        {
+            skeletonGraphic.skeletonDataAsset = data.skeletonData;
+            skeletonGraphic.Initialize(true);
+            PlayAnimation(idleAnim, true);
+        }
+    }
     void Start()
     {
-        SetHp(1000, 1000);
+        Setup(data);
+        // SetHp(1000, 1000);
         if (hpText != null)
         {
             hpText.text = currentHp.ToString() + "/" + hp.ToString();
