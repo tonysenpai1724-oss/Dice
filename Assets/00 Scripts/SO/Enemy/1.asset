@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 1
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   hp: 300
+  enemyName: 1
   damage: 2
   type: 1
   skeletonData: {fileID: 11400000, guid: b40952925ee9a8940954f73d0ed16014, type: 2}

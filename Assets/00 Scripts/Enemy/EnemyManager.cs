@@ -29,20 +29,30 @@ public class EnemyManager : Singleton<EnemyManager>
 
     public void SpawnEnemies(List<EnemyData> enemyDatas)
     {
+        DebugCustom.LogColor("Spawn Enemies: " + enemyDatas.Count);
         ClearEnemies();
+        DebugCustom.LogColor("Enemy Prefab: " + enemyPrefab);
+        DebugCustom.LogColor("Enemy Root: " + enemyRoot);
+        DebugCustom.LogColor("Enemy Datas: " + enemyDatas);
+
 
         if (enemyDatas == null || enemyPrefab == null)
+        {
+            DebugCustom.LogColor("Enemy Datas or Prefab is null");
             return;
+        }
 
         Transform root = enemyRoot != null ? enemyRoot : transform;
 
         for (int i = 0; i < enemyDatas.Count; i++)
         {
             EnemyData data = enemyDatas[i];
+            DebugCustom.LogColor("Enemy Data: " + data);
             if (data == null)
                 continue;
 
             Enemy enemy = Instantiate(enemyPrefab, root);
+            DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
             enemy.Setup(data);
             enemies.Add(enemy);
             SetEnemyPosition(enemy, enemies.Count - 1);

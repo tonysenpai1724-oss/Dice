@@ -108,17 +108,15 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
-  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -262,7 +260,7 @@ MonoBehaviour:
       m_Calls: []
 --- !u!95 &3491738094518307357
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -276,7 +274,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -298,7 +295,6 @@ MonoBehaviour:
   txtVisual: {fileID: 2535262545681469413}
   notiObj: {fileID: 5910865648077872523}
   buttonType: 0
-  deactivateButton: 1
   bgBtn: {fileID: 1093980157523367617}
   sprOn: {fileID: 21300000, guid: 55b2825634e6b4e429e2431a9a59c4e8, type: 3}
   sprOff: {fileID: 21300000, guid: d39bcca4b2c3f7b4daaba7bea15401e4, type: 3}

@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
-using Sirenix.OdinInspector;
 public class CommonButton : MonoBehaviour
 {
     public static Action DisableAll, EnableAll;
@@ -68,18 +67,4 @@ public class CommonButton : MonoBehaviour
             button.image.sprite = DataSystem.Instance.dataSprites.dicButtonColor[color];
         }
     }
-    //   [Button()]
-    // void TestButton()
-    // {
-    //     SetupButton(EButtonColor.Green, "Play", true, () => 
-    //     {
-    //         Debug.Log("Play");
-    //         IPlayerResource.Instance.AddResource(
-    //             new List<GameResource>
-    //             {
-    //                 new CommonResource(ECommonResource.Gem, 10000)
-    //             }, EResourceFrom.DailyLogin
-    //         );
-    //     });
-    // }   
 }

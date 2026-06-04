@@ -11,9 +11,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Wall
   - 
   - 
   - 
@@ -41,36 +41,24 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  m_RenderingLayers:
-  - Default
-  - Light Layer 1
-  - Light Layer 2
-  - Light Layer 3
-  - Light Layer 4
-  - Light Layer 5
-  - Light Layer 6
-  - Light Layer 7
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - name: Background
+    uniqueID: 1945690521
+    locked: 0
+  - name: Object Low
+    uniqueID: 495365345
+    locked: 0
+  - name: Object
+    uniqueID: 3541228843
+    locked: 0
+  - name: Object High
+    uniqueID: 1980624621
+    locked: 0
+  - name: Fx
+    uniqueID: 2326591259
+    locked: 0
+  - name: UI
+    uniqueID: 2729407243
+    locked: 0
+  - name: UI Fx
+    uniqueID: 3042343555
+    locked: 0

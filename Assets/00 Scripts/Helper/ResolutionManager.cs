@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
-using Unity.Cinemachine;
+using Cinemachine;
 using DG.Tweening;
 using UnityEngine.UIElements;
+
 public class ResolutionManager : MonoBehaviour
 {
     #region Field
@@ -106,8 +107,8 @@ public class ResolutionManager : MonoBehaviour
         float height = colliderCam.points[2].y - colliderCam.points[0].y;
         float aspectRatio = (float)Screen.width / (float)Screen.height;
         maxOrthographicSize = Mathf.Min(width / (2 * aspectRatio), height / 2) * 0.95f;
-        //   confinder.MaxWindowSize = maxOrthographicSize;
-        confinder.BoundingShape2D = colliderCam;
+        confinder.m_MaxWindowSize = maxOrthographicSize;
+        confinder.m_BoundingShape2D = colliderCam;
         confinder.enabled = true;
         confinder.InvalidateCache();
     }

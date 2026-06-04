@@ -1,5 +1,4 @@
 using System;
-using Unity.Cinemachine;
 using Sirenix.OdinInspector;
 using System.Collections;
 using UnityEngine;

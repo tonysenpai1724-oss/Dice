@@ -307,8 +307,8 @@ MonoBehaviour:
   - {fileID: 1598238015155596350}
   - {fileID: 3287491763202498105}
   rbMass: 1
-  rbDrag: 0.5
-  rbAngularDrag: 0.5
+  rbDrag: 1
+  rbAngularDrag: 2
   rbMaxAngularVelocity: 100
   dicePhysicMaterial: {fileID: 13400000, guid: fd08e4205b8eb0b46857172532e12e21, type: 2}
   state: 0

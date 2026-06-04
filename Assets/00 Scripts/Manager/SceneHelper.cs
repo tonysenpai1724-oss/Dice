@@ -16,7 +16,7 @@ public class SceneHelper : Singleton<SceneHelper>
     public IEnumerator IEChangeSceneLoading()
     {
         Debug.Log("ChangeScene Loading");
-        if(UIManager.Instance != null)
+        if (UIManager.Instance != null)
             UIManager.Instance.Initialized = false;
         var async = SceneManager.LoadSceneAsync(Constant.SCENE_LOADING);
         while (!async.isDone)
@@ -61,12 +61,14 @@ public class SceneHelper : Singleton<SceneHelper>
     IEnumerator IEChangeSceneGameplay()
     {
         Debug.Log("ChangeScene Gameplay");
-        var async = SceneManager.LoadSceneAsync(Constant.SCENE_GAME_PLAY);
+        var async = SceneManager.LoadSceneAsync(Constant.SCENE_GAME_PLAY_2);
         while (!async.isDone)
         {
             //totalProgress = async.progress;
             yield return null;
         }
+        yield return StartCoroutine(LoadingPanel.Instance.IEEndTransition());
+
         Debug.Log("ChangeScene Gameplay Done");
     }
 

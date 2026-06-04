@@ -12,7 +12,7 @@ public class TestScripts : SerializedMonoBehaviour
     public CanvasGroup canvasGroup;
     public Image coinPrefabs;
     public float timePlayCoin = 1f;
-    [SerializeField] private List<Image> lstCoin;
+    List<Image> lstCoin;
     private void Start()
     {
         lstCoin = new List<Image>();

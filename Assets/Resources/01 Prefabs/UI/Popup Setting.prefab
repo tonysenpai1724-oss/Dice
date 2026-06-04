@@ -459,17 +459,15 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
-  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -569,7 +567,7 @@ MonoBehaviour:
   m_PixelsPerUnitMultiplier: 1
 --- !u!95 &4340985421463253658
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -583,7 +581,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -693,10 +690,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5984422029407729819, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
-      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
-      value: 1801810542
-      objectReference: {fileID: 0}
     - target: {fileID: 8401453871891994982, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
       propertyPath: deactivateButton
       value: 0
@@ -802,14 +795,6 @@ PrefabInstance:
     - target: {fileID: 3522266226497986932, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5984422029407729819, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
-      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
-      value: 1801810542
-      objectReference: {fileID: 0}
-    - target: {fileID: 8401453871891994982, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
-      propertyPath: gameSetting
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8401453871891994982, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
       propertyPath: deactivateButton
@@ -1037,18 +1022,6 @@ PrefabInstance:
     - target: {fileID: 3522266226497986932, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5984422029407729819, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
-      propertyPath: m_text
-      value: sound
-      objectReference: {fileID: 0}
-    - target: {fileID: 5984422029407729819, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
-      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
-      value: 1801810542
-      objectReference: {fileID: 0}
-    - target: {fileID: 8401453871891994982, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
-      propertyPath: gameSetting
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8401453871891994982, guid: 29948600cf8071e4babdb3cca95fa3ac, type: 3}
       propertyPath: deactivateButton

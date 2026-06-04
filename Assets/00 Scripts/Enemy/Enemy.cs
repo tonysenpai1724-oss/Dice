@@ -166,11 +166,14 @@ public class Enemy : MonoBehaviour
 public class EnemyData : ScriptableObject
 {
     public int hp;
+    public string enemyName;
     public int damage;
     public EnemyType type;
     public SkeletonDataAsset skeletonData;
     public int startDistance = 3;
     public int attackRange = 1;
+    public int level = 1;
+    public int expReward = 10;
 
 }
 public enum EnemyType
