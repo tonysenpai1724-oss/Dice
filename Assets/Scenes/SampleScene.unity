@@ -812,7 +812,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -212, y: 400}
+  m_AnchoredPosition: {x: 100, y: 400}
   m_SizeDelta: {x: 121.5, y: 232.19}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &281991091
@@ -1620,7 +1620,7 @@ MonoBehaviour:
   player: {fileID: 1969907883}
   enemySpacing: 120
   meleeMoveDistance: 80
-  enemyMoveDuration: 0.2
+  enemyMoveDuration: 0.4
   meleeStepPerTurn: 1
   enemyActionDelay: 0.15
   enemies: []
@@ -5746,13 +5746,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1965115105}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -4.3, y: -0.31, z: 0.06}
+  m_LocalRotation: {x: -0, y: 0.69414747, z: -0, w: 0.71983284}
+  m_LocalPosition: {x: -4.321023, y: -0.31000012, z: 0.0526371}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 246414580}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 87.919, z: 0}
 --- !u!65 &1965115107
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5772,8 +5772,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.599705, y: 5.438972, z: 1}
-  m_Center: {x: 0.47249824, y: 2.219485, z: -5.334956e-15}
+  m_Size: {x: 12.669485, y: 9.515629, z: 1.3842952}
+  m_Center: {x: 0.58228964, y: 4.2578144, z: 0.19214763}
 --- !u!1 &1969907879
 GameObject:
   m_ObjectHideFlags: 0

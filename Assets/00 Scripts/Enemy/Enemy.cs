@@ -14,8 +14,8 @@ public class Enemy : MonoBehaviour
     public int currentHp;
     public int damage;
     public EnemyData data;
-    public float distanceToPlayer;
-    public float attackRange;
+    public int distanceToPlayer;
+    public int attackRange;
     public SkeletonGraphic skeletonGraphic;
     public TextMeshProUGUI hpText;
     [Header("anim")]
@@ -32,8 +32,8 @@ public class Enemy : MonoBehaviour
         data = newData;
         type = data.type;
         SetHp(data.hp, data.damage);
-        distanceToPlayer = Mathf.Max(0f, data.startDistance);
-        attackRange = data.type == EnemyType.Melee ? Mathf.Max(1f, data.attackRange) : float.PositiveInfinity;
+        distanceToPlayer = Mathf.Max(0, data.startDistance);
+        attackRange = data.type == EnemyType.Melee ? Mathf.Max(1, data.attackRange) : int.MaxValue;
 
         transform.localScale = data.scale;
 
@@ -144,25 +144,12 @@ public class Enemy : MonoBehaviour
         return distanceToPlayer <= attackRange;
     }
 
-    public virtual void SetDistanceToPlayer(float value)
-    {
-        distanceToPlayer = Mathf.Max(0f, value);
-    }
-
-    public virtual void MoveTowardPlayer(float amount)
+    public virtual void MoveTowardPlayer(int amount)
     {
         if (!IsAlive())
             return;
 
-        distanceToPlayer = Mathf.Max(0f, distanceToPlayer - amount);
-
-        PlayAnimation(moveAnim, false);
-
-        currentTrack.Complete += _ =>
-        {
-            if (IsAlive())
-                PlayAnimation(idleAnim, true);
-        };
+        distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
     }
 
     public virtual void Die()

@@ -16,7 +16,7 @@ public class EnemyManager : Singleton<EnemyManager>
     public float enemyMoveDuration = 0.2f;
 
     [Header("Combat")]
-    public int meleeStepPerTurn = 1;
+    public int meleeStepPerTurn = 30;
     public float enemyActionDelay = 0.15f;
 
     public List<Enemy> enemies = new();
@@ -183,10 +183,6 @@ public class EnemyManager : Singleton<EnemyManager>
             Enemy enemy = enemies[i];
             if (enemy == null || !enemy.IsAlive())
                 continue;
-
-            enemy.SetDistanceToPlayer(
-                GetDistanceToPlayer(enemy)
-            );
 
             if (enemy.CanAttack())
             {
@@ -371,60 +367,33 @@ public class EnemyManager : Singleton<EnemyManager>
 
     void MoveEnemyTowardPlayer(Enemy enemy)
     {
-        float distance =
-            GetDistanceToPlayer(enemy);
-
-        float moveAmount =
-            Mathf.Max(
-                0f,
-                distance - enemy.attackRange
-            );
-
-        moveAmount =
-            Mathf.Min(
-                moveAmount,
-                meleeMoveDistance
-            );
-
-        enemy.MoveTowardPlayer(moveAmount);
+        enemy.MoveTowardPlayer(meleeStepPerTurn);
+        enemy.PlayAnimation(enemy.moveAnim, true);
 
         RectTransform rectTransform = enemy.transform as RectTransform;
         if (rectTransform != null)
         {
+            rectTransform.DOKill();
             rectTransform.DOAnchorPosX(
-                rectTransform.anchoredPosition.x - moveAmount,
+                rectTransform.anchoredPosition.x - meleeMoveDistance,
                 enemyMoveDuration
-            );
+            ).OnComplete(() =>
+            {
+                if (enemy != null && enemy.IsAlive())
+                    enemy.PlayAnimation(enemy.idleAnim, true);
+            });
             return;
         }
 
+        enemy.transform.DOKill();
         enemy.transform.DOMoveX(
-            enemy.transform.position.x - moveAmount,
+            enemy.transform.position.x - meleeMoveDistance,
             enemyMoveDuration
-        );
-    }
-
-    float GetDistanceToPlayer(Enemy enemy)
-    {
-        if (enemy == null || player == null)
-            return float.MaxValue;
-
-        Vector3 enemyPos = GetActorPosition(enemy.transform);
-        Vector3 playerPos = GetActorPosition(player.transform);
-
-        return Vector3.Distance(enemyPos, playerPos);
-    }
-
-    Vector3 GetActorPosition(Transform actor)
-    {
-        if (actor == null)
-            return Vector3.zero;
-
-        RectTransform rectTransform = actor as RectTransform;
-        if (rectTransform != null)
-            return rectTransform.position;
-
-        return actor.position;
+        ).OnComplete(() =>
+        {
+            if (enemy != null && enemy.IsAlive())
+                enemy.PlayAnimation(enemy.idleAnim, true);
+        });
     }
 
     void SetEnemyPosition(Enemy enemy, int index)

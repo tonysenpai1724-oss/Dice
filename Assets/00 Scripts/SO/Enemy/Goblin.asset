@@ -28,5 +28,5 @@ MonoBehaviour:
   type: 1
   skeletonData: {fileID: 11400000, guid: 4eb51745291ee6d4da979e520ed7bcdf, type: 2}
   startDistance: 7
-  attackRange: 1
+  attackRange: 5
   level: 1
