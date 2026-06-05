@@ -28,6 +28,8 @@ public class DiceThrowController : MonoBehaviour
 
     bool dragging;
     bool waitingForBoard;
+    [Header("Highlight")]
+    public Transform diceHighlight;
 
     void Start()
     {
@@ -78,9 +80,27 @@ public class DiceThrowController : MonoBehaviour
                 spawnPoint.position,
                 false
             );
-
+        AttachHighlight(currentDice);
         currentDice.rb.linearVelocity =
             Vector3.zero;
+    }
+    void AttachHighlight(Dice dice)
+    {
+        if (diceHighlight == null || dice == null)
+            return;
+
+        diceHighlight.SetParent(
+            dice.transform,
+            false
+        );
+
+        diceHighlight.localPosition = new Vector3(0, -0.8f, 6.8f);
+        //     highlightOffset;
+
+        diceHighlight.localRotation =
+       Quaternion.Euler(90f, 0f, 0f);
+
+        diceHighlight.gameObject.SetActive(true);
     }
 
 
@@ -119,6 +139,12 @@ public class DiceThrowController : MonoBehaviour
             currentDice
         );
         DiceManager.Instance.SetBoardMergeEnabled(true);
+        if (diceHighlight != null)
+        {
+            diceHighlight.SetParent(this.transform);
+            diceHighlight.gameObject.SetActive(false);
+        }
+
 
         currentDice.Shoot(
             launchDir,
