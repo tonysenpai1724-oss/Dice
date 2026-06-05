@@ -2,9 +2,10 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using System.Collections;
+using Sirenix.OdinInspector;
 
 [CreateAssetMenu(menuName = "RuneDice/Dice")]
-public class DiceData : ScriptableObject
+public class DiceData : SerializedScriptableObject
 {
     public string diceName;
 

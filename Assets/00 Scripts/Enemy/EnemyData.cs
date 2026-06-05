@@ -4,8 +4,9 @@ using UnityEngine.UI;
 using System.Collections;
 using Spine.Unity;
 using Spine;
+using Sirenix.OdinInspector;
 [CreateAssetMenu(menuName = "RuneDice/Enemy")]
-public class EnemyData : ScriptableObject
+public class EnemyData : SerializedScriptableObject
 {
     public int hp;
     public string enemyName;

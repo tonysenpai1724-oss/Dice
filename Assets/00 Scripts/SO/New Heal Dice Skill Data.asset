@@ -12,4 +12,3 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: New Heal Dice Skill Data
   m_EditorClassIdentifier: Assembly-CSharp::HealDiceSkillData
-  healAmount: 1

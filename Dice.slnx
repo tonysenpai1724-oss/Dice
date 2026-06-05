@@ -7,10 +7,10 @@
   <Project Path="Unity.Timeline.Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Unity.2D.Psdimporter.Editor.csproj" />
-  <Project Path="Unity.2D.IK.Runtime.csproj" />
   <Project Path="Unity.Collections.csproj" />
-  <Project Path="UnityEngine.Purchasing.Stores.csproj" />
+  <Project Path="Unity.2D.IK.Runtime.csproj" />
   <Project Path="Assembly-CSharp-firstpass.csproj" />
+  <Project Path="UnityEngine.Purchasing.Stores.csproj" />
   <Project Path="Unity.PerformanceTesting.Editor.csproj" />
   <Project Path="Unity.Burst.csproj" />
   <Project Path="Unity.Services.Core.Environments.Editor.csproj" />

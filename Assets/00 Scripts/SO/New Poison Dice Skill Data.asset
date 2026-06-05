@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: New Poison Dice Skill Data
   m_EditorClassIdentifier: Assembly-CSharp::PoisonDiceSkillData
-  bonusDamage: 1
-  poisonHitDamage: 1
+  poisonDamagePerTurn: 1

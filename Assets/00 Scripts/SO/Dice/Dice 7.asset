@@ -12,6 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 937a0f1e92c4c8744955d6383fe275ff, type: 3}
   m_Name: Dice 7
   m_EditorClassIdentifier: Assembly-CSharp::DiceData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   diceName: Dice 7
   level: 7
   damage: 7
