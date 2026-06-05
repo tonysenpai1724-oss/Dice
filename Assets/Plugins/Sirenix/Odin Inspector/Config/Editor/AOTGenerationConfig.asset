@@ -16,106 +16,12 @@ MonoBehaviour:
   deleteDllAfterBuilds: 1
   AutomateForAllAOTPlatforms: 1
   automateForPlatforms: 0900000014000000
-  lastScan: 638786704904405836
+  lastScan: 639162688491120647
   supportSerializedTypes:
-  - TypeName: System.Boolean, mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[System.Boolean, mscorlib],[UnityEngine.Sprite,
-      UnityEngine.CoreModule]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[EGameSetting, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[System.Boolean,
-      mscorlib],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[ECommonResource,
-      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[EContentActiveResource,
-      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[EExpireableResource,
-      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[ERarity,
-      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[EVirtualResource,
-      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[LeaderboardRewardConfig,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: EGameSetting, Assembly-CSharp
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EContentActiveResource,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EExpireableResource,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EGameSetting, Assembly-CSharp]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EUIResourceResolution,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EVirtualResource,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: EUIResourceResolution, Assembly-CSharp
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.GenericEqualityComparer`1[[System.Boolean,
-      mscorlib]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.IEqualityComparer`1[[System.Boolean, mscorlib]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EContentActiveResource,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EExpireableResource,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EGameSetting, Assembly-CSharp]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EUIResourceResolution,
-      Assembly-CSharp]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EVirtualResource, Assembly-CSharp]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: LeaderboardRewardConfig, Assembly-CSharp
-    IsCustom: 0
-    Emit: 1
   - TypeName: UnityEngine.AudioClip, UnityEngine.AudioModule
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Boolean, mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: UnityEngine.Color, UnityEngine.CoreModule
@@ -125,6 +31,10 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: DailyQuestConfig, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[System.Boolean, mscorlib],[UnityEngine.Sprite,
+      UnityEngine.CoreModule]], mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[EAnimationEffectType, Assembly-CSharp],[UnityEngine.ParticleSystem,
@@ -145,6 +55,10 @@ MonoBehaviour:
     Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[EExpireableResource, Assembly-CSharp],[UnityEngine.Sprite,
       UnityEngine.CoreModule]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[EGameSetting, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[System.Boolean,
+      mscorlib],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]], mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[EIAPPackType, Assembly-CSharp],[IAPConfig,
@@ -175,8 +89,37 @@ MonoBehaviour:
       Assembly-CSharp]], mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[ECommonResource,
+      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[EContentActiveResource,
+      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[EExpireableResource,
+      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[ERarity,
+      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[EUIResourceResolution, Assembly-CSharp],[System.Collections.Generic.Dictionary`2[[EVirtualResource,
+      Assembly-CSharp],[UnityEngine.Sprite, UnityEngine.CoreModule]], mscorlib]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[EVirtualResource, Assembly-CSharp],[UnityEngine.Sprite,
       UnityEngine.CoreModule]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[LeaderboardRewardConfig,
+      Assembly-CSharp]], mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[System.String,
@@ -213,6 +156,9 @@ MonoBehaviour:
   - TypeName: EExpireableResource, Assembly-CSharp
     IsCustom: 0
     Emit: 1
+  - TypeName: EGameSetting, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
   - TypeName: EIAPPackType, Assembly-CSharp
     IsCustom: 0
     Emit: 1
@@ -226,6 +172,18 @@ MonoBehaviour:
     Emit: 1
   - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[ECommonResource,
       Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EContentActiveResource,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EExpireableResource,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EGameSetting, Assembly-CSharp]],
+      mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EIAPPackType, Assembly-CSharp]],
@@ -248,6 +206,14 @@ MonoBehaviour:
       mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EUIResourceResolution,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EVirtualResource,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: ERarity, Assembly-CSharp
     IsCustom: 0
     Emit: 1
@@ -260,10 +226,17 @@ MonoBehaviour:
   - TypeName: EShopEnergy, Assembly-CSharp
     IsCustom: 0
     Emit: 1
+  - TypeName: EUIResourceResolution, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
   - TypeName: EVirtualResource, Assembly-CSharp
     IsCustom: 0
     Emit: 1
   - TypeName: System.Single, mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.GenericEqualityComparer`1[[System.Boolean,
+      mscorlib]], mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.GenericEqualityComparer`1[[System.Int32,
@@ -280,6 +253,10 @@ MonoBehaviour:
   - TypeName: IAPShopItem, Assembly-CSharp
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[System.Boolean, mscorlib]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.IEqualityComparer`1[[EAnimationEffectType,
       Assembly-CSharp]], mscorlib
     IsCustom: 0
@@ -289,6 +266,18 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.IEqualityComparer`1[[ECommonResource, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EContentActiveResource,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EExpireableResource,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EGameSetting, Assembly-CSharp]],
       mscorlib
     IsCustom: 0
     Emit: 1
@@ -312,6 +301,14 @@ MonoBehaviour:
       mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EUIResourceResolution,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[EVirtualResource, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.IEqualityComparer`1[[System.Int32, mscorlib]],
       mscorlib
     IsCustom: 0
@@ -321,6 +318,9 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: System.Int32, mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: LeaderboardRewardConfig, Assembly-CSharp
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.List`1[[DailyQuestConfig, Assembly-CSharp]],

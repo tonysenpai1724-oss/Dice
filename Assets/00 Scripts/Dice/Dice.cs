@@ -167,6 +167,14 @@ public class Dice : MonoBehaviour
 
     }
 
+    public virtual void ActivateSkill(DiceSkillContext context)
+    {
+        if (data == null)
+            return;
+
+        data.ExecuteSkill(context);
+    }
+
     public void FreezeForMerge()
     {
         canMerge = false;

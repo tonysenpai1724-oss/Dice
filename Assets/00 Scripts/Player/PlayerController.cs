@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
 {
     public int hp;
     public int currentHp;
+    public int shieldStacks;
+    public int dodgeStacks;
     public TextMeshProUGUI hpText;
     public SkeletonGraphic skeletonGraphic;
     [Header("anim")]
@@ -62,6 +64,10 @@ public class PlayerController : MonoBehaviour
         if (skeletonGraphic == null)
             return;
 
+        animName = AnimationNameUtility.ResolveAnimationName(
+            skeletonGraphic.Skeleton?.Data?.Animations,
+            animName
+        );
         currentTrack = skeletonGraphic.AnimationState.SetAnimation(
             0,
             animName,
@@ -70,12 +76,34 @@ public class PlayerController : MonoBehaviour
     }
     public void Heal(int amount)
     {
+        if (amount <= 0)
+            return;
+
         currentHp += amount;
+        if (currentHp > hp)
+            currentHp = hp;
+
+        UpdateHpText();
     }
     public void TakeDamage(int amount)
     {
+        if (amount <= 0)
+            return;
+
+        if (dodgeStacks > 0)
+        {
+            dodgeStacks--;
+            return;
+        }
+
+        if (shieldStacks > 0)
+        {
+            shieldStacks--;
+            return;
+        }
+
         currentHp -= amount;
-        hpText.text = currentHp.ToString() + "/" + hp.ToString();
+        UpdateHpText();
         StartCoroutine(PlayHurtDelayed());
         if (currentHp <= 0)
         {
@@ -94,12 +122,40 @@ public class PlayerController : MonoBehaviour
         {
             skeletonGraphic.AnimationState.AddAnimation(
                 0,
-                idleAnim,
+                AnimationNameUtility.ResolveAnimationName(
+                    skeletonGraphic.Skeleton?.Data?.Animations,
+                    idleAnim
+                ),
                 true,
                 0
             );
         }
     }
+
+    void UpdateHpText()
+    {
+        if (hpText != null)
+        {
+            hpText.text = currentHp.ToString() + "/" + hp.ToString();
+        }
+    }
+
+    public void AddShieldStacks(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        shieldStacks += amount;
+    }
+
+    public void AddDodgeStacks(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        dodgeStacks += amount;
+    }
+
     void Die()
     {
         PlayAnimation(dieAnim, false);

@@ -812,7 +812,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 234, y: 400}
+  m_AnchoredPosition: {x: 100, y: 400}
   m_SizeDelta: {x: 121.5, y: 232.19}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &281991091
@@ -1626,9 +1626,11 @@ MonoBehaviour:
   enemies: []
   projectilePrefab: {fileID: 5198677948193440392, guid: b011205b4522a324e85cb39aab95b98a, type: 3}
   projectileRoot: {fileID: 1238481525}
-  projectileDuration: 0.5
+  projectileSpeed: 200
   projectileOffset: {x: 3, y: 3.5, z: 0}
   projectileRotationOffset: 2
+  skipNextEnemyTurns: 0
+  nextPlayerDamageReduction: 0
 --- !u!1 &668818825
 GameObject:
   m_ObjectHideFlags: 0
@@ -2031,14 +2033,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceManager
   dicePrefab: {fileID: 3375883884255902782, guid: 619a2ae4ad28acd47894c63a17e14615, type: 3}
   diceDatabase:
-  - {fileID: 11400000, guid: 9b60c657fe2af5a4397e33ee38ce07a3, type: 2}
-  - {fileID: 11400000, guid: 812b4f6583c304047b38637a512f8dc8, type: 2}
   - {fileID: 11400000, guid: 4233f9e583ac95943a09a8428e0a2d22, type: 2}
+  - {fileID: 11400000, guid: bda2a59d29043a749a3b19d18adc5a00, type: 2}
+  - {fileID: 11400000, guid: 3b238dc5fd0d9774bbc16baef50553e9, type: 2}
+  - {fileID: 11400000, guid: f707140fbc58caa4fa9dcd9cd483a3c7, type: 2}
   - {fileID: 11400000, guid: 83b07d7e88c43694183b7861f3e092e7, type: 2}
   - {fileID: 11400000, guid: e13637da6c6dcd540872d169b5281974, type: 2}
-  - {fileID: 11400000, guid: bda2a59d29043a749a3b19d18adc5a00, type: 2}
   - {fileID: 11400000, guid: abc22c9eb77b50f4f8314e8553197bef, type: 2}
+  - {fileID: 11400000, guid: 812b4f6583c304047b38637a512f8dc8, type: 2}
   - {fileID: 11400000, guid: 7dedf86bf88b1fc4cb14ee735f22c238, type: 2}
+  - {fileID: 11400000, guid: 9b60c657fe2af5a4397e33ee38ce07a3, type: 2}
   boardCollider: {fileID: 246414577}
   startSpawnCount: 12
   minStartLevel: 1
@@ -5209,6 +5213,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   hp: 50
   currentHp: 50
+  shieldStacks: 0
+  dodgeStacks: 0
   hpText: {fileID: 920458434}
   skeletonGraphic: {fileID: 0}
   idleAnim: IDLE
@@ -5831,6 +5837,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   hp: 50
   currentHp: 50
+  shieldStacks: 0
+  dodgeStacks: 0
   hpText: {fileID: 993944396}
   skeletonGraphic: {fileID: 1969907885}
   idleAnim: Idle

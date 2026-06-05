@@ -10,6 +10,8 @@ public class EnemyData : ScriptableObject
     public int hp;
     public string enemyName;
     public int damage;
+    [Header("Scale")]
+    public Vector3 scale = Vector3.one;
     public EnemyType type;
     public SkeletonDataAsset skeletonData;
     public int startDistance = 3;

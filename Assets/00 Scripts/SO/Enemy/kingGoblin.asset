@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c52947749b5fc2845a84118fd20cc9e7, type: 3}
-  m_Name: 2
+  m_Name: kingGoblin
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   hp: 300
-  enemyName: 2
-  damage: 2
-  type: 1
-  skeletonData: {fileID: 11400000, guid: b40952925ee9a8940954f73d0ed16014, type: 2}
-  startDistance: 7
-  attackRange: 1
+  enemyName: King Goblin
+  damage: 0
+  scale: {x: 0.5, y: 0.5, z: 0.5}
+  type: 2
+  skeletonData: {fileID: 11400000, guid: f8322f75a9e0cb64d9c5a19aa919ca7d, type: 2}
+  startDistance: 3
+  attackRange: 10000
   level: 1

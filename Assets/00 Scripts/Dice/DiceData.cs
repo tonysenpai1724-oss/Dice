@@ -22,4 +22,34 @@ public class DiceData : ScriptableObject
     public Color targetColor;
     public GameObject hitEffectPrefab;
     public DiceType type;
+    [Header("Skill")]
+    public DiceSkillData skillData;
+
+    public void ExecuteSkill(DiceSkillContext context)
+    {
+        if (context == null)
+            return;
+
+        DiceSkillData resolvedSkill =
+            skillData != null
+                ? skillData
+                : DiceSkillFactory.Create(type);
+
+        if (resolvedSkill == null)
+            return;
+
+        resolvedSkill.Execute(context);
+    }
+
+    void OnValidate()
+    {
+        if (skillData != null &&
+            skillData.TargetType != type)
+        {
+            Debug.LogWarning(
+                $"{name}: skill {skillData.name} targets {skillData.TargetType} but dice type is {type}",
+                this
+            );
+        }
+    }
 }

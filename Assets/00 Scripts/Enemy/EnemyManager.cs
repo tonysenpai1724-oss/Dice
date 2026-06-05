@@ -23,9 +23,13 @@ public class EnemyManager : Singleton<EnemyManager>
     [Header("Projectile")]
     public RectTransform projectilePrefab;
     public Transform projectileRoot;
-    public float projectileDuration = 0.3f;
+    public float projectileSpeed = 2400f;
     public Vector3 projectileOffset = new Vector3(0, 4f, 0);
     public float projectileRotationOffset;
+    public int skipNextEnemyTurns;
+    public int nextPlayerDamageReduction;
+    readonly Dictionary<Enemy, PoisonStatus> poisonStatuses = new();
+    readonly List<Enemy> pendingPoisonRemovals = new();
 
     public void SpawnEnemies(List<EnemyData> enemyDatas)
     {
@@ -87,8 +91,9 @@ public class EnemyManager : Singleton<EnemyManager>
 
         projectile.DOMove(
             targetPos,
-            projectileDuration
+            Mathf.Max(1f, projectileSpeed)
         )
+        .SetSpeedBased(true)
         .SetEase(Ease.Linear)
         .OnComplete(() =>
         {
@@ -149,7 +154,10 @@ public class EnemyManager : Singleton<EnemyManager>
         {
             player.skeletonGraphic.AnimationState.AddAnimation(
                 0,
-                player.idleAnim,
+                AnimationNameUtility.ResolveAnimationName(
+                    player.skeletonGraphic.Skeleton?.Data?.Animations,
+                    player.idleAnim
+                ),
                 true,
                 0
             );
@@ -162,12 +170,23 @@ public class EnemyManager : Singleton<EnemyManager>
     public IEnumerator EnemyTurn()
     {
         CleanupEnemies();
+        ApplyPoisonTicks();
+
+        if (skipNextEnemyTurns > 0)
+        {
+            skipNextEnemyTurns--;
+            yield break;
+        }
 
         for (int i = 0; i < enemies.Count; i++)
         {
             Enemy enemy = enemies[i];
             if (enemy == null || !enemy.IsAlive())
                 continue;
+
+            enemy.SetDistanceToPlayer(
+                GetDistanceToPlayer(enemy)
+            );
 
             if (enemy.CanAttack())
             {
@@ -189,6 +208,8 @@ public class EnemyManager : Singleton<EnemyManager>
             return;
 
         enemies.Remove(enemy);
+        if (!pendingPoisonRemovals.Contains(enemy))
+            pendingPoisonRemovals.Add(enemy);
         Destroy(enemy.gameObject);
         // RebuildLayout();
         CheckWinGame();
@@ -209,37 +230,201 @@ public class EnemyManager : Singleton<EnemyManager>
 
         enemy.PlayAnimation(enemy.attackAnim, false);
 
-        player.TakeDamage(enemy.damage);
+        int damage =
+            Mathf.Max(0, enemy.damage - nextPlayerDamageReduction);
+        nextPlayerDamageReduction = 0;
+
+        player.TakeDamage(damage);
 
         if (enemy.skeletonGraphic != null)
         {
             enemy.skeletonGraphic.AnimationState.AddAnimation(
                 0,
-                enemy.idleAnim,
+                AnimationNameUtility.ResolveAnimationName(
+                    enemy.skeletonGraphic.Skeleton?.Data?.Animations,
+                    enemy.idleAnim
+                ),
                 true,
                 0
             );
         }
     }
 
+    public void SkipNextEnemyTurns(int amount = 1)
+    {
+        if (amount <= 0)
+            return;
+
+        skipNextEnemyTurns += amount;
+    }
+
+    public void ReduceNextPlayerDamage(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        nextPlayerDamageReduction += amount;
+    }
+
+    public void DamageAllEnemies(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        CleanupEnemies();
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            enemy.TakeDamage(amount);
+        }
+    }
+
+    public void ApplyPoison(
+        Enemy target,
+        int turns,
+        int damagePerTurn
+    )
+    {
+        if (target == null ||
+            !target.gameObject.activeInHierarchy ||
+            turns <= 0 ||
+            damagePerTurn <= 0)
+        {
+            return;
+        }
+
+        if (!poisonStatuses.TryGetValue(target, out PoisonStatus status) ||
+            status == null)
+        {
+            status = new PoisonStatus();
+            poisonStatuses[target] = status;
+        }
+
+        status.turnsRemaining += turns;
+        status.damagePerTurn = Mathf.Max(status.damagePerTurn, damagePerTurn);
+    }
+
+    void ApplyPoisonTicks()
+    {
+        CleanupPendingPoisonRemovals();
+
+        if (poisonStatuses.Count == 0)
+            return;
+
+        List<Enemy> expired = null;
+
+        foreach (var pair in poisonStatuses)
+        {
+            Enemy enemy = pair.Key;
+            PoisonStatus status = pair.Value;
+
+            if (enemy == null ||
+                status == null ||
+                !enemy.gameObject.activeInHierarchy)
+            {
+                expired ??= new List<Enemy>();
+                expired.Add(enemy);
+                continue;
+            }
+
+            if (status.turnsRemaining <= 0)
+            {
+                expired ??= new List<Enemy>();
+                expired.Add(enemy);
+                continue;
+            }
+
+            enemy.TakeDamage(status.damagePerTurn);
+            status.turnsRemaining--;
+
+            if (status.turnsRemaining <= 0)
+            {
+                expired ??= new List<Enemy>();
+                expired.Add(enemy);
+            }
+        }
+
+        if (expired == null)
+        {
+            CleanupPendingPoisonRemovals();
+            return;
+        }
+
+        for (int i = 0; i < expired.Count; i++)
+        {
+            if (expired[i] != null)
+                poisonStatuses.Remove(expired[i]);
+        }
+
+        CleanupPendingPoisonRemovals();
+    }
+
+    void OnDisable()
+    {
+        poisonStatuses.Clear();
+        pendingPoisonRemovals.Clear();
+    }
+
     void MoveEnemyTowardPlayer(Enemy enemy)
     {
-        enemy.MoveTowardPlayer(meleeStepPerTurn);
+        float distance =
+            GetDistanceToPlayer(enemy);
+
+        float moveAmount =
+            Mathf.Max(
+                0f,
+                distance - enemy.attackRange
+            );
+
+        moveAmount =
+            Mathf.Min(
+                moveAmount,
+                meleeMoveDistance
+            );
+
+        enemy.MoveTowardPlayer(moveAmount);
 
         RectTransform rectTransform = enemy.transform as RectTransform;
         if (rectTransform != null)
         {
             rectTransform.DOAnchorPosX(
-                rectTransform.anchoredPosition.x - meleeMoveDistance,
+                rectTransform.anchoredPosition.x - moveAmount,
                 enemyMoveDuration
             );
             return;
         }
 
         enemy.transform.DOMoveX(
-            enemy.transform.position.x - meleeMoveDistance,
+            enemy.transform.position.x - moveAmount,
             enemyMoveDuration
         );
+    }
+
+    float GetDistanceToPlayer(Enemy enemy)
+    {
+        if (enemy == null || player == null)
+            return float.MaxValue;
+
+        Vector3 enemyPos = GetActorPosition(enemy.transform);
+        Vector3 playerPos = GetActorPosition(player.transform);
+
+        return Vector3.Distance(enemyPos, playerPos);
+    }
+
+    Vector3 GetActorPosition(Transform actor)
+    {
+        if (actor == null)
+            return Vector3.zero;
+
+        RectTransform rectTransform = actor as RectTransform;
+        if (rectTransform != null)
+            return rectTransform.position;
+
+        return actor.position;
     }
 
     void SetEnemyPosition(Enemy enemy, int index)
@@ -269,7 +454,31 @@ public class EnemyManager : Singleton<EnemyManager>
         for (int i = enemies.Count - 1; i >= 0; i--)
         {
             if (enemies[i] == null)
+            {
+                poisonStatuses.Remove(enemies[i]);
                 enemies.RemoveAt(i);
+            }
         }
+    }
+
+    void CleanupPendingPoisonRemovals()
+    {
+        if (pendingPoisonRemovals.Count == 0)
+            return;
+
+        for (int i = 0; i < pendingPoisonRemovals.Count; i++)
+        {
+            Enemy enemy = pendingPoisonRemovals[i];
+            if (enemy != null)
+                poisonStatuses.Remove(enemy);
+        }
+
+        pendingPoisonRemovals.Clear();
+    }
+
+    class PoisonStatus
+    {
+        public int turnsRemaining;
+        public int damagePerTurn;
     }
 }

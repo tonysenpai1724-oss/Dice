@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c52947749b5fc2845a84118fd20cc9e7, type: 3}
-  m_Name: 3
+  m_Name: Goblin
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   hp: 300
-  enemyName: 3
-  damage: 3
-  type: 2
-  skeletonData: {fileID: 11400000, guid: 01cc62cc71d0add4897f50054f5ce20d, type: 2}
-  startDistance: 3
-  attackRange: 100000000
+  enemyName: Golblin
+  damage: 2
+  scale: {x: 0.5, y: 0.5, z: 0.5}
+  type: 1
+  skeletonData: {fileID: 11400000, guid: 4eb51745291ee6d4da979e520ed7bcdf, type: 2}
+  startDistance: 7
+  attackRange: 1
   level: 1

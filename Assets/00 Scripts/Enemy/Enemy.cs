@@ -14,8 +14,8 @@ public class Enemy : MonoBehaviour
     public int currentHp;
     public int damage;
     public EnemyData data;
-    public int distanceToPlayer;
-    public int attackRange;
+    public float distanceToPlayer;
+    public float attackRange;
     public SkeletonGraphic skeletonGraphic;
     public TextMeshProUGUI hpText;
     [Header("anim")]
@@ -32,8 +32,10 @@ public class Enemy : MonoBehaviour
         data = newData;
         type = data.type;
         SetHp(data.hp, data.damage);
-        distanceToPlayer = Mathf.Max(0, data.startDistance);
-        attackRange = data.type == EnemyType.Melee ? Mathf.Max(1, data.attackRange) : int.MaxValue;
+        distanceToPlayer = Mathf.Max(0f, data.startDistance);
+        attackRange = data.type == EnemyType.Melee ? Mathf.Max(1f, data.attackRange) : float.PositiveInfinity;
+
+        transform.localScale = data.scale;
 
         if (skeletonGraphic != null)
         {
@@ -53,6 +55,10 @@ public class Enemy : MonoBehaviour
         if (skeletonGraphic == null)
             return;
 
+        animName = AnimationNameUtility.ResolveAnimationName(
+            skeletonGraphic.Skeleton?.Data?.Animations,
+            animName
+        );
         currentTrack = skeletonGraphic.AnimationState.SetAnimation(
             0,
             animName,
@@ -96,7 +102,10 @@ public class Enemy : MonoBehaviour
         {
             skeletonGraphic.AnimationState.AddAnimation(
                 0,
-                idleAnim,
+                AnimationNameUtility.ResolveAnimationName(
+                    skeletonGraphic.Skeleton?.Data?.Animations,
+                    idleAnim
+                ),
                 true,
                 0
             );
@@ -114,7 +123,10 @@ public class Enemy : MonoBehaviour
         {
             skeletonGraphic.AnimationState.AddAnimation(
                 0,
-                idleAnim,
+                AnimationNameUtility.ResolveAnimationName(
+                    skeletonGraphic.Skeleton?.Data?.Animations,
+                    idleAnim
+                ),
                 true,
                 0
             );
@@ -132,12 +144,17 @@ public class Enemy : MonoBehaviour
         return distanceToPlayer <= attackRange;
     }
 
-    public virtual void MoveTowardPlayer(int amount)
+    public virtual void SetDistanceToPlayer(float value)
+    {
+        distanceToPlayer = Mathf.Max(0f, value);
+    }
+
+    public virtual void MoveTowardPlayer(float amount)
     {
         if (!IsAlive())
             return;
 
-        distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
+        distanceToPlayer = Mathf.Max(0f, distanceToPlayer - amount);
 
         PlayAnimation(moveAnim, false);
 

@@ -92,6 +92,29 @@ public class DiceQueue : MonoBehaviour
             if (first != null)
             {
                 DiceData diceData = first.data;
+                EnemyManager enemyManager = EnemyManager.Instance;
+                PlayerController player =
+                    enemyManager != null
+                        ? enemyManager.player
+                        : null;
+                Enemy targetEnemy =
+                    enemyManager != null
+                        ? enemyManager.GetNearestAliveEnemy()
+                        : null;
+                DiceSkillContext context =
+                    new DiceSkillContext(
+                        diceData,
+                        this,
+                        null,
+                        enemyManager,
+                        player,
+                        targetEnemy
+                    );
+
+                if (diceData == null)
+                    context.skipAttack = true;
+
+                diceData?.ExecuteSkill(context);
 
                 yield return MoveItem(
                     first.transform,
@@ -99,8 +122,13 @@ public class DiceQueue : MonoBehaviour
                     itemMoveDuration
                 );
 
-                if (EnemyManager.Instance != null)
-                    EnemyManager.Instance.PlayerAttack(diceData);
+                if (enemyManager != null &&
+                    !context.skipAttack)
+                {
+                    enemyManager.PlayerAttack(context.damage);
+                }
+
+                context.RunAfterAttackActions();
 
                 yield return new WaitForSeconds(delayDestoyTime);
                 Destroy(
