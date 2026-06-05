@@ -2530,7 +2530,7 @@ MonoBehaviour:
   contentRoot: {fileID: 151708143}
   spacing: 53
   startPosition: {x: -18.7, y: 11, z: -11.5}
-  stackOffset: {x: -0.07, y: 0.4, z: -1.6}
+  stackOffset: {x: -0.07, y: 0.8, z: -2}
   consumeOffset: {x: 0.1, y: 7.5, z: 0}
   itemMoveDuration: 0.1
   shiftMoveDuration: 0.2
@@ -4250,7 +4250,7 @@ Transform:
   m_GameObject: {fileID: 1471202523}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.54, y: 0, z: -4.6}
+  m_LocalPosition: {x: -0.54, y: 0, z: -4.31}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4275,7 +4275,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.599705, y: 6.5014095, z: 1}
+  m_Size: {x: 12.77, y: 14.02, z: 1}
   m_Center: {x: 0.47249794, y: 2.7507048, z: 0}
 --- !u!1 &1491780633
 GameObject:
