@@ -16,7 +16,7 @@ MonoBehaviour:
   deleteDllAfterBuilds: 1
   AutomateForAllAOTPlatforms: 1
   automateForPlatforms: 0900000014000000
-  lastScan: 639162702714953332
+  lastScan: 639165102423892517
   supportSerializedTypes:
   - TypeName: UnityEngine.AudioClip, UnityEngine.AudioModule
     IsCustom: 0
@@ -33,7 +33,14 @@ MonoBehaviour:
   - TypeName: DailyQuestConfig, Assembly-CSharp
     IsCustom: 0
     Emit: 1
+  - TypeName: DiceType, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[System.Boolean, mscorlib],[UnityEngine.Sprite,
+      UnityEngine.CoreModule]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[DiceType, Assembly-CSharp],[UnityEngine.Sprite,
       UnityEngine.CoreModule]], mscorlib
     IsCustom: 0
     Emit: 1
@@ -162,6 +169,10 @@ MonoBehaviour:
   - TypeName: EIAPPackType, Assembly-CSharp
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[DiceType, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EAnimationEffectType,
       Assembly-CSharp]], mscorlib
     IsCustom: 0
@@ -254,6 +265,10 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.IEqualityComparer`1[[System.Boolean, mscorlib]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[DiceType, Assembly-CSharp]],
       mscorlib
     IsCustom: 0
     Emit: 1

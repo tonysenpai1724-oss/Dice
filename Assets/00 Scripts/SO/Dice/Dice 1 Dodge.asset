@@ -33,4 +33,4 @@ MonoBehaviour:
   targetColor: {r: 1, g: 1, b: 1, a: 1}
   hitEffectPrefab: {fileID: 4859746839628731135, guid: fa5cadda581724947b2860ab128b921f, type: 3}
   type: 1
-  skillData: {fileID: 11400000, guid: 21759f5f2e6a46846be489e57bdef119, type: 2}
+  skillData: {fileID: 11400000, guid: 555210ebc75bc3d4888155275d185b70, type: 2}
