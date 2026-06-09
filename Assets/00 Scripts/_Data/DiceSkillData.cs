@@ -68,9 +68,11 @@ public static class DodgeDiceSkillData
 {
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        if (context?.player == null) return;
+        DodgeEffect dodgeEffect = context?.player.effectManager?.AddEffect<DodgeEffect>(context.player);
+        if (dodgeEffect == null)
+            return;
 
-        context.player.AddDodgeStacks(stackApply);
+        dodgeEffect.AddStacks(stackApply);
     }
 }
 
@@ -78,35 +80,18 @@ public static class PoisonDiceSkillData
 {
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        if (context == null || context.enemyManager == null)
+        if (context == null)
             return;
 
-        Enemy target =
-            context.targetEnemy != null &&
-            context.targetEnemy.gameObject.activeInHierarchy
-                ? context.targetEnemy
-                : context.enemyManager.GetNearestAliveEnemy();
-
+        Enemy target = context.GetTargetEnemy();
         if (target == null)
             return;
 
-        int poisonTurns =
-            Mathf.Max(
-                1,
-                context.diceData != null
-                    ? context.diceData.damage
-                    : 1
-            );
-
+        int poisonTurns = Mathf.Max(1, context.DiceDamage);
         int poisonDamage = poisonTurns;
 
-        context.SetDamage(0);
-        context.skipAttack = true;
-        context.enemyManager.ApplyPoison(
-            target,
-            poisonTurns,
-            poisonDamage
-        );
+        context.CancelAttack();
+        target.effectManager?.AddEffect<PoisonEffect>(target)?.Apply(poisonTurns, poisonDamage);
     }
 }
 
@@ -118,17 +103,10 @@ public static class HealDiceSkillData
         if (context?.player == null)
             return;
 
-        int healAmount =
-            Mathf.Max(
-                0,
-                context.diceData != null
-                    ? context.diceData.damage
-                    : 0
-            );
+        int healAmount = Mathf.Max(0, context.DiceDamage);
 
-        context.SetDamage(0);
-        context.skipAttack = true;
-        context.player.Heal(healAmount);
+        context.CancelAttack();
+        context.player.effectManager?.AddEffect<HealEffect>(context.player)?.Apply(healAmount);
     }
 }
 
@@ -137,10 +115,11 @@ public static class ShieldDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        if (context?.player == null)
+        ShieldEffect shieldEffect = context?.player.effectManager?.AddEffect<ShieldEffect>(context.player);
+        if (shieldEffect == null)
             return;
 
-        context.player.AddShieldStacks(stackApply);
+        shieldEffect.AddStacks(stackApply);
     }
 }
 
@@ -149,8 +128,7 @@ public static class BackstabDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        valueApply = context.diceData.damage;
-        context?.AddDamage(valueApply);
+        context?.AddDamage(context.DiceDamage);
     }
 }
 
@@ -162,27 +140,10 @@ public static class CoinDiceSkillData
         if (context == null)
             return;
 
-        int coinReward =
-            Mathf.Max(
-                0,
-                context.diceData != null
-                    ? context.diceData.damage
-                    : 0
-            );
+        int coinReward = Mathf.Max(0, context.DiceDamage);
 
-        context.SetDamage(0);
-        context.skipAttack = true;
-
-        if (coinReward <= 0 || IPlayerResource.Instance == null)
-            return;
-
-        IPlayerResource.Instance.AddResource(
-            new List<GameResource>
-            {
-                new CommonResource(ECommonResource.Coin, coinReward)
-            },
-            EResourceFrom.TimeReward
-        );
+        context.CancelAttack();
+        CoinRewardEffect.Apply(coinReward);
     }
 }
 
@@ -191,8 +152,9 @@ public static class BlindStrikeDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        valueApply = context.diceData.damage;
-        context?.enemyManager?.ReduceNextPlayerDamage(valueApply);
+        DamageReductionEffect damageReductionEffect = context?.player.effectManager?.AddEffect<DamageReductionEffect>(context.player);
+        if (damageReductionEffect != null)
+            damageReductionEffect.AddReduction(context.DiceDamage);
     }
 }
 
@@ -201,7 +163,9 @@ public static class StunDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        context?.enemyManager?.SkipNextEnemyTurns(stackApply);
+        EnemyTurnSkipEffect turnSkipEffect = context?.enemyManager.effectManager?.AddEffect<EnemyTurnSkipEffect>(context.enemyManager);
+        if (turnSkipEffect != null)
+            turnSkipEffect.AddTurns(stackApply);
     }
 }
 
@@ -215,10 +179,11 @@ public static class BombDiceSkillData
 
         context.AddAfterAttack(() =>
         {
-            if (context.enemyManager != null)
-            {
-                context.enemyManager.DamageAllEnemies(valueApply);
-            }
+            DamageAllEnemiesEffect damageAllEnemiesEffect =
+                context.enemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>(context.enemyManager);
+
+            if (damageAllEnemiesEffect != null)
+                damageAllEnemiesEffect.Apply(valueApply);
         });
     }
 }
@@ -246,6 +211,8 @@ public sealed class DiceSkillContext
     public int damage;
     public bool skipAttack;
 
+    public int DiceDamage => diceData != null ? Mathf.Max(0, diceData.damage) : 0;
+
     public DiceSkillContext(
         DiceData diceData,
         DiceQueue queue,
@@ -272,6 +239,24 @@ public sealed class DiceSkillContext
     public void SetDamage(int amount)
     {
         damage = Mathf.Max(0, amount);
+    }
+
+    public void CancelAttack()
+    {
+        SetDamage(0);
+        skipAttack = true;
+    }
+
+    public Enemy GetTargetEnemy()
+    {
+        if (targetEnemy != null &&
+            targetEnemy.gameObject.activeInHierarchy &&
+            targetEnemy.IsAlive())
+        {
+            return targetEnemy;
+        }
+
+        return enemyManager != null ? enemyManager.GetNearestAliveEnemy() : null;
     }
 
     public void AddAfterAttack(System.Action action)

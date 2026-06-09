@@ -5,6 +5,8 @@ using DG.Tweening;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
+    public EffectManager effectManager;
+
     [Header("Refs")]
     public Enemy enemyPrefab;
     public Transform enemyRoot;
@@ -30,10 +32,12 @@ public class EnemyManager : Singleton<EnemyManager>
     public float projectileSpeed = 2400f;
     public Vector3 projectileOffset = new Vector3(0, 4f, 0);
     public float projectileRotationOffset;
-    public int skipNextEnemyTurns;
-    public int nextPlayerDamageReduction;
-    readonly Dictionary<Enemy, PoisonStatus> poisonStatuses = new();
-    readonly List<Enemy> pendingPoisonRemovals = new();
+
+    public override void Awake()
+    {
+        base.Awake();
+        effectManager = EffectManager.Instance;
+    }
 
     public void SpawnEnemies(Level level)
     {
@@ -73,6 +77,7 @@ public class EnemyManager : Singleton<EnemyManager>
                     continue;
 
                 Enemy enemy = Instantiate(enemyPrefab, root, false);
+                RegisterEnemy(enemy);
                 DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
                 enemy.Setup(placement.data);
                 enemies.Add(enemy);
@@ -96,6 +101,7 @@ public class EnemyManager : Singleton<EnemyManager>
                 continue;
 
             Enemy enemy = Instantiate(enemyPrefab, root, false);
+            RegisterEnemy(enemy);
             DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
             enemy.Setup(data);
             enemies.Add(enemy);
@@ -234,9 +240,9 @@ public class EnemyManager : Singleton<EnemyManager>
         CleanupEnemies();
         ApplyPoisonTicks();
 
-        if (skipNextEnemyTurns > 0)
+        EnemyTurnSkipEffect turnSkipEffect = effectManager?.GetEffect<EnemyTurnSkipEffect>(this);
+        if (turnSkipEffect != null && turnSkipEffect.ConsumeTurnSkip())
         {
-            skipNextEnemyTurns--;
             yield break;
         }
 
@@ -273,12 +279,20 @@ public class EnemyManager : Singleton<EnemyManager>
         if (enemy == null)
             return;
 
+        enemy.DeathCompleted -= RemoveEnemy;
         enemies.Remove(enemy);
-        if (!pendingPoisonRemovals.Contains(enemy))
-            pendingPoisonRemovals.Add(enemy);
         Destroy(enemy.gameObject);
         // RebuildLayout();
         CheckWinGame();
+    }
+
+    void RegisterEnemy(Enemy enemy)
+    {
+        if (enemy == null)
+            return;
+
+        enemy.DeathCompleted -= RemoveEnemy;
+        enemy.DeathCompleted += RemoveEnemy;
     }
 
     void CheckWinGame()
@@ -296,11 +310,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
         enemy.PlayAnimation(enemy.attackAnim, false);
 
-        int damage =
-            Mathf.Max(0, enemy.damage - nextPlayerDamageReduction);
-        nextPlayerDamageReduction = 0;
-
-        player.TakeDamage(damage);
+        player.TakeDamage(enemy.damage);
 
         if (enemy.skeletonGraphic != null)
         {
@@ -321,7 +331,9 @@ public class EnemyManager : Singleton<EnemyManager>
         if (amount <= 0)
             return;
 
-        skipNextEnemyTurns += amount;
+        EnemyTurnSkipEffect turnSkipEffect = effectManager?.AddEffect<EnemyTurnSkipEffect>(this);
+        if (turnSkipEffect != null)
+            turnSkipEffect.AddTurns(amount);
     }
 
     public void ReduceNextPlayerDamage(int amount)
@@ -329,7 +341,9 @@ public class EnemyManager : Singleton<EnemyManager>
         if (amount <= 0)
             return;
 
-        nextPlayerDamageReduction += amount;
+        DamageReductionEffect damageReductionEffect = player.effectManager?.AddEffect<DamageReductionEffect>(player);
+        if (damageReductionEffect != null)
+            damageReductionEffect.AddReduction(amount);
     }
 
     public void DamageAllEnemies(int amount)
@@ -337,16 +351,9 @@ public class EnemyManager : Singleton<EnemyManager>
         if (amount <= 0)
             return;
 
-        CleanupEnemies();
-
-        for (int i = 0; i < enemies.Count; i++)
-        {
-            Enemy enemy = enemies[i];
-            if (enemy == null || !enemy.IsAlive())
-                continue;
-
-            enemy.TakeDamage(amount);
-        }
+        DamageAllEnemiesEffect damageAllEnemiesEffect = effectManager?.AddEffect<DamageAllEnemiesEffect>(this);
+        if (damageAllEnemiesEffect != null)
+            damageAllEnemiesEffect.Apply(amount);
     }
 
     public void ApplyPoison(
@@ -363,76 +370,21 @@ public class EnemyManager : Singleton<EnemyManager>
             return;
         }
 
-        if (!poisonStatuses.TryGetValue(target, out PoisonStatus status) ||
-            status == null)
-        {
-            status = new PoisonStatus();
-            poisonStatuses[target] = status;
-        }
-
-        status.turnsRemaining += turns;
-        status.damagePerTurn = status.turnsRemaining;
+        PoisonEffect poisonEffect = target.effectManager?.AddEffect<PoisonEffect>(target);
+        if (poisonEffect != null)
+            poisonEffect.Apply(turns, damagePerTurn);
     }
 
     void ApplyPoisonTicks()
     {
-        CleanupPendingPoisonRemovals();
+        CleanupEnemies();
 
-        if (poisonStatuses.Count == 0)
-            return;
-
-        List<Enemy> expired = null;
-
-        foreach (var pair in poisonStatuses)
+        for (int i = 0; i < enemies.Count; i++)
         {
-            Enemy enemy = pair.Key;
-            PoisonStatus status = pair.Value;
-
-            if (enemy == null ||
-                status == null ||
-                !enemy.gameObject.activeInHierarchy)
-            {
-                expired ??= new List<Enemy>();
-                expired.Add(enemy);
-                continue;
-            }
-
-            if (status.turnsRemaining <= 0)
-            {
-                expired ??= new List<Enemy>();
-                expired.Add(enemy);
-                continue;
-            }
-
-            enemy.TakeDamage(status.damagePerTurn);
-            status.turnsRemaining--;
-
-            if (status.turnsRemaining <= 0)
-            {
-                expired ??= new List<Enemy>();
-                expired.Add(enemy);
-            }
+            Enemy enemy = enemies[i];
+            if (enemy != null && enemy.IsAlive())
+                enemy.BeginTurn();
         }
-
-        if (expired == null)
-        {
-            CleanupPendingPoisonRemovals();
-            return;
-        }
-
-        for (int i = 0; i < expired.Count; i++)
-        {
-            if (expired[i] != null)
-                poisonStatuses.Remove(expired[i]);
-        }
-
-        CleanupPendingPoisonRemovals();
-    }
-
-    void OnDisable()
-    {
-        poisonStatuses.Clear();
-        pendingPoisonRemovals.Clear();
     }
 
     Enemy GetFrontEnemy()
@@ -783,30 +735,9 @@ public class EnemyManager : Singleton<EnemyManager>
         {
             if (enemies[i] == null)
             {
-                poisonStatuses.Remove(enemies[i]);
                 enemies.RemoveAt(i);
             }
         }
     }
 
-    void CleanupPendingPoisonRemovals()
-    {
-        if (pendingPoisonRemovals.Count == 0)
-            return;
-
-        for (int i = 0; i < pendingPoisonRemovals.Count; i++)
-        {
-            Enemy enemy = pendingPoisonRemovals[i];
-            if (enemy != null)
-                poisonStatuses.Remove(enemy);
-        }
-
-        pendingPoisonRemovals.Clear();
-    }
-
-    class PoisonStatus
-    {
-        public int turnsRemaining;
-        public int damagePerTurn;
-    }
 }
