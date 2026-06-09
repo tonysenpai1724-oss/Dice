@@ -21,7 +21,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 300
+  hp: 15
   enemyName: Smile
   damage: 1
   scale: {x: 0.5, y: 0.5, z: 1}

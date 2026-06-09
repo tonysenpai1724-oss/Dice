@@ -21,11 +21,11 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 300
+  hp: 20
   enemyName: King Goblin
   damage: 0
   scale: {x: 0.5, y: 0.5, z: 1}
-  type: 2
+  type: 0
   skeletonData: {fileID: 11400000, guid: f8322f75a9e0cb64d9c5a19aa919ca7d, type: 2}
   startDistance: 3
   attackRange: 10000

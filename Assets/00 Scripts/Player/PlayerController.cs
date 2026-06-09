@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     public int currentHp;
     public int shieldStacks;
     public int dodgeStacks;
-    public TextMeshProUGUI hpText;
+    public HPBar hpBar;
     public SkeletonGraphic skeletonGraphic;
     [Header("anim")]
     public string idleAnim = "Idle";
@@ -41,15 +41,14 @@ public class PlayerController : MonoBehaviour
     {
         Setup(data);
         // SetHp(1000, 1000);
-        if (hpText != null)
-        {
-            hpText.text = currentHp.ToString() + "/" + hp.ToString();
-        }
+        UpdateHpText();
     }
     public void SetHp(int hp, int currentHp)
     {
         this.hp = hp;
         this.currentHp = currentHp;
+        UpdateHpText();
+
         if (skeletonGraphic != null)
         {
             //   skeletonGraphic.skeletonDataAsset = data.skeletonData;
@@ -134,10 +133,11 @@ public class PlayerController : MonoBehaviour
 
     void UpdateHpText()
     {
-        if (hpText != null)
+        if (hpBar != null)
         {
-            hpText.text = currentHp.ToString() + "/" + hp.ToString();
+            hpBar.SetHp(currentHp, hp);
         }
+
     }
 
     public void AddShieldStacks(int amount)

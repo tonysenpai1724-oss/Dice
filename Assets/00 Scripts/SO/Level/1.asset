@@ -28,19 +28,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
   - {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
   enemySpawnPlacements:
+  - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
+    position: {x: -305.025, y: -52.176598, z: 0}
+    useUIPosition: 1
+    isBackRow: 0
+  - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    position: {x: -101.674995, y: -52.176598, z: 0}
+    useUIPosition: 1
+    isBackRow: 0
   - data: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
-    position: {x: 86.49053, y: -43.090397, z: 0}
+    position: {x: 101.67501, y: -52.176598, z: 0}
     useUIPosition: 1
     isBackRow: 0
   - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
-    position: {x: 244.89099, y: -24.376755, z: 0}
+    position: {x: 305.025, y: -52.176598, z: 0}
     useUIPosition: 1
     isBackRow: 0
-  - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-    position: {x: -130.45468, y: 38.80349, z: 0}
-    useUIPosition: 1
-    isBackRow: 1
-  - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
-    position: {x: -244.51328, y: 30.773426, z: 0}
-    useUIPosition: 1
-    isBackRow: 1

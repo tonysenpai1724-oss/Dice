@@ -98,12 +98,14 @@ public static class PoisonDiceSkillData
                     : 1
             );
 
+        int poisonDamage = poisonTurns;
+
         context.SetDamage(0);
         context.skipAttack = true;
         context.enemyManager.ApplyPoison(
             target,
             poisonTurns,
-            valueApply
+            poisonDamage
         );
     }
 }

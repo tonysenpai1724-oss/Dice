@@ -17,7 +17,8 @@ public class Enemy : MonoBehaviour
     public int distanceToPlayer;
     public int attackRange;
     public SkeletonGraphic skeletonGraphic;
-    public TextMeshProUGUI hpText;
+    public HPBar hpBar;
+
     [Header("anim")]
     public string idleAnim = "IDLE";
     public string moveAnim = "Move";
@@ -45,10 +46,7 @@ public class Enemy : MonoBehaviour
 
 
         }
-        if (hpText != null)
-        {
-            hpText.text = currentHp.ToString() + "/" + hp.ToString();
-        }
+        UpdateHpBar();
     }
     public void PlayAnimation(string animName, bool loop = false)
     {
@@ -86,8 +84,7 @@ public class Enemy : MonoBehaviour
 
         currentHp -= amount;
 
-        if (hpText != null)
-            hpText.text = currentHp + "/" + hp;
+        UpdateHpBar();
 
 
 
@@ -144,6 +141,13 @@ public class Enemy : MonoBehaviour
         return distanceToPlayer <= attackRange;
     }
 
+    private void UpdateHpBar()
+    {
+        if (hpBar != null)
+            hpBar.SetHp(currentHp, hp);
+
+    }
+
     public virtual void MoveTowardPlayer(int amount)
     {
         if (!IsAlive())
@@ -154,6 +158,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void Die()
     {
+        hpBar.gameObject.SetActive(false);
         PlayAnimation(dieAnim, false);
 
         currentTrack.Complete += _ =>

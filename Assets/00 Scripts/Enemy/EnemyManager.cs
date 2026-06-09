@@ -32,7 +32,6 @@ public class EnemyManager : Singleton<EnemyManager>
     public float projectileRotationOffset;
     public int skipNextEnemyTurns;
     public int nextPlayerDamageReduction;
-    bool rangeRowLocked;
     readonly Dictionary<Enemy, PoisonStatus> poisonStatuses = new();
     readonly List<Enemy> pendingPoisonRemovals = new();
 
@@ -241,68 +240,32 @@ public class EnemyManager : Singleton<EnemyManager>
             yield break;
         }
 
-        Enemy frontRangeEnemy = GetFrontEnemyOfType(EnemyType.Range);
-        if (frontRangeEnemy != null)
-        {
-            if (!frontRangeEnemy.IsAlive())
-            {
-                rangeRowLocked = false;
-                yield break;
-            }
-
-            if (rangeRowLocked && !IsAtAttackPoint(frontRangeEnemy))
-            {
-                rangeRowLocked = false;
-            }
-
-            if (!rangeRowLocked)
-            {
-                yield return MoveEnemyRowToAttackPoint(EnemyType.Range);
-                frontRangeEnemy = GetFrontEnemyOfType(EnemyType.Range);
-
-                if (frontRangeEnemy != null &&
-                    frontRangeEnemy.IsAlive() &&
-                    IsAtAttackPoint(frontRangeEnemy))
-                {
-                    rangeRowLocked = true;
-                }
-            }
-
-            frontRangeEnemy = GetFrontEnemyOfType(EnemyType.Range);
-            if (frontRangeEnemy != null &&
-                frontRangeEnemy.IsAlive() &&
-                IsAtAttackPoint(frontRangeEnemy))
-            {
-                rangeRowLocked = true;
-                AttackPlayer(frontRangeEnemy);
-            }
-
-            if (enemyActionDelay > 0f)
-                yield return new WaitForSeconds(enemyActionDelay);
-
-            yield break;
-        }
-
-        rangeRowLocked = false;
-
         Enemy frontEnemy = GetFrontEnemy();
         if (frontEnemy == null)
             yield break;
 
-        if (!IsAtAttackPoint(frontEnemy))
+        if (frontEnemy.type == EnemyType.Range && !IsAtAttackPoint(frontEnemy))
         {
-            yield return MoveFrontEnemyToAttackPoint(frontEnemy);
+            yield return MoveEnemyRowToAttackPoint(EnemyType.Range);
+            frontEnemy = GetFrontEnemy();
         }
 
-        if (frontEnemy != null &&
-            frontEnemy.IsAlive() &&
-            IsAtAttackPoint(frontEnemy))
-        {
-            AttackPlayer(frontEnemy);
-        }
+        List<Enemy> attackers = GetEnemyTurnAttackers(frontEnemy);
 
-        if (enemyActionDelay > 0f)
-            yield return new WaitForSeconds(enemyActionDelay);
+        for (int i = 0; i < attackers.Count; i++)
+        {
+            Enemy attacker = attackers[i];
+            if (attacker == null || !attacker.IsAlive())
+                continue;
+
+            if (attacker == frontEnemy && attacker.type == EnemyType.Range && !IsAtAttackPoint(frontEnemy))
+                continue;
+
+            AttackPlayer(attacker);
+
+            if (enemyActionDelay > 0f)
+                yield return new WaitForSeconds(enemyActionDelay);
+        }
     }
 
     public void RemoveEnemy(Enemy enemy)
@@ -408,7 +371,7 @@ public class EnemyManager : Singleton<EnemyManager>
         }
 
         status.turnsRemaining += turns;
-        status.damagePerTurn = Mathf.Max(status.damagePerTurn, damagePerTurn);
+        status.damagePerTurn = status.turnsRemaining;
     }
 
     void ApplyPoisonTicks()
@@ -547,6 +510,35 @@ public class EnemyManager : Singleton<EnemyManager>
         return frontEnemy;
     }
 
+    List<Enemy> GetEnemyTurnAttackers(Enemy frontEnemy)
+    {
+        List<Enemy> attackers = new();
+
+        AddEnemyTurnAttacker(attackers, frontEnemy);
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            if (enemy.type == EnemyType.Melee)
+                AddEnemyTurnAttacker(attackers, enemy);
+        }
+
+        AddEnemyTurnAttacker(attackers, GetFrontEnemyOfType(EnemyType.Range));
+
+        return attackers;
+    }
+
+    void AddEnemyTurnAttacker(List<Enemy> attackers, Enemy enemy)
+    {
+        if (enemy == null || !enemy.IsAlive() || attackers.Contains(enemy))
+            return;
+
+        attackers.Add(enemy);
+    }
+
     bool IsAtAttackPoint(Enemy enemy)
     {
         if (enemy == null || attackPoint == null)
@@ -675,23 +667,6 @@ public class EnemyManager : Singleton<EnemyManager>
         }
 
         yield return seq.WaitForCompletion();
-
-        frontEnemy = GetFrontEnemyOfType(type);
-        if (frontEnemy != null && frontEnemy.IsAlive())
-        {
-            RectTransform frontRect =
-                frontEnemy.transform as RectTransform;
-            RectTransform attackRect = attackPoint;
-
-            if (frontRect != null && attackRect != null)
-            {
-                frontRect.anchoredPosition =
-                    new Vector2(
-                        attackRect.anchoredPosition.x,
-                        frontRect.anchoredPosition.y
-                    );
-            }
-        }
 
         for (int i = 0; i < row.Count; i++)
         {
