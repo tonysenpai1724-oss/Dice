@@ -12,9 +12,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c9af9d0aa4d3c24e9d37027275cc226, type: 3}
   m_Name: 2 6
   m_EditorClassIdentifier: Assembly-CSharp::Level
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   levelNumber: 1
   enemyDatas:
   - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
   - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
   - {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
   - {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
+  enemySpawnPlacements:
+  - data: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
+    position: {x: 165.33229, y: -27.429304, z: 0}
+    useUIPosition: 1
+    isBackRow: 0
+  - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
+    position: {x: 64.56461, y: -24.385767, z: 0}
+    useUIPosition: 1
+    isBackRow: 0
+  - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
+    position: {x: -250.12619, y: 31.156574, z: 0}
+    useUIPosition: 1
+    isBackRow: 1
+  - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    position: {x: -27.869875, y: 31.992815, z: 0}
+    useUIPosition: 1
+    isBackRow: 1

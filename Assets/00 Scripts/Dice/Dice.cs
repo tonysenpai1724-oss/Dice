@@ -23,7 +23,8 @@ public enum DiceType
     Coin,
     BlindStrike,
     Stun,
-    Bomb
+    Bomb,
+    Enemy
 
 
 }

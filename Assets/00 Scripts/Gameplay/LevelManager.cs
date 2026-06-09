@@ -28,6 +28,6 @@ public class LevelManager : Singleton<LevelManager>
 
 
         if (EnemyManager.Instance != null)
-            EnemyManager.Instance.SpawnEnemies(level.enemyDatas);
+            EnemyManager.Instance.SpawnEnemies(level);
     }
 }

@@ -9,6 +9,10 @@ public class EnemyManager : Singleton<EnemyManager>
     public Enemy enemyPrefab;
     public Transform enemyRoot;
     public PlayerController player;
+    public EnemyLevelPositionGenerator spawnPositionGenerator;
+    public EnemySpawnArea spawnArea;
+    public RectTransform combatSpaceRoot;
+    public RectTransform attackPoint;
 
     [Header("Layout")]
     public float enemySpacing = 120f;
@@ -28,25 +32,62 @@ public class EnemyManager : Singleton<EnemyManager>
     public float projectileRotationOffset;
     public int skipNextEnemyTurns;
     public int nextPlayerDamageReduction;
+    bool rangeRowLocked;
     readonly Dictionary<Enemy, PoisonStatus> poisonStatuses = new();
     readonly List<Enemy> pendingPoisonRemovals = new();
 
-    public void SpawnEnemies(List<EnemyData> enemyDatas)
+    public void SpawnEnemies(Level level)
     {
-        DebugCustom.LogColor("Spawn Enemies: " + enemyDatas.Count);
+        DebugCustom.LogColor(
+            "Spawn Enemies: " +
+            (level != null && level.enemyDatas != null ? level.enemyDatas.Count : 0)
+        );
         ClearEnemies();
         DebugCustom.LogColor("Enemy Prefab: " + enemyPrefab);
         DebugCustom.LogColor("Enemy Root: " + enemyRoot);
-        DebugCustom.LogColor("Enemy Datas: " + enemyDatas);
+        DebugCustom.LogColor("Enemy Datas: " + level);
 
-
-        if (enemyDatas == null || enemyPrefab == null)
+        if (level == null || enemyPrefab == null)
         {
             DebugCustom.LogColor("Enemy Datas or Prefab is null");
             return;
         }
 
-        Transform root = enemyRoot != null ? enemyRoot : transform;
+        Transform root =
+            combatSpaceRoot != null
+                ? combatSpaceRoot
+                : (enemyRoot != null ? enemyRoot : transform);
+        List<EnemySpawnPlacement> placements =
+            level.enemySpawnPlacements != null &&
+            level.enemySpawnPlacements.Count > 0
+                ? level.enemySpawnPlacements
+                : spawnPositionGenerator != null
+                    ? spawnPositionGenerator.BuildPlacements(level.enemyDatas)
+                    : null;
+
+        if (placements != null && placements.Count > 0)
+        {
+            for (int i = 0; i < placements.Count; i++)
+            {
+                EnemySpawnPlacement placement = placements[i];
+                if (placement == null || placement.data == null)
+                    continue;
+
+                Enemy enemy = Instantiate(enemyPrefab, root, false);
+                DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
+                enemy.Setup(placement.data);
+                enemies.Add(enemy);
+                SetEnemyPosition(
+                    enemy,
+                    placement.position,
+                    placement.useUIPosition
+                );
+            }
+
+            return;
+        }
+
+        List<EnemyData> enemyDatas = level.enemyDatas;
 
         for (int i = 0; i < enemyDatas.Count; i++)
         {
@@ -55,11 +96,19 @@ public class EnemyManager : Singleton<EnemyManager>
             if (data == null)
                 continue;
 
-            Enemy enemy = Instantiate(enemyPrefab, root);
+            Enemy enemy = Instantiate(enemyPrefab, root, false);
             DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
             enemy.Setup(data);
             enemies.Add(enemy);
-            SetEnemyPosition(enemy, enemies.Count - 1);
+            SetEnemyPosition(
+                enemy,
+                new Vector3(
+                    (enemies.Count - 1) * enemySpacing,
+                    0f,
+                    0f
+                ),
+                false
+            );
         }
     }
     void SpawnProjectile(Enemy target, int damage)
@@ -116,6 +165,20 @@ public class EnemyManager : Singleton<EnemyManager>
         }
 
         enemies.Clear();
+    }
+
+    public float GetCombatSpaceX(Transform target)
+    {
+        if (target == null)
+            return 0f;
+
+        RectTransform rectTransform =
+            target as RectTransform;
+
+        if (rectTransform != null)
+            return rectTransform.anchoredPosition.x;
+
+        return target.localPosition.x;
     }
 
     public Enemy GetNearestAliveEnemy()
@@ -178,24 +241,68 @@ public class EnemyManager : Singleton<EnemyManager>
             yield break;
         }
 
-        for (int i = 0; i < enemies.Count; i++)
+        Enemy frontRangeEnemy = GetFrontEnemyOfType(EnemyType.Range);
+        if (frontRangeEnemy != null)
         {
-            Enemy enemy = enemies[i];
-            if (enemy == null || !enemy.IsAlive())
-                continue;
-
-            if (enemy.CanAttack())
+            if (!frontRangeEnemy.IsAlive())
             {
-                AttackPlayer(enemy);
+                rangeRowLocked = false;
+                yield break;
             }
-            else
+
+            if (rangeRowLocked && !IsAtAttackPoint(frontRangeEnemy))
             {
-                MoveEnemyTowardPlayer(enemy);
+                rangeRowLocked = false;
+            }
+
+            if (!rangeRowLocked)
+            {
+                yield return MoveEnemyRowToAttackPoint(EnemyType.Range);
+                frontRangeEnemy = GetFrontEnemyOfType(EnemyType.Range);
+
+                if (frontRangeEnemy != null &&
+                    frontRangeEnemy.IsAlive() &&
+                    IsAtAttackPoint(frontRangeEnemy))
+                {
+                    rangeRowLocked = true;
+                }
+            }
+
+            frontRangeEnemy = GetFrontEnemyOfType(EnemyType.Range);
+            if (frontRangeEnemy != null &&
+                frontRangeEnemy.IsAlive() &&
+                IsAtAttackPoint(frontRangeEnemy))
+            {
+                rangeRowLocked = true;
+                AttackPlayer(frontRangeEnemy);
             }
 
             if (enemyActionDelay > 0f)
                 yield return new WaitForSeconds(enemyActionDelay);
+
+            yield break;
         }
+
+        rangeRowLocked = false;
+
+        Enemy frontEnemy = GetFrontEnemy();
+        if (frontEnemy == null)
+            yield break;
+
+        if (!IsAtAttackPoint(frontEnemy))
+        {
+            yield return MoveFrontEnemyToAttackPoint(frontEnemy);
+        }
+
+        if (frontEnemy != null &&
+            frontEnemy.IsAlive() &&
+            IsAtAttackPoint(frontEnemy))
+        {
+            AttackPlayer(frontEnemy);
+        }
+
+        if (enemyActionDelay > 0f)
+            yield return new WaitForSeconds(enemyActionDelay);
     }
 
     public void RemoveEnemy(Enemy enemy)
@@ -365,49 +472,316 @@ public class EnemyManager : Singleton<EnemyManager>
         pendingPoisonRemovals.Clear();
     }
 
-    void MoveEnemyTowardPlayer(Enemy enemy)
+    Enemy GetFrontEnemy()
     {
-        enemy.MoveTowardPlayer(meleeStepPerTurn);
-        enemy.PlayAnimation(enemy.moveAnim, true);
+        CleanupEnemies();
 
-        RectTransform rectTransform = enemy.transform as RectTransform;
-        if (rectTransform != null)
+        Enemy frontEnemy = null;
+        float bestX = float.PositiveInfinity;
+        float playerX =
+            player != null
+                ? GetCombatSpaceX(player.transform)
+                : float.NegativeInfinity;
+
+        for (int i = 0; i < enemies.Count; i++)
         {
-            rectTransform.DOKill();
-            rectTransform.DOAnchorPosX(
-                rectTransform.anchoredPosition.x - meleeMoveDistance,
-                enemyMoveDuration
-            ).OnComplete(() =>
+            Enemy enemy = enemies[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            float enemyX = GetCombatSpaceX(enemy.transform);
+            if (enemyX < playerX)
+                continue;
+
+            if (enemyX < bestX)
             {
-                if (enemy != null && enemy.IsAlive())
-                    enemy.PlayAnimation(enemy.idleAnim, true);
-            });
-            return;
+                bestX = enemyX;
+                frontEnemy = enemy;
+            }
         }
 
-        enemy.transform.DOKill();
-        enemy.transform.DOMoveX(
-            enemy.transform.position.x - meleeMoveDistance,
-            enemyMoveDuration
-        ).OnComplete(() =>
+        if (frontEnemy != null)
+            return frontEnemy;
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy != null && enemy.IsAlive())
+                return enemy;
+        }
+
+        return null;
+    }
+
+    Enemy GetFrontEnemyOfType(EnemyType type)
+    {
+        CleanupEnemies();
+
+        Enemy frontEnemy = null;
+        float bestX = float.PositiveInfinity;
+        float playerX =
+            player != null
+                ? GetCombatSpaceX(player.transform)
+                : float.NegativeInfinity;
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            if (enemy.type != type)
+                continue;
+
+            float enemyX = GetCombatSpaceX(enemy.transform);
+            if (enemyX < playerX)
+                continue;
+
+            if (enemyX < bestX)
+            {
+                bestX = enemyX;
+                frontEnemy = enemy;
+            }
+        }
+
+        return frontEnemy;
+    }
+
+    bool IsAtAttackPoint(Enemy enemy)
+    {
+        if (enemy == null || attackPoint == null)
+            return false;
+
+        float enemyX = GetCombatSpaceX(enemy.transform);
+        float attackX = GetCombatSpaceX(attackPoint);
+
+        return Mathf.Abs(enemyX - attackX) <= 1f;
+    }
+
+    IEnumerator MoveFrontEnemyToAttackPoint(Enemy enemy)
+    {
+        if (enemy == null || attackPoint == null)
+            yield break;
+
+        enemy.PlayAnimation(enemy.moveAnim, true);
+
+        RectTransform enemyRect =
+            enemy.transform as RectTransform;
+        RectTransform attackRect =
+            attackPoint as RectTransform;
+
+        if (enemyRect == null || attackRect == null)
         {
             if (enemy != null && enemy.IsAlive())
                 enemy.PlayAnimation(enemy.idleAnim, true);
-        });
+
+            yield break;
+        }
+
+        float enemyX = enemyRect.anchoredPosition.x;
+        float targetX = attackRect.anchoredPosition.x;
+        float dx = targetX - enemyX;
+
+        if (Mathf.Abs(dx) <= 0.1f)
+        {
+            enemy.PlayAnimation(enemy.idleAnim, true);
+            yield break;
+        }
+
+        float moveDistance =
+            Mathf.Min(
+                meleeMoveDistance,
+                Mathf.Max(0f, Mathf.Abs(dx) - 0.1f)
+            );
+
+        if (moveDistance <= 0.01f)
+        {
+            if (enemy != null && enemy.IsAlive())
+                enemy.PlayAnimation(enemy.idleAnim, true);
+            yield break;
+        }
+
+        float direction = Mathf.Sign(dx);
+
+        Tween tween =
+            enemyRect.DOAnchorPosX(
+                enemyRect.anchoredPosition.x + (direction * moveDistance),
+                enemyMoveDuration
+            );
+
+        yield return tween.WaitForCompletion();
+
+        if (enemyRect != null)
+        {
+            enemyRect.anchoredPosition =
+                new Vector2(
+                    attackRect.anchoredPosition.x,
+                    enemyRect.anchoredPosition.y
+                );
+        }
+
+        if (enemy != null && enemy.IsAlive())
+            enemy.PlayAnimation(enemy.idleAnim, true);
     }
 
-    void SetEnemyPosition(Enemy enemy, int index)
+    IEnumerator MoveEnemyRowToAttackPoint(EnemyType type)
+    {
+        if (attackPoint == null)
+            yield break;
+
+        List<Enemy> row =
+            GetAliveEnemiesOfType(type);
+
+        if (row.Count == 0)
+            yield break;
+
+        Enemy frontEnemy = row[0];
+        float frontX = GetCombatSpaceX(frontEnemy.transform);
+        float targetX = GetCombatSpaceX(attackPoint);
+        float dx = targetX - frontX;
+
+        if (Mathf.Abs(dx) <= 1f)
+            yield break;
+
+        float moveDistance =
+            Mathf.Min(
+                meleeMoveDistance,
+                Mathf.Max(0f, Mathf.Abs(dx) - 1f)
+            );
+
+        if (moveDistance <= 0.01f)
+            yield break;
+
+        float direction = Mathf.Sign(dx);
+
+        Sequence seq = DOTween.Sequence();
+        for (int i = 0; i < row.Count; i++)
+        {
+            Enemy enemy = row[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            RectTransform rectTransform = enemy.transform as RectTransform;
+            if (rectTransform == null)
+                continue;
+
+            enemy.PlayAnimation(enemy.moveAnim, true);
+            seq.Join(
+                rectTransform.DOAnchorPosX(
+                    rectTransform.anchoredPosition.x + (direction * moveDistance),
+                    enemyMoveDuration
+                )
+            );
+        }
+
+        yield return seq.WaitForCompletion();
+
+        frontEnemy = GetFrontEnemyOfType(type);
+        if (frontEnemy != null && frontEnemy.IsAlive())
+        {
+            RectTransform frontRect =
+                frontEnemy.transform as RectTransform;
+            RectTransform attackRect = attackPoint;
+
+            if (frontRect != null && attackRect != null)
+            {
+                frontRect.anchoredPosition =
+                    new Vector2(
+                        attackRect.anchoredPosition.x,
+                        frontRect.anchoredPosition.y
+                    );
+            }
+        }
+
+        for (int i = 0; i < row.Count; i++)
+        {
+            Enemy enemy = row[i];
+            if (enemy != null && enemy.IsAlive())
+                enemy.PlayAnimation(enemy.idleAnim, true);
+        }
+    }
+
+    List<Enemy> GetAliveEnemiesOfType(EnemyType type)
+    {
+        List<Enemy> row = new();
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            if (enemy.type != type)
+                continue;
+
+            row.Add(enemy);
+        }
+
+        row.Sort(
+            (a, b) =>
+                GetCombatSpaceX(a.transform).CompareTo(
+                    GetCombatSpaceX(b.transform)
+                )
+        );
+
+        return row;
+    }
+
+    void SetEnemyPosition(
+        Enemy enemy,
+        Vector3 position,
+        bool useUIPosition
+    )
     {
         RectTransform rectTransform = enemy.transform as RectTransform;
-        if (rectTransform != null)
+        if (useUIPosition && rectTransform != null)
         {
-            rectTransform.anchoredPosition =
-                new Vector2(index * enemySpacing, rectTransform.anchoredPosition.y);
+            rectTransform.SetParent(
+                combatSpaceRoot != null
+                    ? combatSpaceRoot
+                    : (enemyRoot != null ? enemyRoot : transform),
+                false
+            );
+
+            Vector3 localPosition = position;
+            if (spawnArea != null &&
+                spawnArea.uiArea != null &&
+                combatSpaceRoot != null)
+            {
+                Vector3 worldPoint =
+                    spawnArea.uiArea.TransformPoint(
+                        new Vector3(position.x, position.y, 0f)
+                    );
+
+                localPosition =
+                    combatSpaceRoot.InverseTransformPoint(worldPoint);
+            }
+
+            rectTransform.anchoredPosition3D =
+                new Vector3(localPosition.x, localPosition.y, 0f);
+
             return;
         }
 
-        enemy.transform.localPosition =
-            new Vector3(index * enemySpacing, enemy.transform.localPosition.y, enemy.transform.localPosition.z);
+        if (rectTransform != null)
+        {
+            rectTransform.SetParent(
+                combatSpaceRoot != null
+                    ? combatSpaceRoot
+                    : (enemyRoot != null ? enemyRoot : transform),
+                false
+            );
+            rectTransform.localPosition = position;
+            return;
+        }
+
+        enemy.transform.SetParent(
+            combatSpaceRoot != null
+                ? combatSpaceRoot
+                : (enemyRoot != null ? enemyRoot : transform),
+            false
+        );
+        enemy.transform.localPosition = position;
     }
 
     void RebuildLayout()
@@ -415,7 +789,17 @@ public class EnemyManager : Singleton<EnemyManager>
         CleanupEnemies();
 
         for (int i = 0; i < enemies.Count; i++)
-            SetEnemyPosition(enemies[i], i);
+        {
+            SetEnemyPosition(
+                enemies[i],
+                new Vector3(
+                    i * enemySpacing,
+                    0f,
+                    0f
+                ),
+                false
+            );
+        }
     }
 
     void CleanupEnemies()

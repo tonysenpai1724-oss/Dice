@@ -33,7 +33,7 @@ public class Enemy : MonoBehaviour
         type = data.type;
         SetHp(data.hp, data.damage);
         distanceToPlayer = Mathf.Max(0, data.startDistance);
-        attackRange = data.type == EnemyType.Melee ? Mathf.Max(1, data.attackRange) : int.MaxValue;
+        attackRange = Mathf.Max(1, data.attackRange);
 
         transform.localScale = data.scale;
 
@@ -169,7 +169,9 @@ public class Enemy : MonoBehaviour
 
 public enum EnemyType
 {
-    Normal,
+    // Normal,
     Melee,
     Range,
+    MiniBoss,
+    Boss,
 }

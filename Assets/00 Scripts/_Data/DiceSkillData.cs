@@ -48,6 +48,9 @@ public class DiceSkillData : SerializedScriptableObject
             case DiceType.Bomb:
                 BombDiceSkillData.Execute(context, stackApply, valueApply);
                 break;
+            case DiceType.Enemy:
+                EnemyDiceSKillData.Execute(context, stackApply, valueApply);
+                break;
 
         }
     }
@@ -144,6 +147,7 @@ public static class BackstabDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
+        valueApply = context.diceData.damage;
         context?.AddDamage(valueApply);
     }
 }
@@ -185,6 +189,7 @@ public static class BlindStrikeDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
+        valueApply = context.diceData.damage;
         context?.enemyManager?.ReduceNextPlayerDamage(valueApply);
     }
 }
@@ -215,10 +220,18 @@ public static class BombDiceSkillData
         });
     }
 }
+public static class EnemyDiceSKillData
+{
+
+    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    {
+
+    }
+}
 
 public sealed class DiceSkillContext
 {
-    readonly System.Collections.Generic.List<System.Action> afterAttackActions =
+    readonly List<System.Action> afterAttackActions =
         new();
 
     public DiceData diceData;
