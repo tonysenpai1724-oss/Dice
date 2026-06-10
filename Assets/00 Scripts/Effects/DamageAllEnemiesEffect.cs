@@ -18,7 +18,7 @@
             if (enemy == null || !enemy.IsAlive())
                 continue;
 
-            enemy.TakeDamage(amount);
+            enemy.OnTakeDamage(amount);
         }
     }
 }

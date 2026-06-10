@@ -10,6 +10,8 @@ using System.Linq;
 
 public class GameplayManager : Singleton<GameplayManager>
 {
+    readonly List<Action> afterAttackActions = new();
+
     public EGamePlayState State => state;
     [SerializeField, ReadOnly] protected EGamePlayState state;
     public EGamePlayState LastState { get; private set; }
@@ -19,6 +21,96 @@ public class GameplayManager : Singleton<GameplayManager>
     public bool IsGameEnded => state == EGamePlayState.GameOver;
     public int Score { get; private set; }
     public PackageResource PackReward { get; private set; }
+
+    [Header("Dice Skill Runtime")]
+    public DiceData skillDiceData;
+    public DiceQueue skillQueue;
+    public EnemyManager skillEnemyManager;
+    public PlayerController skillPlayer;
+    public Dice skillDice;
+    public Enemy skillTargetEnemy;
+    public int skillDamage;
+    public bool skillSkipAttack;
+
+    public int DiceDamage => skillDiceData != null ? Mathf.Max(0, skillDiceData.damage) : 0;
+
+    public void BeginDiceSkill(
+        DiceData diceData,
+        DiceQueue queue,
+        Dice dice,
+        EnemyManager enemyManager,
+        PlayerController player,
+        Enemy targetEnemy
+    )
+    {
+        ClearDiceSkillState();
+
+        skillDiceData = diceData;
+        skillQueue = queue;
+        skillDice = dice;
+        skillEnemyManager = enemyManager;
+        skillPlayer = player;
+        skillTargetEnemy = targetEnemy;
+        skillDamage = DiceDamage;
+    }
+
+    public void AddDamage(int amount)
+    {
+        skillDamage = Mathf.Max(0, skillDamage + amount);
+    }
+
+    public void SetDamage(int amount)
+    {
+        skillDamage = Mathf.Max(0, amount);
+    }
+
+    public void CancelAttack()
+    {
+        SetDamage(0);
+        skillSkipAttack = true;
+    }
+
+    public Enemy GetTargetEnemy()
+    {
+        if (skillTargetEnemy != null &&
+            skillTargetEnemy.gameObject.activeInHierarchy &&
+            skillTargetEnemy.IsAlive())
+        {
+            return skillTargetEnemy;
+        }
+
+        return skillEnemyManager != null ? skillEnemyManager.GetNearestAliveEnemy() : null;
+    }
+
+    public void AddAfterAttack(Action action)
+    {
+        if (action != null)
+            afterAttackActions.Add(action);
+    }
+
+    public void RunAfterAttackActions()
+    {
+        for (int i = 0; i < afterAttackActions.Count; i++)
+        {
+            afterAttackActions[i]?.Invoke();
+        }
+
+        afterAttackActions.Clear();
+    }
+
+    public void ClearDiceSkillState()
+    {
+        skillDiceData = null;
+        skillQueue = null;
+        skillEnemyManager = null;
+        skillPlayer = null;
+        skillDice = null;
+        skillTargetEnemy = null;
+        skillDamage = 0;
+        skillSkipAttack = false;
+        afterAttackActions.Clear();
+    }
+
     public IEnumerator IEInit()
     {
         DebugCustom.LogColor("Init Level");

@@ -14,42 +14,42 @@ public class DiceSkillData : SerializedScriptableObject
 
     public int valueApply = 1;
 
-    public virtual void Execute(DiceSkillContext context)
+    public virtual void Execute()
     {
         switch (TargetType)
         {
             case DiceType.Normal:
-                NormalDiceSkillData.Execute(context);
+                NormalDiceSkillData.Execute();
                 break;
             case DiceType.Dodge:
-                DodgeDiceSkillData.Execute(context, stackApply, valueApply);
+                DodgeDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Poison:
-                PoisonDiceSkillData.Execute(context, stackApply, valueApply);
+                PoisonDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Heal:
-                HealDiceSkillData.Execute(context, stackApply, valueApply);
+                HealDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Shield:
-                ShieldDiceSkillData.Execute(context, stackApply, valueApply);
+                ShieldDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Backstab:
-                BackstabDiceSkillData.Execute(context, stackApply, valueApply);
+                BackstabDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Coin:
-                CoinDiceSkillData.Execute(context, stackApply, valueApply);
+                CoinDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.BlindStrike:
-                BlindStrikeDiceSkillData.Execute(context, stackApply, valueApply);
+                BlindStrikeDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Stun:
-                StunDiceSkillData.Execute(context, stackApply, valueApply);
+                StunDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Bomb:
-                BombDiceSkillData.Execute(context, stackApply, valueApply);
+                BombDiceSkillData.Execute(stackApply, valueApply);
                 break;
             case DiceType.Enemy:
-                EnemyDiceSKillData.Execute(context, stackApply, valueApply);
+                EnemyDiceSKillData.Execute(stackApply, valueApply);
                 break;
 
         }
@@ -59,16 +59,17 @@ public class DiceSkillData : SerializedScriptableObject
 
 public static class NormalDiceSkillData
 {
-    public static void Execute(DiceSkillContext context)
+    public static void Execute()
     {
     }
 }
 
 public static class DodgeDiceSkillData
 {
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        DodgeEffect dodgeEffect = context?.player.effectManager?.AddEffect<DodgeEffect>();
+        GameplayManager gameplay = GameplayManager.Instance;
+        DodgeEffect dodgeEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<DodgeEffect>();
         if (dodgeEffect == null)
             return;
 
@@ -78,19 +79,20 @@ public static class DodgeDiceSkillData
 
 public static class PoisonDiceSkillData
 {
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        if (context == null)
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay == null)
             return;
 
-        Enemy target = context.GetTargetEnemy();
+        Enemy target = gameplay.GetTargetEnemy();
         if (target == null)
             return;
 
-        int poisonTurns = Mathf.Max(1, context.DiceDamage);
+        int poisonTurns = Mathf.Max(1, gameplay.DiceDamage);
         int poisonDamage = poisonTurns;
 
-        context.CancelAttack();
+        gameplay.CancelAttack();
         target.effectManager?.AddEffect<PoisonEffect>()?.Apply(poisonTurns, poisonDamage);
     }
 }
@@ -98,24 +100,26 @@ public static class PoisonDiceSkillData
 public static class HealDiceSkillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        if (context?.player == null)
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay?.skillPlayer == null)
             return;
 
-        int healAmount = Mathf.Max(0, context.DiceDamage);
+        int healAmount = Mathf.Max(0, gameplay.DiceDamage);
 
-        context.CancelAttack();
-        context.player.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
+        gameplay.CancelAttack();
+        gameplay.skillPlayer.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
     }
 }
 
 public static class ShieldDiceSkillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        ShieldEffect shieldEffect = context?.player.effectManager?.AddEffect<ShieldEffect>();
+        GameplayManager gameplay = GameplayManager.Instance;
+        ShieldEffect shieldEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<ShieldEffect>();
         if (shieldEffect == null)
             return;
 
@@ -126,23 +130,25 @@ public static class ShieldDiceSkillData
 public static class BackstabDiceSkillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        context?.AddDamage(context.DiceDamage);
+        GameplayManager gameplay = GameplayManager.Instance;
+        gameplay?.AddDamage(gameplay.DiceDamage);
     }
 }
 
 public static class CoinDiceSkillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        if (context == null)
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay == null)
             return;
 
-        int coinReward = Mathf.Max(0, context.DiceDamage);
+        int coinReward = Mathf.Max(0, gameplay.DiceDamage);
 
-        context.CancelAttack();
+        gameplay.CancelAttack();
         CoinRewardEffect.Apply(coinReward);
     }
 }
@@ -150,20 +156,22 @@ public static class CoinDiceSkillData
 public static class BlindStrikeDiceSkillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        DamageReductionEffect damageReductionEffect = context?.player.effectManager?.AddEffect<DamageReductionEffect>();
+        GameplayManager gameplay = GameplayManager.Instance;
+        DamageReductionEffect damageReductionEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<DamageReductionEffect>();
         if (damageReductionEffect != null)
-            damageReductionEffect.AddReduction(context.DiceDamage);
+            damageReductionEffect.AddReduction(gameplay.DiceDamage);
     }
 }
 
 public static class StunDiceSkillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        EnemyTurnSkipEffect turnSkipEffect = context?.enemyManager.effectManager?.AddEffect<EnemyTurnSkipEffect>();
+        GameplayManager gameplay = GameplayManager.Instance;
+        EnemyTurnSkipEffect turnSkipEffect = gameplay?.skillEnemyManager?.effectManager?.AddEffect<EnemyTurnSkipEffect>();
         if (turnSkipEffect != null)
             turnSkipEffect.AddTurns(stackApply);
     }
@@ -172,15 +180,16 @@ public static class StunDiceSkillData
 public static class BombDiceSkillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
-        if (context == null || context.enemyManager == null)
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay == null || gameplay.skillEnemyManager == null)
             return;
 
-        context.AddAfterAttack(() =>
+        gameplay.AddAfterAttack(() =>
         {
             DamageAllEnemiesEffect damageAllEnemiesEffect =
-                context.enemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>();
+                gameplay.skillEnemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>();
 
             if (damageAllEnemiesEffect != null)
                 damageAllEnemiesEffect.Apply(valueApply);
@@ -190,89 +199,9 @@ public static class BombDiceSkillData
 public static class EnemyDiceSKillData
 {
 
-    public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
+    public static void Execute(int stackApply, int valueApply)
     {
 
-    }
-}
-
-public sealed class DiceSkillContext
-{
-    readonly List<System.Action> afterAttackActions =
-        new();
-
-    public DiceData diceData;
-    public DiceQueue queue;
-    public EnemyManager enemyManager;
-    public PlayerController player;
-    public Dice dice;
-    public Enemy targetEnemy;
-
-    public int damage;
-    public bool skipAttack;
-
-    public int DiceDamage => diceData != null ? Mathf.Max(0, diceData.damage) : 0;
-
-    public DiceSkillContext(
-        DiceData diceData,
-        DiceQueue queue,
-        Dice dice,
-        EnemyManager enemyManager,
-        PlayerController player,
-        Enemy targetEnemy
-    )
-    {
-        this.diceData = diceData;
-        this.queue = queue;
-        this.dice = dice;
-        this.enemyManager = enemyManager;
-        this.player = player;
-        this.targetEnemy = targetEnemy;
-        damage = diceData != null ? Mathf.Max(0, diceData.damage) : 0;
-    }
-
-    public void AddDamage(int amount)
-    {
-        damage = Mathf.Max(0, damage + amount);
-    }
-
-    public void SetDamage(int amount)
-    {
-        damage = Mathf.Max(0, amount);
-    }
-
-    public void CancelAttack()
-    {
-        SetDamage(0);
-        skipAttack = true;
-    }
-
-    public Enemy GetTargetEnemy()
-    {
-        if (targetEnemy != null &&
-            targetEnemy.gameObject.activeInHierarchy &&
-            targetEnemy.IsAlive())
-        {
-            return targetEnemy;
-        }
-
-        return enemyManager != null ? enemyManager.GetNearestAliveEnemy() : null;
-    }
-
-    public void AddAfterAttack(System.Action action)
-    {
-        if (action != null)
-            afterAttackActions.Add(action);
-    }
-
-    public void RunAfterAttackActions()
-    {
-        for (int i = 0; i < afterAttackActions.Count; i++)
-        {
-            afterAttackActions[i]?.Invoke();
-        }
-
-        afterAttackActions.Clear();
     }
 }
 

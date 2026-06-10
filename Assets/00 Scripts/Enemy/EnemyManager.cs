@@ -153,7 +153,7 @@ public class EnemyManager : Singleton<EnemyManager>
         .SetEase(Ease.Linear)
         .OnComplete(() =>
         {
-            target.TakeDamage(damage);
+            target.OnTakeDamage(damage);
             Destroy(projectile.gameObject);
         });
     }
@@ -289,7 +289,6 @@ public class EnemyManager : Singleton<EnemyManager>
             return;
 
         enemy.DeathCompleted -= RemoveEnemy;
-        enemy.Died -= OnEnemyDied;
         enemies.Remove(enemy);
         Destroy(enemy.gameObject);
         // RebuildLayout();
@@ -303,20 +302,13 @@ public class EnemyManager : Singleton<EnemyManager>
 
         enemy.DeathCompleted -= RemoveEnemy;
         enemy.DeathCompleted += RemoveEnemy;
-        enemy.Died -= OnEnemyDied;
-        enemy.Died += OnEnemyDied;
-    }
-
-    void OnEnemyDied(GameUnit unit)
-    {
-        CheckWinGame();
     }
 
     void CheckWinGame()
     {
         CleanupEnemies();
 
-        if (!HasAliveEnemies() && GameplayManager.Instance != null && !GameplayManager.Instance.IsGameEnded)
+        if (enemies.Count == 0 && GameplayManager.Instance != null && !GameplayManager.Instance.IsGameEnded)
             GameplayManager.Instance.EndGame(true);
     }
 
@@ -339,7 +331,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
         enemy.PlayAnimation(enemy.attackAnim, false);
 
-        player.TakeDamage(enemy.damage);
+        player.OnTakeDamage(enemy.damage);
 
         if (enemy.skeletonGraphic != null)
         {

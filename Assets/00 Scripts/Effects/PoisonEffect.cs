@@ -14,8 +14,8 @@ public class PoisonEffect : GameEffect
 
         if (unit != null)
         {
-            unit.TurnStarted += OnTurnStarted;
-            unit.Died += OnUnitDied;
+            unit.OnTurnStarted += OnTurnStarted;
+            unit.OnDied += OnUnitDied;
         }
     }
 
@@ -23,8 +23,8 @@ public class PoisonEffect : GameEffect
     {
         if (unit != null)
         {
-            unit.TurnStarted -= OnTurnStarted;
-            unit.Died -= OnUnitDied;
+            unit.OnTurnStarted -= OnTurnStarted;
+            unit.OnDied -= OnUnitDied;
         }
 
         base.OnDestroy();
@@ -45,7 +45,7 @@ public class PoisonEffect : GameEffect
             return;
 
         ticking = true;
-        unit.TakeDamage(damagePerTurn);
+        unit.OnTakeDamage(damagePerTurn);
         ticking = false;
 
         turnsRemaining--;

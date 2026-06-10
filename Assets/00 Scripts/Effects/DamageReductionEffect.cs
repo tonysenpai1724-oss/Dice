@@ -11,13 +11,13 @@ public class DamageReductionEffect : GameEffect
         unit = GetComponent<GameUnit>();
 
         if (unit != null)
-            unit.BeforeDamage += OnBeforeDamage;
+            unit.OnBeforeDamage += OnBeforeDamage;
     }
 
     protected override void OnDestroy()
     {
         if (unit != null)
-            unit.BeforeDamage -= OnBeforeDamage;
+            unit.OnBeforeDamage -= OnBeforeDamage;
 
         base.OnDestroy();
     }

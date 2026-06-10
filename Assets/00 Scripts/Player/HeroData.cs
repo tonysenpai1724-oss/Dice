@@ -11,6 +11,7 @@ public class HeroData : ScriptableObject
 {
     public int hp;
     public int damage;
+    public int shield;
     public HeroType type;
 
     public SkeletonDataAsset skeletonData;

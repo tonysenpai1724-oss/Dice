@@ -26,11 +26,8 @@ public class DiceData : SerializedScriptableObject
     [Header("Skill")]
     public DiceSkillData skillData;
 
-    public void ExecuteSkill(DiceSkillContext context)
+    public void ExecuteSkill()
     {
-        if (context == null)
-            return;
-
         DiceSkillData resolvedSkill =
             skillData != null
                 ? skillData
@@ -39,7 +36,7 @@ public class DiceData : SerializedScriptableObject
         if (resolvedSkill == null)
             return;
 
-        resolvedSkill.Execute(context);
+        resolvedSkill.Execute();
     }
 
     void OnValidate()

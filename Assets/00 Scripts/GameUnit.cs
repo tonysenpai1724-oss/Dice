@@ -17,12 +17,12 @@ public abstract class GameUnit : MonoBehaviour
     public string dieAnim = "Die";
     public string hurtAnim = "Hurt";
 
-    public event Action<GameUnit, int, int> HpChanged;
-    public event Action<GameUnitDamageEvent> BeforeDamage;
-    public event Action<GameUnit, int> Damaged;
-    public event Action<GameUnit, int> Healed;
-    public event Action<GameUnit> TurnStarted;
-    public event Action<GameUnit> Died;
+    public event Action<GameUnit, int, int> OnHpChanged;
+    public event Action<GameUnitDamageEvent> OnBeforeDamage;
+    public event Action<GameUnit, int> OnDamaged;
+    public event Action<GameUnit, int> OnHealed;
+    public event Action<GameUnit> OnTurnStarted;
+    public event Action<GameUnit> OnDied;
 
     protected TrackEntry currentTrack;
     bool deathNotified;
@@ -33,12 +33,12 @@ public abstract class GameUnit : MonoBehaviour
         if (effectManager == null)
             effectManager = gameObject.AddComponent<EffectManager>();
 
-        HpChanged += UpdateHpBar;
+        OnHpChanged += UpdateHpBar;
     }
 
     protected virtual void OnDestroy()
     {
-        HpChanged -= UpdateHpBar;
+        OnHpChanged -= UpdateHpBar;
     }
 
     public virtual void SetHealth(int maxHp, int newCurrentHp)
@@ -53,13 +53,13 @@ public abstract class GameUnit : MonoBehaviour
         return currentHp > 0;
     }
 
-    public virtual void TakeDamage(int amount)
+    public virtual void OnTakeDamage(int amount)
     {
         if (amount <= 0 || !IsAlive())
             return;
 
         GameUnitDamageEvent damageEvent = new(this, amount);
-        BeforeDamage?.Invoke(damageEvent);
+        OnBeforeDamage?.Invoke(damageEvent);
 
         if (damageEvent.Cancelled || damageEvent.Amount <= 0)
             return;
@@ -67,25 +67,25 @@ public abstract class GameUnit : MonoBehaviour
         amount = damageEvent.Amount;
 
         currentHp = Mathf.Max(0, currentHp - amount);
-        Damaged?.Invoke(this, amount);
+        OnDamaged?.Invoke(this, amount);
         NotifyHpChanged();
 
         if (currentHp <= 0)
         {
-            Die();
+            OnDie();
             return;
         }
 
         PlayHurtAnimation();
     }
 
-    public virtual void Heal(int amount)
+    public virtual void OnHeal(int amount)
     {
         if (amount <= 0 || !IsAlive())
             return;
 
         currentHp = Mathf.Min(hp, currentHp + amount);
-        Healed?.Invoke(this, amount);
+        OnHealed?.Invoke(this, amount);
         NotifyHpChanged();
     }
 
@@ -108,7 +108,7 @@ public abstract class GameUnit : MonoBehaviour
         return currentTrack;
     }
 
-    public virtual void Die()
+    public virtual void OnDie()
     {
         NotifyDied();
         PlayAnimation(dieAnim, false);
@@ -117,12 +117,12 @@ public abstract class GameUnit : MonoBehaviour
     public void BeginTurn()
     {
         if (IsAlive())
-            TurnStarted?.Invoke(this);
+            OnTurnStarted?.Invoke(this);
     }
 
     protected void NotifyHpChanged()
     {
-        HpChanged?.Invoke(this, currentHp, hp);
+        OnHpChanged?.Invoke(this, currentHp, hp);
     }
 
     protected void NotifyDied()
@@ -131,7 +131,7 @@ public abstract class GameUnit : MonoBehaviour
             return;
 
         deathNotified = true;
-        Died?.Invoke(this);
+        OnDied?.Invoke(this);
     }
 
     protected virtual void PlayHurtAnimation()

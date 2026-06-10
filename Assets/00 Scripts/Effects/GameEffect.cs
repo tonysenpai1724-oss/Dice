@@ -5,7 +5,7 @@ public abstract class GameEffect : MonoBehaviour
 {
     public EffectManager EffectManager { get; private set; }
     public GameUnit Unit { get; private set; }
-    public int Stacks { get; private set; }
+    public int Stacks;
 
     public event Action<GameEffect, int> StacksChanged;
 

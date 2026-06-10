@@ -5,13 +5,13 @@
         base.Awake();
 
         if (Unit != null)
-            Unit.BeforeDamage += OnBeforeDamage;
+            Unit.OnBeforeDamage += OnBeforeDamage;
     }
 
     protected override void OnDestroy()
     {
         if (Unit != null)
-            Unit.BeforeDamage -= OnBeforeDamage;
+            Unit.OnBeforeDamage -= OnBeforeDamage;
 
         base.OnDestroy();
     }

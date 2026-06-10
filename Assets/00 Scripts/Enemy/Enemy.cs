@@ -73,7 +73,7 @@ public class Enemy : GameUnit
         distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
     }
 
-    public override void Die()
+    public override void OnDie()
     {
         NotifyDied();
 

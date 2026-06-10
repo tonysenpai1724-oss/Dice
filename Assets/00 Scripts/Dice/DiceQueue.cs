@@ -101,20 +101,21 @@ public class DiceQueue : MonoBehaviour
                     enemyManager != null
                         ? enemyManager.GetNearestAliveEnemy()
                         : null;
-                DiceSkillContext context =
-                    new DiceSkillContext(
-                        diceData,
-                        this,
-                        null,
-                        enemyManager,
-                        player,
-                        targetEnemy
-                    );
+
+                GameplayManager gameplay = GameplayManager.Instance;
+                gameplay?.BeginDiceSkill(
+                    diceData,
+                    this,
+                    null,
+                    enemyManager,
+                    player,
+                    targetEnemy
+                );
 
                 if (diceData == null)
-                    context.skipAttack = true;
+                    gameplay?.CancelAttack();
 
-                diceData?.ExecuteSkill(context);
+                diceData?.ExecuteSkill();
 
                 yield return MoveItem(
                     first.transform,
@@ -123,12 +124,14 @@ public class DiceQueue : MonoBehaviour
                 );
 
                 if (enemyManager != null &&
-                    !context.skipAttack)
+                    gameplay != null &&
+                    !gameplay.skillSkipAttack)
                 {
-                    enemyManager.PlayerAttack(context.damage);
+                    enemyManager.PlayerAttack(gameplay.skillDamage);
                 }
 
-                context.RunAfterAttackActions();
+                gameplay?.RunAfterAttackActions();
+                gameplay?.ClearDiceSkillState();
 
                 yield return new WaitForSeconds(delayDestoyTime);
                 Destroy(

@@ -168,12 +168,12 @@ public class Dice : MonoBehaviour
 
     }
 
-    public virtual void ActivateSkill(DiceSkillContext context)
+    public virtual void ActivateSkill()
     {
         if (data == null)
             return;
 
-        data.ExecuteSkill(context);
+        data.ExecuteSkill();
     }
 
     public void FreezeForMerge()

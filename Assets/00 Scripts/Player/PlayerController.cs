@@ -48,7 +48,7 @@ public class PlayerController : GameUnit
         QueueIdleAnimation();
     }
 
-    public override void Die()
+    public override void OnDie()
     {
         NotifyDied();
         PlayAnimation(dieAnim, false);

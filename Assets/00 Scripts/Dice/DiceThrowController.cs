@@ -7,6 +7,9 @@ public class DiceThrowController : MonoBehaviour
 {
     [Header("Spawn")]
     public Transform spawnPoint;
+    public DiceHand hand;
+    public Vector3 handLocalPosition = new Vector3(0f, 1.5f, 0f);
+    public Vector3 handLocalEuler = new Vector3(-90f, 90f, 90f);
 
     public int spawnLevel = 1;
 
@@ -28,6 +31,7 @@ public class DiceThrowController : MonoBehaviour
 
     bool dragging;
     bool waitingForBoard;
+
     [Header("Highlight")]
     public Transform diceHighlight;
 
@@ -81,6 +85,7 @@ public class DiceThrowController : MonoBehaviour
                 false
             );
         AttachHighlight(currentDice);
+        PrepareHand();
         currentDice.rb.linearVelocity =
             Vector3.zero;
     }
@@ -151,6 +156,13 @@ public class DiceThrowController : MonoBehaviour
             shootForce
         );
 
+        if (hand != null)
+        {
+            hand.transform.SetParent(null, true);
+            hand.Release();
+            // hand.gameObject.SetActive(false);
+        }
+
         currentDice = null;
 
         StartCoroutine(
@@ -214,6 +226,22 @@ public class DiceThrowController : MonoBehaviour
     {
         return GameplayManager.Instance != null &&
             GameplayManager.Instance.IsGameEnded;
+    }
+
+    void PrepareHand()
+    {
+        if (hand == null || spawnPoint == null)
+            return;
+
+        if (currentDice != null)
+        {
+            //   hand.gameObject.SetActive(true);
+            hand.transform.SetParent(currentDice.transform, true);
+            hand.transform.localPosition = handLocalPosition;
+            hand.transform.localRotation = Quaternion.Euler(handLocalEuler);
+        }
+
+        hand.Prepare();
     }
 
     Vector3 GetMouseWorldPosition()

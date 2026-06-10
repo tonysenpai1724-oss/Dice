@@ -10,6 +10,6 @@
     public void Apply(int amount)
     {
         if (unit != null)
-            unit.Heal(amount);
+            unit.OnHeal(amount);
     }
 }
