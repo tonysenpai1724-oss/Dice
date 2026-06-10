@@ -6,22 +6,20 @@ public class DamageReductionEffect : GameEffect
 
     GameUnit unit;
 
-    public override void Initialize(EffectManager effectManager, object owner)
+    protected override void Awake()
     {
-        base.Initialize(effectManager, owner);
-        unit = owner as GameUnit;
+        unit = GetComponent<GameUnit>();
 
         if (unit != null)
             unit.BeforeDamage += OnBeforeDamage;
     }
 
-    public override void Dispose()
+    protected override void OnDestroy()
     {
         if (unit != null)
             unit.BeforeDamage -= OnBeforeDamage;
 
-        unit = null;
-        base.Dispose();
+        base.OnDestroy();
     }
 
     public void AddReduction(int amount)

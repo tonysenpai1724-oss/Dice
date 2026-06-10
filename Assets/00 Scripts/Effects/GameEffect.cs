@@ -1,24 +1,63 @@
-﻿public abstract class GameEffect
+﻿using System;
+using UnityEngine;
+
+public abstract class GameEffect : MonoBehaviour
 {
     public EffectManager EffectManager { get; private set; }
-    public object Owner { get; private set; }
+    public GameUnit Unit { get; private set; }
+    public int Stacks { get; private set; }
+
+    public event Action<GameEffect, int> StacksChanged;
 
     public bool IsActiveEffect => EffectManager != null && EffectManager.Contains(this);
 
-    public virtual void Initialize(EffectManager effectManager, object owner)
+    protected virtual void Awake()
     {
-        EffectManager = effectManager;
-        Owner = owner;
+        Unit = GetComponent<GameUnit>();
     }
 
-    public virtual void Dispose()
+    public virtual void Initialize(EffectManager effectManager)
     {
-        EffectManager = null;
-        Owner = null;
+        EffectManager = effectManager;
+
+        if (Unit == null)
+            Unit = GetComponent<GameUnit>();
+    }
+
+    public virtual void AddStacks(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        Stacks += amount;
+        NotifyStacksChanged();
+    }
+
+    protected bool ConsumeStack()
+    {
+        if (Stacks <= 0)
+            return false;
+
+        Stacks--;
+        NotifyStacksChanged();
+        return true;
+    }
+
+    protected virtual void OnDestroy()
+    {
+        Unit = null;
+
+        if (EffectManager != null)
+            EffectManager.UnregisterEffect(this);
     }
 
     protected void RemoveSelf()
     {
-        EffectManager?.RemoveEffect(this);
+        Destroy(this);
+    }
+
+    protected void NotifyStacksChanged()
+    {
+        StacksChanged?.Invoke(this, Stacks);
     }
 }

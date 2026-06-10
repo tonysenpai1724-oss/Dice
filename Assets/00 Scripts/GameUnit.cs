@@ -29,14 +29,16 @@ public abstract class GameUnit : MonoBehaviour
 
     protected virtual void Awake()
     {
-        effectManager = EffectManager.Instance;
+        effectManager = GetComponent<EffectManager>();
+        if (effectManager == null)
+            effectManager = gameObject.AddComponent<EffectManager>();
+
         HpChanged += UpdateHpBar;
     }
 
     protected virtual void OnDestroy()
     {
         HpChanged -= UpdateHpBar;
-        EffectManager.Instance.RemoveEffects(this);
     }
 
     public virtual void SetHealth(int maxHp, int newCurrentHp)

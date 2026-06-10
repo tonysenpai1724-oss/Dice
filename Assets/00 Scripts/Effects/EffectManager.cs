@@ -1,39 +1,36 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
-public sealed class EffectManager : Singleton<EffectManager>
+public class EffectManager : MonoBehaviour
 {
-
-    readonly List<GameEffect> currentEffects = new();
+    [SerializeField] private List<GameEffect> currentEffects = new();
 
     public IReadOnlyList<GameEffect> CurrentEffects => currentEffects;
 
-    EffectManager()
+    void Awake()
     {
+        InitializeExistingEffects();
     }
 
-    public T GetEffect<T>(object owner) where T : GameEffect
+    public T GetEffect<T>() where T : GameEffect
     {
         for (int i = 0; i < currentEffects.Count; i++)
         {
-            if (currentEffects[i] is T effect && ReferenceEquals(effect.Owner, owner))
+            if (currentEffects[i] is T effect)
                 return effect;
         }
 
         return null;
     }
 
-    public T AddEffect<T>(object owner) where T : GameEffect, new()
+    public T AddEffect<T>() where T : GameEffect
     {
-        if (owner == null)
-            return null;
-
-        T effect = GetEffect<T>(owner);
+        T effect = GetEffect<T>();
         if (effect != null)
             return effect;
 
-        effect = new T();
-        currentEffects.Add(effect);
-        effect.Initialize(this, owner);
+        effect = gameObject.AddComponent<T>();
+        RegisterEffect(effect);
         return effect;
     }
 
@@ -42,26 +39,31 @@ public sealed class EffectManager : Singleton<EffectManager>
         return effect != null && currentEffects.Contains(effect);
     }
 
-    public void RemoveEffect(GameEffect effect)
+    public void RegisterEffect(GameEffect effect)
     {
         if (effect == null)
             return;
 
-        if (!currentEffects.Remove(effect))
-            return;
+        if (!currentEffects.Contains(effect))
+            currentEffects.Add(effect);
 
-        effect.Dispose();
+        effect.Initialize(this);
     }
 
-    public void RemoveEffects(object owner)
+    public void UnregisterEffect(GameEffect effect)
     {
-        if (owner == null)
+        if (effect == null)
             return;
 
-        for (int i = currentEffects.Count - 1; i >= 0; i--)
+        currentEffects.Remove(effect);
+    }
+
+    void InitializeExistingEffects()
+    {
+        GameEffect[] effects = GetComponents<GameEffect>();
+        for (int i = 0; i < effects.Length; i++)
         {
-            if (ReferenceEquals(currentEffects[i].Owner, owner))
-                RemoveEffect(currentEffects[i]);
+            RegisterEffect(effects[i]);
         }
     }
 }

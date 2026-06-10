@@ -36,23 +36,25 @@ public class EnemyManager : Singleton<EnemyManager>
     public override void Awake()
     {
         base.Awake();
-        effectManager = EffectManager.Instance;
+        effectManager = GetComponent<EffectManager>();
+        if (effectManager == null)
+            effectManager = gameObject.AddComponent<EffectManager>();
     }
 
     public void SpawnEnemies(Level level)
     {
-        DebugCustom.LogColor(
-            "Spawn Enemies: " +
-            (level != null && level.enemyDatas != null ? level.enemyDatas.Count : 0)
-        );
+        // DebugCustom.LogColor(
+        //     "Spawn Enemies: " +
+        //     (level != null && level.enemyDatas != null ? level.enemyDatas.Count : 0)
+        // );
         ClearEnemies();
-        DebugCustom.LogColor("Enemy Prefab: " + enemyPrefab);
-        DebugCustom.LogColor("Enemy Root: " + enemyRoot);
-        DebugCustom.LogColor("Enemy Datas: " + level);
+        // DebugCustom.LogColor("Enemy Prefab: " + enemyPrefab);
+        // DebugCustom.LogColor("Enemy Root: " + enemyRoot);
+        // DebugCustom.LogColor("Enemy Datas: " + level);
 
         if (level == null || enemyPrefab == null)
         {
-            DebugCustom.LogColor("Enemy Datas or Prefab is null");
+            // DebugCustom.LogColor("Enemy Datas or Prefab is null");
             return;
         }
 
@@ -78,7 +80,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
                 Enemy enemy = Instantiate(enemyPrefab, root, false);
                 RegisterEnemy(enemy);
-                DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
+                //                DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
                 enemy.Setup(placement.data);
                 enemies.Add(enemy);
                 SetEnemyPosition(
@@ -96,13 +98,13 @@ public class EnemyManager : Singleton<EnemyManager>
         for (int i = 0; i < enemyDatas.Count; i++)
         {
             EnemyData data = enemyDatas[i];
-            DebugCustom.LogColor("Enemy Data: " + data);
+            //    DebugCustom.LogColor("Enemy Data: " + data);
             if (data == null)
                 continue;
 
             Enemy enemy = Instantiate(enemyPrefab, root, false);
             RegisterEnemy(enemy);
-            DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
+            //  DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
             enemy.Setup(data);
             enemies.Add(enemy);
             SetEnemyPosition(
@@ -240,7 +242,11 @@ public class EnemyManager : Singleton<EnemyManager>
         CleanupEnemies();
         ApplyPoisonTicks();
 
-        EnemyTurnSkipEffect turnSkipEffect = effectManager?.GetEffect<EnemyTurnSkipEffect>(this);
+        CheckWinGame();
+        if (!HasAliveEnemies())
+            yield break;
+
+        EnemyTurnSkipEffect turnSkipEffect = effectManager?.GetEffect<EnemyTurnSkipEffect>();
         if (turnSkipEffect != null && turnSkipEffect.ConsumeTurnSkip())
         {
             yield break;
@@ -248,7 +254,10 @@ public class EnemyManager : Singleton<EnemyManager>
 
         Enemy frontEnemy = GetFrontEnemy();
         if (frontEnemy == null)
+        {
+            CheckWinGame();
             yield break;
+        }
 
         if (frontEnemy.type == EnemyType.Range && !IsAtAttackPoint(frontEnemy))
         {
@@ -280,6 +289,7 @@ public class EnemyManager : Singleton<EnemyManager>
             return;
 
         enemy.DeathCompleted -= RemoveEnemy;
+        enemy.Died -= OnEnemyDied;
         enemies.Remove(enemy);
         Destroy(enemy.gameObject);
         // RebuildLayout();
@@ -293,14 +303,33 @@ public class EnemyManager : Singleton<EnemyManager>
 
         enemy.DeathCompleted -= RemoveEnemy;
         enemy.DeathCompleted += RemoveEnemy;
+        enemy.Died -= OnEnemyDied;
+        enemy.Died += OnEnemyDied;
+    }
+
+    void OnEnemyDied(GameUnit unit)
+    {
+        CheckWinGame();
     }
 
     void CheckWinGame()
     {
         CleanupEnemies();
 
-        if (enemies.Count == 0 && GameplayManager.Instance != null && !GameplayManager.Instance.winGame)
+        if (!HasAliveEnemies() && GameplayManager.Instance != null && !GameplayManager.Instance.IsGameEnded)
             GameplayManager.Instance.EndGame(true);
+    }
+
+    bool HasAliveEnemies()
+    {
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy != null && enemy.IsAlive())
+                return true;
+        }
+
+        return false;
     }
 
     void AttackPlayer(Enemy enemy)
@@ -331,7 +360,7 @@ public class EnemyManager : Singleton<EnemyManager>
         if (amount <= 0)
             return;
 
-        EnemyTurnSkipEffect turnSkipEffect = effectManager?.AddEffect<EnemyTurnSkipEffect>(this);
+        EnemyTurnSkipEffect turnSkipEffect = effectManager?.AddEffect<EnemyTurnSkipEffect>();
         if (turnSkipEffect != null)
             turnSkipEffect.AddTurns(amount);
     }
@@ -341,7 +370,7 @@ public class EnemyManager : Singleton<EnemyManager>
         if (amount <= 0)
             return;
 
-        DamageReductionEffect damageReductionEffect = player.effectManager?.AddEffect<DamageReductionEffect>(player);
+        DamageReductionEffect damageReductionEffect = player.effectManager?.AddEffect<DamageReductionEffect>();
         if (damageReductionEffect != null)
             damageReductionEffect.AddReduction(amount);
     }
@@ -351,7 +380,7 @@ public class EnemyManager : Singleton<EnemyManager>
         if (amount <= 0)
             return;
 
-        DamageAllEnemiesEffect damageAllEnemiesEffect = effectManager?.AddEffect<DamageAllEnemiesEffect>(this);
+        DamageAllEnemiesEffect damageAllEnemiesEffect = effectManager?.AddEffect<DamageAllEnemiesEffect>();
         if (damageAllEnemiesEffect != null)
             damageAllEnemiesEffect.Apply(amount);
     }
@@ -370,7 +399,7 @@ public class EnemyManager : Singleton<EnemyManager>
             return;
         }
 
-        PoisonEffect poisonEffect = target.effectManager?.AddEffect<PoisonEffect>(target);
+        PoisonEffect poisonEffect = target.effectManager?.AddEffect<PoisonEffect>();
         if (poisonEffect != null)
             poisonEffect.Apply(turns, damagePerTurn);
     }

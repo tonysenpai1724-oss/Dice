@@ -40,6 +40,7 @@ public class GameplayManager : Singleton<GameplayManager>
     }
     public void StartGame()
     {
+        winGame = false;
         SetState(EGamePlayState.Running);
     }
     private void Update()
@@ -80,8 +81,13 @@ public class GameplayManager : Singleton<GameplayManager>
 
     public void EndGame(bool win)
     {
+        if (IsGameEnded)
+            return;
+
         DebugCustom.LogColor("End Game");
         winGame = win;
+        SetState(EGamePlayState.GameOver);
+
         if (winGame)
         {
             IPlayerInfoController.Instance.WinLevel();

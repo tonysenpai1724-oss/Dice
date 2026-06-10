@@ -68,7 +68,7 @@ public static class DodgeDiceSkillData
 {
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        DodgeEffect dodgeEffect = context?.player.effectManager?.AddEffect<DodgeEffect>(context.player);
+        DodgeEffect dodgeEffect = context?.player.effectManager?.AddEffect<DodgeEffect>();
         if (dodgeEffect == null)
             return;
 
@@ -91,7 +91,7 @@ public static class PoisonDiceSkillData
         int poisonDamage = poisonTurns;
 
         context.CancelAttack();
-        target.effectManager?.AddEffect<PoisonEffect>(target)?.Apply(poisonTurns, poisonDamage);
+        target.effectManager?.AddEffect<PoisonEffect>()?.Apply(poisonTurns, poisonDamage);
     }
 }
 
@@ -106,7 +106,7 @@ public static class HealDiceSkillData
         int healAmount = Mathf.Max(0, context.DiceDamage);
 
         context.CancelAttack();
-        context.player.effectManager?.AddEffect<HealEffect>(context.player)?.Apply(healAmount);
+        context.player.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
     }
 }
 
@@ -115,7 +115,7 @@ public static class ShieldDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        ShieldEffect shieldEffect = context?.player.effectManager?.AddEffect<ShieldEffect>(context.player);
+        ShieldEffect shieldEffect = context?.player.effectManager?.AddEffect<ShieldEffect>();
         if (shieldEffect == null)
             return;
 
@@ -152,7 +152,7 @@ public static class BlindStrikeDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        DamageReductionEffect damageReductionEffect = context?.player.effectManager?.AddEffect<DamageReductionEffect>(context.player);
+        DamageReductionEffect damageReductionEffect = context?.player.effectManager?.AddEffect<DamageReductionEffect>();
         if (damageReductionEffect != null)
             damageReductionEffect.AddReduction(context.DiceDamage);
     }
@@ -163,7 +163,7 @@ public static class StunDiceSkillData
 
     public static void Execute(DiceSkillContext context, int stackApply, int valueApply)
     {
-        EnemyTurnSkipEffect turnSkipEffect = context?.enemyManager.effectManager?.AddEffect<EnemyTurnSkipEffect>(context.enemyManager);
+        EnemyTurnSkipEffect turnSkipEffect = context?.enemyManager.effectManager?.AddEffect<EnemyTurnSkipEffect>();
         if (turnSkipEffect != null)
             turnSkipEffect.AddTurns(stackApply);
     }
@@ -180,7 +180,7 @@ public static class BombDiceSkillData
         context.AddAfterAttack(() =>
         {
             DamageAllEnemiesEffect damageAllEnemiesEffect =
-                context.enemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>(context.enemyManager);
+                context.enemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>();
 
             if (damageAllEnemiesEffect != null)
                 damageAllEnemiesEffect.Apply(valueApply);

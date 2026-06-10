@@ -2,16 +2,9 @@
 {
     EnemyManager enemyManager;
 
-    public override void Initialize(EffectManager effectManager, object owner)
+    protected override void Awake()
     {
-        base.Initialize(effectManager, owner);
-        enemyManager = owner as EnemyManager;
-    }
-
-    public override void Dispose()
-    {
-        enemyManager = null;
-        base.Dispose();
+        enemyManager = GetComponent<EnemyManager>();
     }
 
     public void Apply(int amount)

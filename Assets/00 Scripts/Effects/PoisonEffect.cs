@@ -8,10 +8,9 @@ public class PoisonEffect : GameEffect
     GameUnit unit;
     bool ticking;
 
-    public override void Initialize(EffectManager effectManager, object owner)
+    protected override void Awake()
     {
-        base.Initialize(effectManager, owner);
-        unit = owner as GameUnit;
+        unit = GetComponent<GameUnit>();
 
         if (unit != null)
         {
@@ -20,7 +19,7 @@ public class PoisonEffect : GameEffect
         }
     }
 
-    public override void Dispose()
+    protected override void OnDestroy()
     {
         if (unit != null)
         {
@@ -28,8 +27,7 @@ public class PoisonEffect : GameEffect
             unit.Died -= OnUnitDied;
         }
 
-        unit = null;
-        base.Dispose();
+        base.OnDestroy();
     }
 
     public void Apply(int turns, int damage)

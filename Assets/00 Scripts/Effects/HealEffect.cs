@@ -2,16 +2,9 @@
 {
     GameUnit unit;
 
-    public override void Initialize(EffectManager effectManager, object owner)
+    protected override void Awake()
     {
-        base.Initialize(effectManager, owner);
-        unit = owner as GameUnit;
-    }
-
-    public override void Dispose()
-    {
-        unit = null;
-        base.Dispose();
+        unit = GetComponent<GameUnit>();
     }
 
     public void Apply(int amount)
