@@ -2998,8 +2998,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceThrowController
   spawnPoint: {fileID: 1634904172}
   hand: {fileID: 879415298}
-  handLocalPosition: {x: 0, y: 2, z: -3.6}
-  handLocalEuler: {x: -90, y: 90, z: 90}
+  handLocalPosition: {x: 2, y: 0, z: -3.6}
+  handLocalEuler: {x: 0, y: 90, z: 90}
   spawnLevel: 1
   shootForce: 100
   minLaunchAngle: 15
@@ -4842,15 +4842,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 14
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -36.22
+      value: -3.6
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -7158,15 +7158,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.26
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11.67
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -32.25
+      value: -3.6
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ade02ee80e8c7ec4795c5b19a1bf49d8, type: 3}
       propertyPath: m_LocalRotation.w

@@ -12,7 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20f757b9f7389404b8c5cf94cf00d476, type: 3}
   m_Name: Necromancer
   m_EditorClassIdentifier: Assembly-CSharp::HeroData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: startDiceLevelConfig
+      Entry: 6
+      Data: 
   hp: 50
-  damage: 0
+  level: 1
+  damage: 2
+  shield: 36
   type: 6
   skeletonData: {fileID: 11400000, guid: e57cdb51287d3924ebb2ececf816733b, type: 2}

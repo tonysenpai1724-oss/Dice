@@ -40,6 +40,10 @@ public abstract class GameEffect : MonoBehaviour
 
         Stacks--;
         NotifyStacksChanged();
+
+        if (Stacks <= 0)
+            RemoveSelf();
+
         return true;
     }
 

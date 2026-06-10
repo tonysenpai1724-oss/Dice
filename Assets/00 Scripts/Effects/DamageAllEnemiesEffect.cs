@@ -10,7 +10,10 @@
     public void Apply(int amount)
     {
         if (enemyManager == null || amount <= 0)
+        {
+            RemoveSelf();
             return;
+        }
 
         for (int i = 0; i < enemyManager.enemies.Count; i++)
         {
@@ -20,5 +23,7 @@
 
             enemy.OnTakeDamage(amount);
         }
+
+        RemoveSelf();
     }
 }

@@ -5,15 +5,18 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Spine.Unity;
+using Sirenix.OdinInspector;
 
-[CreateAssetMenu(fileName = "New Hero Data", menuName = "Hero Data")]
-public class HeroData : ScriptableObject
+
+[CreateAssetMenu(menuName = "RuneDice/Hero Data")]
+public class HeroData : SerializedScriptableObject
 {
     public int hp;
+    public int level;
     public int damage;
     public int shield;
     public HeroType type;
-
+    public Dictionary<int, List<DiceData>> startDiceLevelConfig;
     public SkeletonDataAsset skeletonData;
 }
 public enum HeroType

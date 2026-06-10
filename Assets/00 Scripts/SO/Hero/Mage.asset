@@ -12,7 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20f757b9f7389404b8c5cf94cf00d476, type: 3}
   m_Name: Mage
   m_EditorClassIdentifier: Assembly-CSharp::HeroData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: startDiceLevelConfig
+      Entry: 6
+      Data: 
   hp: 50
-  damage: 0
+  level: 1
+  damage: 2
+  shield: 36
   type: 1
   skeletonData: {fileID: 11400000, guid: af38a3de26ed9b84abc2fe7c7f3b209d, type: 2}

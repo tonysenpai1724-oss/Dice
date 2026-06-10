@@ -7,6 +7,7 @@ public class Level : SerializedScriptableObject
 {
     public int levelNumber;
     public List<EnemyData> enemyDatas;
+    public LevelType leveltype;
     [Header("Enemy Spawn")]
     public List<EnemySpawnPlacement> enemySpawnPlacements = new();
     //public DiceType[] diceTypes;
@@ -16,4 +17,18 @@ public class Level : SerializedScriptableObject
     {
         enemySpawnPlacements.Clear();
     }
+}
+public enum LevelType
+{
+    NormalBattle,
+    ToughBattle,
+    MiniBoss,
+    Shop,
+    MagicAltar,
+    Chest,
+    Jester,
+    Upgrade,
+    FinalBoss,
+
+
 }
