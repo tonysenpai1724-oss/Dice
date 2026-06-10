@@ -1,4 +1,3 @@
-using System;
 using Cinemachine;
 using Sirenix.OdinInspector;
 using System.Collections;
@@ -10,8 +9,6 @@ using System.Linq;
 
 public class GameplayManager : Singleton<GameplayManager>
 {
-    readonly List<Action> afterAttackActions = new();
-
     public EGamePlayState State => state;
     [SerializeField, ReadOnly] protected EGamePlayState state;
     public EGamePlayState LastState { get; private set; }
@@ -31,6 +28,7 @@ public class GameplayManager : Singleton<GameplayManager>
     public Enemy skillTargetEnemy;
     public int skillDamage;
     public bool skillSkipAttack;
+    public int skillAfterAttackDamageAllEnemies;
 
     public int DiceDamage => skillDiceData != null ? Mathf.Max(0, skillDiceData.damage) : 0;
 
@@ -82,20 +80,31 @@ public class GameplayManager : Singleton<GameplayManager>
         return skillEnemyManager != null ? skillEnemyManager.GetNearestAliveEnemy() : null;
     }
 
-    public void AddAfterAttack(Action action)
+    public void AddDamageAllEnemiesAfterAttack(int amount)
     {
-        if (action != null)
-            afterAttackActions.Add(action);
+        if (amount <= 0)
+            return;
+
+        skillAfterAttackDamageAllEnemies += amount;
     }
 
     public void RunAfterAttackActions()
     {
-        for (int i = 0; i < afterAttackActions.Count; i++)
-        {
-            afterAttackActions[i]?.Invoke();
-        }
+        TigerForge.EventManager.EmitEvent(Constant.ON_DICE_AFTER_ATTACK);
+    }
 
-        afterAttackActions.Clear();
+    void OnDiceAfterAttack()
+    {
+        if (skillAfterAttackDamageAllEnemies <= 0 || skillEnemyManager == null)
+            return;
+
+        DamageAllEnemiesEffect damageAllEnemiesEffect =
+            skillEnemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>();
+
+        if (damageAllEnemiesEffect != null)
+            damageAllEnemiesEffect.Apply(skillAfterAttackDamageAllEnemies);
+
+        skillAfterAttackDamageAllEnemies = 0;
     }
 
     public void ClearDiceSkillState()
@@ -108,7 +117,16 @@ public class GameplayManager : Singleton<GameplayManager>
         skillTargetEnemy = null;
         skillDamage = 0;
         skillSkipAttack = false;
-        afterAttackActions.Clear();
+        skillAfterAttackDamageAllEnemies = 0;
+    }
+    public void SpeedGame()
+    {
+        Time.timeScale += 0.5f;
+        if (Time.timeScale > 2)
+        {
+            Time.timeScale = 1;
+        }
+        TigerForge.EventManager.EmitEvent(Constant.On_Speed_Changed);
     }
 
     public IEnumerator IEInit()
@@ -128,7 +146,14 @@ public class GameplayManager : Singleton<GameplayManager>
         UIManager.Instance.uIGameplay.Initialize();
         StartGame();
         TigerForge.EventManager.StartListening(Constant.EVENT_TIMER_TICK, OnTick);
+        TigerForge.EventManager.StartListening(Constant.ON_DICE_AFTER_ATTACK, OnDiceAfterAttack);
         TigerForge.EventManager.EmitEvent(Constant.EVENT_LEVEL_INITED);
+
+    }
+
+    void OnDestroy()
+    {
+        TigerForge.EventManager.StopListening(Constant.ON_DICE_AFTER_ATTACK, OnDiceAfterAttack);
     }
     public void StartGame()
     {

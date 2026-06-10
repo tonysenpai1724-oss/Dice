@@ -186,14 +186,7 @@ public static class BombDiceSkillData
         if (gameplay == null || gameplay.skillEnemyManager == null)
             return;
 
-        gameplay.AddAfterAttack(() =>
-        {
-            DamageAllEnemiesEffect damageAllEnemiesEffect =
-                gameplay.skillEnemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>();
-
-            if (damageAllEnemiesEffect != null)
-                damageAllEnemiesEffect.Apply(valueApply);
-        });
+        gameplay.AddDamageAllEnemiesAfterAttack(valueApply);
     }
 }
 public static class EnemyDiceSKillData

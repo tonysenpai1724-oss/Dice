@@ -68,6 +68,10 @@ public abstract class GameUnit : MonoBehaviour
 
         currentHp = Mathf.Max(0, currentHp - amount);
         OnDamaged?.Invoke(this, amount);
+        TigerForge.EventManager.EmitEventData(
+            Constant.ON_UNIT_DAMAGED,
+            new GameUnitAmountEventData(this, amount)
+        );
         NotifyHpChanged();
 
         if (currentHp <= 0)
@@ -86,6 +90,10 @@ public abstract class GameUnit : MonoBehaviour
 
         currentHp = Mathf.Min(hp, currentHp + amount);
         OnHealed?.Invoke(this, amount);
+        TigerForge.EventManager.EmitEventData(
+            Constant.ON_UNIT_HEALED,
+            new GameUnitAmountEventData(this, amount)
+        );
         NotifyHpChanged();
     }
 
@@ -117,12 +125,22 @@ public abstract class GameUnit : MonoBehaviour
     public void BeginTurn()
     {
         if (IsAlive())
+        {
             OnTurnStarted?.Invoke(this);
+            TigerForge.EventManager.EmitEventData(
+                Constant.ON_UNIT_TURN_STARTED,
+                this
+            );
+        }
     }
 
     protected void NotifyHpChanged()
     {
         OnHpChanged?.Invoke(this, currentHp, hp);
+        TigerForge.EventManager.EmitEventData(
+            Constant.ON_UNIT_HP_CHANGED,
+            new GameUnitHpEventData(this, currentHp, hp)
+        );
     }
 
     protected void NotifyDied()
@@ -132,6 +150,10 @@ public abstract class GameUnit : MonoBehaviour
 
         deathNotified = true;
         OnDied?.Invoke(this);
+        TigerForge.EventManager.EmitEventData(
+            Constant.ON_UNIT_DIED,
+            this
+        );
     }
 
     protected virtual void PlayHurtAnimation()
@@ -160,6 +182,32 @@ public abstract class GameUnit : MonoBehaviour
     {
         if (hpBar != null)
             hpBar.SetHp(current, max);
+    }
+}
+
+public sealed class GameUnitHpEventData
+{
+    public GameUnit Unit { get; }
+    public int CurrentHp { get; }
+    public int MaxHp { get; }
+
+    public GameUnitHpEventData(GameUnit unit, int currentHp, int maxHp)
+    {
+        Unit = unit;
+        CurrentHp = currentHp;
+        MaxHp = maxHp;
+    }
+}
+
+public sealed class GameUnitAmountEventData
+{
+    public GameUnit Unit { get; }
+    public int Amount { get; }
+
+    public GameUnitAmountEventData(GameUnit unit, int amount)
+    {
+        Unit = unit;
+        Amount = amount;
     }
 }
 

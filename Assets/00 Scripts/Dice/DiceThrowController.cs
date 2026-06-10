@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 public class DiceThrowController : MonoBehaviour
@@ -54,6 +55,12 @@ public class DiceThrowController : MonoBehaviour
             Mouse.current.leftButton.wasPressedThisFrame
         )
         {
+            if (!IsPointerOverBoardMesh())
+            {
+                dragging = false;
+                return;
+            }
+
             dragging = true;
         }
 
@@ -63,6 +70,9 @@ public class DiceThrowController : MonoBehaviour
         )
         {
             dragging = false;
+
+            if (!IsPointerOverBoardMesh())
+                return;
 
             Shoot();
         }
@@ -226,6 +236,33 @@ public class DiceThrowController : MonoBehaviour
     {
         return GameplayManager.Instance != null &&
             GameplayManager.Instance.IsGameEnded;
+    }
+    bool IsPointerOverBoardMesh()
+    {
+        if (Camera.main == null || Mouse.current == null)
+            return false;
+
+        if (DiceManager.Instance == null || DiceManager.Instance.boardCollider == null)
+            return false;
+
+        Collider boardCollider = DiceManager.Instance.boardCollider;
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        RaycastHit[] hits = Physics.RaycastAll(
+            ray,
+            Mathf.Infinity,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Collide
+        );
+        Debug.Log(hits.Length);
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Debug.Log(hits[i].collider.gameObject.name);
+            if (hits[i].collider == boardCollider)
+                return true;
+        }
+
+        return false;
     }
 
     void PrepareHand()

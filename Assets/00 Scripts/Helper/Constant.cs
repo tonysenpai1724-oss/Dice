@@ -71,6 +71,11 @@ public static class Constant
     public const string ON_PLAYER_RELOADING_WEAPON = "ON_PLAYER_RELOADING_WEAPON";
     public const string ON_PLAYER_STOP_RELOADING = "ON_PLAYER_STOP_RELOADING";
     public const string ON_FIRST_BULLET_SHOT = "ON_FIRST_BULLET_SHOT";
+    public const string ON_UNIT_HP_CHANGED = "ON_UNIT_HP_CHANGED";
+    public const string ON_UNIT_DAMAGED = "ON_UNIT_DAMAGED";
+    public const string ON_UNIT_HEALED = "ON_UNIT_HEALED";
+    public const string ON_UNIT_TURN_STARTED = "ON_UNIT_TURN_STARTED";
+    public const string ON_UNIT_DIED = "ON_UNIT_DIED";
     public const string ON_Boss_HP_CHANGE = "ON_Enemy_HP_CHANGE";
     public const string ON_ENEMY_KILLED = "ON_ENEMY_KILLED";
     public const string ON_CHEST_KILLED = "ON_CHEST_KILLED";
@@ -98,5 +103,9 @@ public static class Constant
     public const string AdsReward_X2_Daily = "AdsReward_X2_Daily";
     public const string AdsReward_Daily_Shop = "AdsReward_Daily_Shop";
 
+    #endregion
+    #region GamePlay
+    public const string On_Speed_Changed = "On_Speed_Changed";
+    public const string ON_DICE_AFTER_ATTACK = "ON_DICE_AFTER_ATTACK";
     #endregion
 }

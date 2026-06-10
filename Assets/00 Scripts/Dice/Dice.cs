@@ -324,12 +324,12 @@ public class Dice : MonoBehaviour
 
     void OnMouseEnter()
     {
-        SetHoverState(true);
+        // SetHoverState(true);
     }
 
     void OnMouseExit()
     {
-        SetHoverState(false);
+        //SetHoverState(false);
     }
 
     public Quaternion GetUprightRotation()

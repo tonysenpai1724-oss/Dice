@@ -6,12 +6,13 @@ using System.Collections;
 
 public class UiGameplay : MonoBehaviour
 {
-    public TextMeshProUGUI txtLevel, txtTimer, txtTut, txtScore;
+    public TextMeshProUGUI txtLevel, txtTimer, txtTut, txtScore, txtSpeed;
     public GameObject tutBox;
 
     private void Start()
     {
         UIManager.Instance.uIGameplay = this;
+        TigerForge.EventManager.StartListening(Constant.On_Speed_Changed, OnSpeedChanged);
     }
 
     public void Initialize()
@@ -21,23 +22,28 @@ public class UiGameplay : MonoBehaviour
         InitLevel();
         TigerForge.EventManager.StartListening(Constant.EVENT_LEVEL_INITED, InitLevel);
         OnTick();
+
+    }
+    public void OnSpeedChanged()
+    {
+        txtSpeed.text = $"{Time.timeScale}x";
     }
     void InitLevel()
     {
-        if (GameManager.Instance.GameType == EGameType.Campaign)
-        {
-            txtLevel.text = $"Level {GameplayManager.Instance.CurrentLevel}";
-            txtScore.gameObject.SetActive(false);
-        }
-        else
-        {
-            txtScore.gameObject.SetActive(true);
-        }
+        // if (GameManager.Instance.GameType == EGameType.Campaign)
+        // {
+        //     txtLevel.text = $"Level {GameplayManager.Instance.CurrentLevel}";
+        //     txtScore.gameObject.SetActive(false);
+        // }
+        // else
+        // {
+        //     txtScore.gameObject.SetActive(true);
+        // }
     }
     void OnTick()
     {
-        txtTimer.text = Helper.TimeToString(System.TimeSpan.FromSeconds(GameplayManager.Instance.LevelTime));
-        txtScore.text = $"Score: {GameplayManager.Instance.Score}";
+        // txtTimer.text = Helper.TimeToString(System.TimeSpan.FromSeconds(GameplayManager.Instance.LevelTime));
+        // txtScore.text = $"Score: {GameplayManager.Instance.Score}";
     }
     public void OnClickPauseGame()
     {
@@ -47,11 +53,11 @@ public class UiGameplay : MonoBehaviour
 
     public void ShowTextTut(string txt)
     {
-        txtTut.text = txt;
-        tutBox.SetActive(true);
+        // txtTut.text = txt;
+        // tutBox.SetActive(true);
     }
     public void HideTextTut()
     {
-        tutBox.SetActive(false);
+        // tutBox.SetActive(false);
     }
 }

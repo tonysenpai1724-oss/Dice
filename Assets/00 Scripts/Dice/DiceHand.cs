@@ -100,8 +100,8 @@ public class DiceHand : MonoBehaviour
     {
         if (animator != null)
         {
-            Debug.Log("Animator");
-            animator.speed = 1f;
+
+            animator.speed = 1.5f;
 
             while (true)
             {

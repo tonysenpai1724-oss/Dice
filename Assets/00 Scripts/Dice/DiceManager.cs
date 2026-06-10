@@ -72,11 +72,11 @@ public class DiceManager : MonoBehaviour
     }
     void Update()
     {
-        //HandleHover();
+        HandleHover();
     }
     void HandleHover()
     {
-        if (Mouse.current == null)
+        if (Mouse.current == null || Camera.main == null)
             return;
 
         Ray ray =
@@ -85,16 +85,34 @@ public class DiceManager : MonoBehaviour
             );
 
         Dice hitDice = null;
+        float nearestDistance = float.MaxValue;
 
-        if (
-            Physics.Raycast(
-                ray,
-                out RaycastHit hit
-            )
-        )
+        RaycastHit[] hits = Physics.RaycastAll(
+            ray,
+            Mathf.Infinity,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Ignore
+        );
+
+        for (int i = 0; i < hits.Length; i++)
         {
-            hitDice =
-                hit.collider.GetComponent<Dice>();
+            RaycastHit hit = hits[i];
+            if (hit.collider == null || hit.distance >= nearestDistance)
+                continue;
+
+            Dice dice = hit.collider.GetComponentInParent<Dice>();
+            if (dice == null)
+                continue;
+
+            if (!dice.gameObject.activeInHierarchy)
+                continue;
+
+            if (dice.state == DiceState.Merging ||
+                dice.state == DiceState.FlyingCombo)
+                continue;
+
+            hitDice = dice;
+            nearestDistance = hit.distance;
         }
 
         if (currentHover != hitDice)
