@@ -107,5 +107,9 @@ public static class Constant
     #region GamePlay
     public const string On_Speed_Changed = "On_Speed_Changed";
     public const string ON_DICE_AFTER_ATTACK = "ON_DICE_AFTER_ATTACK";
+    public const string ON_RUNE_CHANGE = "ON_RUNE_CHANGE";
+    public const string ON_DRAG_RUNE = "ON_DRAG_RUNE";
+    public const string ON_DROP_RUNE = "ON_DROP_RUNE";
+
     #endregion
 }

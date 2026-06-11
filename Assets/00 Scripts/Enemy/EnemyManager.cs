@@ -304,15 +304,24 @@ public class EnemyManager : Singleton<EnemyManager>
         enemy.DeathCompleted += RemoveEnemy;
     }
 
-    void CheckWinGame()
+    public void CheckWinGame()
     {
         CleanupEnemies();
 
-        if (enemies.Count == 0 && GameplayManager.Instance != null && !GameplayManager.Instance.IsGameEnded)
-            GameplayManager.Instance.EndGame(true);
+        if (enemies.Count != 0 || GameplayManager.Instance == null || GameplayManager.Instance.IsGameEnded)
+            return;
+
+        DiceQueue queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueue : null;
+        if (queue != null && queue.IsBusy)
+        {
+            queue.RequestFastFlush();
+            return;
+        }
+
+        GameplayManager.Instance.EndGame(true);
     }
 
-    bool HasAliveEnemies()
+    public bool HasAliveEnemies()
     {
         for (int i = 0; i < enemies.Count; i++)
         {

@@ -35,11 +35,32 @@ public class DiceThrowController : MonoBehaviour
 
     [Header("Highlight")]
     public Transform diceHighlight;
+    public bool canLook = true;
 
     void Start()
     {
         SpawnCurrentDice();
+        TigerForge.EventManager.StartListening(Constant.ON_DRAG_RUNE, OnRuneDragStarted);
+        TigerForge.EventManager.StartListening(Constant.ON_DROP_RUNE, OnRuneDragEnded);
     }
+
+    void OnDestroy()
+    {
+        TigerForge.EventManager.StopListening(Constant.ON_DRAG_RUNE, OnRuneDragStarted);
+        TigerForge.EventManager.StopListening(Constant.ON_DROP_RUNE, OnRuneDragEnded);
+    }
+
+    void OnRuneDragStarted()
+    {
+        canLook = false;
+        dragging = false;
+    }
+
+    void OnRuneDragEnded()
+    {
+        canLook = true;
+    }
+
 
     void Update()
     {
@@ -47,6 +68,9 @@ public class DiceThrowController : MonoBehaviour
             return;
 
         if (currentDice == null)
+            return;
+
+        if (!canLook)
             return;
 
         RotateCurrentDiceToMouse();
@@ -142,6 +166,9 @@ public class DiceThrowController : MonoBehaviour
     void Shoot()
     {
         if (waitingForBoard || IsGameEnded())
+            return;
+
+        if (!canLook)
             return;
 
         Vector3 launchDir =
@@ -253,11 +280,8 @@ public class DiceThrowController : MonoBehaviour
             Physics.DefaultRaycastLayers,
             QueryTriggerInteraction.Collide
         );
-        Debug.Log(hits.Length);
-
         for (int i = 0; i < hits.Length; i++)
         {
-            Debug.Log(hits[i].collider.gameObject.name);
             if (hits[i].collider == boardCollider)
                 return true;
         }

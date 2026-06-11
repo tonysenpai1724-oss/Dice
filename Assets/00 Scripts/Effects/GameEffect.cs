@@ -30,6 +30,7 @@ public abstract class GameEffect : MonoBehaviour
             return;
 
         Stacks += amount;
+        Debug.Log("Stacks: " + Stacks);
         NotifyStacksChanged();
     }
 

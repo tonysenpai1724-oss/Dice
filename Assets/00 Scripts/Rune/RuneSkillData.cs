@@ -1,86 +1,89 @@
-
+using Sirenix.OdinInspector;
+using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using UnityEngine.InputSystem;
-using UnityEngine.EventSystems;
-using Sirenix.OdinInspector;
-using System;
-public sealed class RuneSkillContext
+
+
+[CreateAssetMenu(menuName = "RuneDice/Rune/Rune Base")]
+public class RuneSkillData : SerializedScriptableObject
 {
-    public DiceData diceData;
-    public DiceQueue queue;
-    public EnemyManager enemyManager;
-    public PlayerController player;
-    public Dice dice;
-    public Enemy targetEnemy;
+    public RuneType TargetType;
 
-    public int damage;
-    public bool skipAttack;
+    public int stackApply;
 
-    public RuneSkillContext(
-        DiceData diceData,
-        DiceQueue queue,
-        Dice dice,
-        EnemyManager enemyManager,
-        PlayerController player,
-        Enemy targetEnemy
-    )
+    public int valueApply = 1;
+
+    public virtual void Execute()
     {
-        this.diceData = diceData;
-        this.queue = queue;
-        this.dice = dice;
-        this.enemyManager = enemyManager;
-        this.player = player;
-        this.targetEnemy = targetEnemy;
-        damage = diceData != null ? Mathf.Max(0, diceData.damage) : 0;
-    }
-}
-public abstract class RuneSkillData : SerializedScriptableObject
-{
-    public abstract RuneType RuneType { get; }
-
-    public abstract void Execute(RuneSkillContext context);
-}
-public static class RuneSkillFactory
-{
-    static readonly System.Collections.Generic.Dictionary<RuneType, RuneSkillData> cachedSkills =
-        new();
-
-    public static RuneSkillData Create(RuneType type)
-    {
-        if (cachedSkills.TryGetValue(type, out RuneSkillData cachedSkill) &&
-               cachedSkill != null)
-        {
-            return cachedSkill;
-        }
-        RuneSkillData skill;
-
-        switch (type)
+        switch (TargetType)
         {
             case RuneType.Bomb:
-                skill = ScriptableObject.CreateInstance<BombRuneSkillData>();
+                BombRuneSkillData.Execute();
                 break;
             case RuneType.MinorLife:
-                skill = ScriptableObject.CreateInstance<MinorLifeRuneSkillData>();
+                MinorLifeRuneSkillData.Execute();
                 break;
             case RuneType.Shuffle:
-                skill = ScriptableObject.CreateInstance<ShuffleRuneSkillData>();
+                ShuffleRuneSkillData.Execute();
                 break;
             case RuneType.Protection:
-                skill = ScriptableObject.CreateInstance<ProtectionRuneSkillData>();
+                ProtectionRuneSkillData.Execute(stackApply, valueApply);
                 break;
-            default:
-                skill = ScriptableObject.CreateInstance<NormalRuneSkillData>();
-                break;
-
         }
-        skill.hideFlags = HideFlags.HideAndDontSave;
-        cachedSkills[type] = skill;
-        return skill;
     }
 }
+
+
+public static class NormalRuneSkillData
+{
+    public static void Execute()
+    {
+    }
+}
+
+public static class MinorLifeRuneSkillData
+{
+    public static void Execute()
+    {
+    }
+}
+
+public static class ShuffleRuneSkillData
+{
+    public static void Execute()
+    {
+
+
+
+
+    }
+}
+
+public static class ProtectionRuneSkillData
+{
+    public static void Execute(int stackApply, int valueApply)
+    {
+
+        GameplayManager gameplay = GameplayManager.Instance;
+        ShieldEffect shieldEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<ShieldEffect>();
+        if (shieldEffect == null)
+            return;
+
+        shieldEffect.AddStacks(valueApply);
+
+    }
+}
+public static class BombRuneSkillData
+{
+    public static void Execute()
+    {
+    }
+
+}
+
+
+
 
 public enum RuneType
 {

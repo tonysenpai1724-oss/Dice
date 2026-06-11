@@ -38,6 +38,10 @@ public class DiceQueue : MonoBehaviour
     public float shiftMoveDuration = 0.2f;
     public float stepDelay = 0.05f;
     public float delayDestoyTime;
+    public float fastFlushItemMoveDuration = 0.03f;
+    public float fastFlushShiftMoveDuration = 0.03f;
+    public float fastFlushStepDelay;
+    public float fastFlushDestroyDelay;
 
     List<DiceQueueItem> items =
         new();
@@ -46,6 +50,14 @@ public class DiceQueue : MonoBehaviour
     List<DiceData> pendingItems =
         new();
     bool flushingPendingItems;
+    bool fastFlushRequested;
+
+    public bool IsBusy => processing || flushingPendingItems || items.Count > 0 || pendingItems.Count > 0;
+
+    public void RequestFastFlush()
+    {
+        fastFlushRequested = true;
+    }
 
     public void AddDice(DiceData data)
     {
@@ -120,7 +132,7 @@ public class DiceQueue : MonoBehaviour
                 yield return MoveItem(
                     first.transform,
                     first.transform.position + consumeOffset,
-                    itemMoveDuration
+                    GetItemMoveDuration()
                 );
 
                 if (enemyManager != null &&
@@ -133,7 +145,10 @@ public class DiceQueue : MonoBehaviour
                 gameplay?.RunAfterAttackActions();
                 gameplay?.ClearDiceSkillState();
 
-                yield return new WaitForSeconds(delayDestoyTime);
+                float destroyDelay = GetDestroyDelay();
+                if (destroyDelay > 0f)
+                    yield return new WaitForSeconds(destroyDelay);
+
                 Destroy(
                     first.gameObject
                 );
@@ -141,18 +156,24 @@ public class DiceQueue : MonoBehaviour
 
             yield return ShiftItems();
 
-            if (stepDelay > 0f)
+            float currentStepDelay = GetStepDelay();
+            if (currentStepDelay > 0f)
             {
                 yield return new WaitForSeconds(
-                    stepDelay
+                    currentStepDelay
                 );
             }
         }
 
-        if (EnemyManager.Instance != null)
+        if (EnemyManager.Instance != null && EnemyManager.Instance.HasAliveEnemies())
             yield return EnemyManager.Instance.EnemyTurn();
 
         processing = false;
+
+        if (EnemyManager.Instance != null)
+            EnemyManager.Instance.CheckWinGame();
+
+        fastFlushRequested = false;
     }
 
     IEnumerator FlushPendingItems()
@@ -208,7 +229,7 @@ public class DiceQueue : MonoBehaviour
         float duration =
             Mathf.Max(
                 0.01f,
-                shiftMoveDuration
+                GetShiftMoveDuration()
             );
 
         float timer = 0f;
@@ -297,5 +318,25 @@ public class DiceQueue : MonoBehaviour
     {
         return startPosition +
             stackOffset * index;
+    }
+
+    float GetItemMoveDuration()
+    {
+        return fastFlushRequested ? fastFlushItemMoveDuration : itemMoveDuration;
+    }
+
+    float GetShiftMoveDuration()
+    {
+        return fastFlushRequested ? fastFlushShiftMoveDuration : shiftMoveDuration;
+    }
+
+    float GetStepDelay()
+    {
+        return fastFlushRequested ? fastFlushStepDelay : stepDelay;
+    }
+
+    float GetDestroyDelay()
+    {
+        return fastFlushRequested ? fastFlushDestroyDelay : delayDestoyTime;
     }
 }
