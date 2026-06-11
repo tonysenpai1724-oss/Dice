@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 937a0f1e92c4c8744955d6383fe275ff, type: 3}
-  m_Name: Dice 2 Dodge
+  m_Name: Dice 4
   m_EditorClassIdentifier: Assembly-CSharp::DiceData
   serializationData:
     SerializedFormat: 2
@@ -21,17 +21,16 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  diceName: Dice 2 Dodge
-  level: 2
-  damage: 2
-  diceMaterial: {fileID: 2100000, guid: 32b5765d7ebf39143bff10f34d9935d8, type: 2}
+  diceName: Dice 4
+  level: 4
+  damage: 4
+  diceMaterial: {fileID: 2100000, guid: f1823ac621758eb43b155cb74f94fb23, type: 2}
   decalMaterial:
-  - {fileID: 2100000, guid: 410d91de9be93b34a9edfedad1b0607a, type: 2}
-  - {fileID: 2100000, guid: 9c17275b6541d9148b9f64bb8a61853d, type: 2}
+  - {fileID: 2100000, guid: 50c4ae62527b22b4faa93b7a247a24a3, type: 2}
   diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
   baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
-  targetColor: {r: 1, g: 1, b: 1, a: 1}
-  diceColor: {r: 0, g: 0, b: 0, a: 0}
-  hitEffectPrefab: {fileID: 3537892071448097904, guid: 98491fb6a00577b459d1fb605044c137, type: 3}
-  type: 1
-  skillData: {fileID: 11400000, guid: 555210ebc75bc3d4888155275d185b70, type: 2}
+  targetColor: {r: 1, g: 0.995283, b: 0.995283, a: 1}
+  diceColor: {r: 0.4745098, g: 0.99607843, b: 0.54509807, a: 0}
+  hitEffectPrefab: {fileID: 5568153061024448838, guid: e8f29088d60810740a9185680fa7b04d, type: 3}
+  type: 0
+  skillData: {fileID: 11400000, guid: 7c28a6e4a29879d4890719e840850b7f, type: 2}

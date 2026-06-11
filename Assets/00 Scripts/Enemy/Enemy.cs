@@ -59,7 +59,7 @@ public class Enemy : GameUnit
         if (!IsAlive())
             return false;
 
-        if (type == EnemyType.Range)
+        if (type == EnemyType.Melee)
             return true;
 
         return distanceToPlayer <= attackRange;
@@ -96,8 +96,8 @@ public class Enemy : GameUnit
 public enum EnemyType
 {
     // Normal,
-    Melee,
     Range,
+    Melee,
     MiniBoss,
     Boss,
 }

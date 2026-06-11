@@ -259,9 +259,9 @@ public class EnemyManager : Singleton<EnemyManager>
             yield break;
         }
 
-        if (frontEnemy.type == EnemyType.Range && !IsAtAttackPoint(frontEnemy))
+        if (frontEnemy.type == EnemyType.Melee && !IsAtAttackPoint(frontEnemy))
         {
-            yield return MoveEnemyRowToAttackPoint(EnemyType.Range);
+            yield return MoveEnemyRowToAttackPoint(EnemyType.Melee);
             frontEnemy = GetFrontEnemy();
         }
 
@@ -273,7 +273,7 @@ public class EnemyManager : Singleton<EnemyManager>
             if (attacker == null || !attacker.IsAlive())
                 continue;
 
-            if (attacker == frontEnemy && attacker.type == EnemyType.Range && !IsAtAttackPoint(frontEnemy))
+            if (attacker == frontEnemy && attacker.type == EnemyType.Melee && !IsAtAttackPoint(frontEnemy))
                 continue;
 
             yield return AttackPlayerRoutine(attacker);
@@ -513,11 +513,11 @@ public class EnemyManager : Singleton<EnemyManager>
             if (enemy == null || !enemy.IsAlive())
                 continue;
 
-            if (enemy.type == EnemyType.Melee)
+            if (enemy.type == EnemyType.Range)
                 AddEnemyTurnAttacker(attackers, enemy);
         }
 
-        AddEnemyTurnAttacker(attackers, GetFrontEnemyOfType(EnemyType.Range));
+        AddEnemyTurnAttacker(attackers, GetFrontEnemyOfType(EnemyType.Melee));
 
         return attackers;
     }

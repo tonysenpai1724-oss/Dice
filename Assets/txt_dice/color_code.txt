@@ -1,0 +1,9 @@
+1: #ffffff
+2: #fbd4b5
+3: #e5eb78
+4: #79fe8b
+5: #78fdeb
+6: #6388fd
+7: #b46dfd
+8: #f75ec7
+9: #f66f6f

@@ -126,7 +126,7 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             if (data == null)
                 continue;
 
-            if (data.type == EnemyType.Range)
+            if (data.type == EnemyType.Melee)
                 rangeRow.Add(data);
             else
                 meleeRow.Add(data);
@@ -217,7 +217,7 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
                 GetRandomPlacementPosition(
                     placements,
                     isBackRow,
-                    data != null && data.type != EnemyType.Range
+                    data != null && data.type != EnemyType.Melee
                 );
 
             placements.Add(
