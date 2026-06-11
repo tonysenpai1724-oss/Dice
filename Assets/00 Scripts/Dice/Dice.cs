@@ -49,6 +49,9 @@ public class Dice : MonoBehaviour
     public float rbAngularDrag = 0.4f;
     public float rbMaxAngularVelocity = 35f;
     public PhysicsMaterial dicePhysicMaterial;
+    public float driftStopVelocity = 0.08f;
+    public float driftStopAngularVelocity = 0.08f;
+    public float driftStopDelay = 0.15f;
 
 
     [Header("State")]
@@ -57,6 +60,7 @@ public class Dice : MonoBehaviour
     Vector3 defaultScale;
     Material outlineMaterial;
     bool isHovered;
+    float slowMoveTimer;
     readonly RigidbodyConstraints groundedConstraints =
         RigidbodyConstraints.FreezePositionY |
         RigidbodyConstraints.FreezeRotationX |
@@ -140,6 +144,7 @@ public class Dice : MonoBehaviour
     public virtual void Shoot(Vector3 dir, float force)
     {
         state = DiceState.Shot;
+        slowMoveTimer = 0f;
 
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -211,6 +216,43 @@ public class Dice : MonoBehaviour
 
     void FixedUpdate()
     {
+        StopSlowDrift();
+    }
+
+    void StopSlowDrift()
+    {
+        if (rb == null || rb.isKinematic)
+            return;
+
+        if (state == DiceState.Merging ||
+            state == DiceState.FlyingCombo)
+        {
+            slowMoveTimer = 0f;
+            return;
+        }
+
+        float velocityLimit = driftStopVelocity * driftStopVelocity;
+        float angularVelocityLimit = driftStopAngularVelocity * driftStopAngularVelocity;
+
+        bool isMovingSlowly =
+            rb.linearVelocity.sqrMagnitude <= velocityLimit &&
+            rb.angularVelocity.sqrMagnitude <= angularVelocityLimit;
+
+        if (!isMovingSlowly)
+        {
+            slowMoveTimer = 0f;
+            return;
+        }
+
+        slowMoveTimer += Time.fixedDeltaTime;
+
+        if (slowMoveTimer < driftStopDelay)
+            return;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.Sleep();
+        slowMoveTimer = 0f;
     }
 
     void ApplyPhysicsSettings()
