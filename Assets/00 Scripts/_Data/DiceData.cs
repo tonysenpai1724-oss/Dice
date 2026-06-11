@@ -21,6 +21,7 @@ public class DiceData : SerializedScriptableObject
     public Sprite diceSprite;
     public Color baseOutlineColor;
     public Color targetColor;
+    public Color diceColor;
     public GameObject hitEffectPrefab;
     public DiceType type;
     [Header("Skill")]

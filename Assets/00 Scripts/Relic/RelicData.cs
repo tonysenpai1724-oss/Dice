@@ -1,16 +1,39 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
-public class RelicData : MonoBehaviour
+
+[CreateAssetMenu(menuName = "RuneDice/Rune/Relic Base")]
+public class RelickillData : SerializedScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public RelicType TargetType;
+
+    public int stackApply;
+
+    public int valueApply = 1;
+
+    public virtual void Execute()
     {
+        switch (TargetType)
+        {
 
+        }
     }
+}
 
-    // Update is called once per frame
-    void Update()
+
+public static class PhantomStrikeRelicSkillData
+{
+    public static void Execute()
     {
-
     }
+}
+
+public enum RelicType
+{
+    PhantomStrike
+
+
 }

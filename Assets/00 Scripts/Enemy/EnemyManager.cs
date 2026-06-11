@@ -276,7 +276,7 @@ public class EnemyManager : Singleton<EnemyManager>
             if (attacker == frontEnemy && attacker.type == EnemyType.Range && !IsAtAttackPoint(frontEnemy))
                 continue;
 
-            AttackPlayer(attacker);
+            yield return AttackPlayerRoutine(attacker);
 
             if (enemyActionDelay > 0f)
                 yield return new WaitForSeconds(enemyActionDelay);
@@ -333,14 +333,23 @@ public class EnemyManager : Singleton<EnemyManager>
         return false;
     }
 
-    void AttackPlayer(Enemy enemy)
+    IEnumerator AttackPlayerRoutine(Enemy enemy)
     {
         if (player == null || enemy == null)
-            return;
+            yield break;
 
-        enemy.PlayAnimation(enemy.attackAnim, false);
+        bool attackCompleted = false;
+        Spine.TrackEntry attackTrack = enemy.PlayAnimation(enemy.attackAnim, false);
+        if (attackTrack != null)
+            attackTrack.Complete += _ => attackCompleted = true;
 
         player.OnTakeDamage(enemy.damage);
+
+        if (attackTrack != null)
+        {
+            while (!attackCompleted && enemy != null && enemy.IsAlive())
+                yield return null;
+        }
 
         if (enemy.skeletonGraphic != null)
         {

@@ -61,6 +61,9 @@ public class DiceManager : MonoBehaviour
         new Dictionary<Dice, int>();
 
     Dice currentHover;
+
+    [SerializeField] GameObject floatingTextPrefab;
+    [SerializeField] Vector3 floatingTextOffset = new Vector3(0f, 1.5f, 0f);
     void Awake()
     {
         Instance = this;
@@ -147,31 +150,12 @@ public class DiceManager : MonoBehaviour
         int maxAttempts = startSpawnCount * 12;
         int spawned = 0;
         int attempts = 0;
-        float sideMarginPercent =
-            (1f - sideSpawnPercent) * 0.5f;
-        float minX =
-            Mathf.Lerp(
-                b.min.x + spawnPadding,
-                b.max.x - spawnPadding,
-                sideMarginPercent
-            );
-        float maxX =
-            Mathf.Lerp(
-                b.min.x + spawnPadding,
-                b.max.x - spawnPadding,
-                1f - sideMarginPercent
-            );
-        float minZ =
-            Mathf.Lerp(
-                b.min.z + spawnPadding,
-                b.max.z - spawnPadding,
-                1f - topSpawnPercent
-            );
-        float maxZ =
-            Mathf.Max(
-                b.min.z + spawnPadding,
-                b.max.z - spawnPadding
-            );
+        float sideMarginPercent = (1f - sideSpawnPercent) * 0.5f;
+
+        float minX = Mathf.Lerp(b.min.x + spawnPadding, b.max.x - spawnPadding, sideMarginPercent);
+        float maxX = Mathf.Lerp(b.min.x + spawnPadding, b.max.x - spawnPadding, 1f - sideMarginPercent);
+        float minZ = Mathf.Lerp(b.min.z + spawnPadding, b.max.z - spawnPadding, 1f - topSpawnPercent);
+        float maxZ = Mathf.Max(b.min.z + spawnPadding, b.max.z - spawnPadding);
 
         while (spawned < startSpawnCount &&
             attempts < maxAttempts)
@@ -179,26 +163,12 @@ public class DiceManager : MonoBehaviour
             attempts++;
 
             Vector3 candidate =
-                new Vector3(
-                    Random.Range(
-                        minX,
-                        maxX
-                    ),
-                    boardY,
-                    Random.Range(
-                        minZ,
-                        maxZ
-                    )
-                );
+                new Vector3(Random.Range(minX, maxX), boardY, Random.Range(minZ, maxZ));
 
             Vector3 pos =
                 FindClearPosition(candidate);
 
-            int level =
-                Random.Range(
-                    minStartLevel,
-                    maxStartLevel + 1
-                );
+            int level = Random.Range(minStartLevel, maxStartLevel + 1);
             DiceData data = GetRandomDiceDataByLevel(level);
 
             if (IsOccupied(pos, null))
@@ -209,31 +179,13 @@ public class DiceManager : MonoBehaviour
         }
     }
 
-    public Dice SpawnDice(
-        DiceData data,
-        Vector3 pos,
-        bool registerOnBoard = true
-    )
+    public Dice SpawnDice(DiceData data, Vector3 pos, bool registerOnBoard = true)
     {
-        Quaternion rotation =
-            Quaternion.Euler(
-                0,
-                Random.Range(0, 360),
-                0
-            );
+        Quaternion rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
 
-        GameObject obj =
-            ObjectPool.Instance.Get(
-                pos,
-                rotation
-            );
+        GameObject obj = ObjectPool.Instance.Get(pos, rotation);
         Dice d = obj.GetComponent<Dice>();
         d.Setup(data);
-
-
-        // d.Setup(
-        //     diceDatabase[level - 1]
-        // );
 
         // FORCE STABLE
         d.transform.position = pos;
@@ -333,10 +285,7 @@ public class DiceManager : MonoBehaviour
         ];
     }
 
-    public bool IsBoardStable(
-        float velocityThreshold,
-        float angularVelocityThreshold
-    )
+    public bool IsBoardStable(float velocityThreshold, float angularVelocityThreshold)
     {
         for (int i = boardDices.Count - 1; i >= 0; i--)
         {
@@ -371,9 +320,7 @@ public class DiceManager : MonoBehaviour
         return true;
     }
 
-    void ReturnBoardDice(
-        Dice dice
-    )
+    void ReturnBoardDice(Dice dice)
     {
         if (dice == null)
             return;
@@ -389,10 +336,7 @@ public class DiceManager : MonoBehaviour
 
     #region MERGE
 
-    public void TryMerge(
-    Dice a,
-    Dice b
-)
+    public void TryMerge(Dice a, Dice b)
     {
         if (a == null || b == null)
             return;
@@ -425,10 +369,7 @@ public class DiceManager : MonoBehaviour
         );
     }
 
-    IEnumerator MergeRoutine(
-        Dice a,
-        Dice b
-    )
+    IEnumerator MergeRoutine(Dice a, Dice b)
     {
         a.FreezeForMerge();
         b.FreezeForMerge();
@@ -441,12 +382,8 @@ public class DiceManager : MonoBehaviour
             b.transform.position) * 0.5f;
         mergePos.y = GetBoardSurfaceY();
 
-        int nextLevel =
-            Mathf.Clamp(
-                a.Level + 1,
-                1,
-                diceDatabase.Count
-            );
+
+        int nextLevel = Mathf.Clamp(a.Level + 1, 1, diceDatabase.Count);
         int chain = 1;
 
         if (comboChainMap.ContainsKey(a))
@@ -458,13 +395,7 @@ public class DiceManager : MonoBehaviour
 
         ReturnBoardDice(b);
 
-
-
-        DiceData nextData =
-     GetDiceData(
-        a.Level + 1,
-        DiceType.Normal
-    );
+        DiceData nextData = GetDiceData(a.Level + 1, DiceType.Normal);
 
         if (nextData == null)
         {
@@ -474,33 +405,22 @@ public class DiceManager : MonoBehaviour
             yield break;
         }
 
-        Dice merged =
-            SpawnDice(
-                nextData,
-                FindClearPosition(mergePos)
-            );
-        if (
-            merged.data != null &&
-            merged.data.hitEffectPrefab != null
-            )
-        {
-            Vector3 fxPos =
-                merged.transform.position;
+        Dice merged = SpawnDice(nextData, FindClearPosition(mergePos));
 
-            if (
-                merged.cachedCollider != null
-            )
+        SpawnMergeFloatingText(
+            merged != null ? merged.transform.position : mergePos,
+            (a.data.level + 1).ToString(), merged.data.diceColor
+        );
+        if (merged.data != null && merged.data.hitEffectPrefab != null)
+        {
+            Vector3 fxPos = merged.transform.position;
+
+            if (merged.cachedCollider != null)
             {
-                fxPos.y =
-                   11.5f;
+                fxPos.y = 11.5f;
             }
 
-            GameObject fx =
-                Instantiate(
-                    merged.data.hitEffectPrefab,
-                    fxPos,
-                    Quaternion.identity
-                );
+            GameObject fx = Instantiate(merged.data.hitEffectPrefab, fxPos, Quaternion.identity);
 
             Destroy(fx, 1f);
         }
@@ -520,6 +440,26 @@ public class DiceManager : MonoBehaviour
         yield break;
     }
 
+    void SpawnMergeFloatingText(Vector3 position, string value, Color color)
+    {
+        if (floatingTextPrefab == null)
+            return;
+
+        Vector3 spawnPosition = position + floatingTextOffset;
+        GameObject textObject = Instantiate(
+            floatingTextPrefab,
+            spawnPosition,
+            Quaternion.identity
+        );
+
+        FloatingText floatingText = textObject.GetComponent<FloatingText>();
+        if (floatingText != null)
+        {
+            floatingText.SetWorldPosition(spawnPosition);
+            floatingText.SetText(value, color);
+        }
+    }
+
     #endregion
 
     #region COMBO
@@ -537,15 +477,9 @@ public class DiceManager : MonoBehaviour
         if (target == null)
         {
             Vector3 randomTargetPos =
-                FindRandomClearPositionWithinRadius(
-                    dice.transform.position,
-                    maxComboDistance,
-                    dice
-                );
+                FindRandomClearPositionWithinRadius(dice.transform.position, maxComboDistance, dice);
 
-            Vector3 randomDir =
-                randomTargetPos -
-                dice.transform.position;
+            Vector3 randomDir = randomTargetPos - dice.transform.position;
 
             randomDir.y = 0f;
 
@@ -571,11 +505,7 @@ public class DiceManager : MonoBehaviour
             return;
         }
 
-        Vector3 dir =
-            (
-                target.transform.position -
-                dice.transform.position
-            ).normalized;
+        Vector3 dir = (target.transform.position - dice.transform.position).normalized;
         int comboCount = 1;
 
         if (comboChainMap.ContainsKey(dice))
@@ -583,38 +513,21 @@ public class DiceManager : MonoBehaviour
             comboCount = comboChainMap[dice];
         }
 
-        float dynamicMaxComboDistance =
-            Mathf.Min(
-                maxComboDistance +
-                comboCount * comboDistancePerChain,
+        float dynamicMaxComboDistance = Mathf.Min(maxComboDistance + comboCount * comboDistancePerChain,
                 maxComboDistanceLimit
             );
 
-        float dist =
-            Vector3.Distance(
-                dice.transform.position,
-                target.transform.position
-            );
+        float dist = Vector3.Distance(dice.transform.position, target.transform.position);
 
         Vector3 targetPos;
 
-        // OUT OF RANGE
-        // if (dist > maxComboDistance)
-        // {
-        //     targetPos =
-        //         dice.transform.position +
-        //         dir * maxComboDistance;
-        // }
         if (dist > dynamicMaxComboDistance)
         {
-            targetPos =
-                dice.transform.position +
-                dir * dynamicMaxComboDistance;
+            targetPos = dice.transform.position + dir * dynamicMaxComboDistance;
         }
         else
         {
-            targetPos =
-                target.transform.position;
+            targetPos = target.transform.position;
         }
 
         targetPos.y = GetBoardSurfaceY();
@@ -630,228 +543,28 @@ public class DiceManager : MonoBehaviour
         );
     }
 
-    //     IEnumerator ComboJumpRoutine(
-    //      Dice dice,
-    //      Dice target,
-    //      Vector3 targetPos,
-    //      Vector3 dir
-    //  )
-    //     {
-    //         if (dice == null)
-    //             yield break;
 
-    //         dice.state =
-    //             DiceState.FlyingCombo;
-
-    //         dice.canMerge = true;
-
-    //         dice.rb.isKinematic = true;
-    //         dice.rb.linearVelocity =
-    //             Vector3.zero;
-    //         dice.rb.angularVelocity =
-    //             Vector3.zero;
-    //         dice.SetCollisionEnabled(false);
-
-    //         Vector3 start =
-    //             dice.transform.position;
-    //         Vector3 finalPos =
-    //             targetPos;
-    //         Quaternion startRotation =
-    //             dice.transform.rotation;
-    //         Quaternion endRotation =
-    //             startRotation *
-    //             Quaternion.Euler(
-    //                 Random.Range(
-    //                     comboSpinTurnsX.x,
-    //                     comboSpinTurnsX.y
-    //                 ) * 360f,
-    //                 Random.Range(
-    //                     comboSpinTurnsY.x,
-    //                     comboSpinTurnsY.y
-    //                 ) * 360f,
-    //                 Random.Range(
-    //                     comboSpinTurnsZ.x,
-    //                     comboSpinTurnsZ.y
-    //                 ) * 360f
-    //             );
-    //         Vector3 sideOffset =
-    //             Vector3.Cross(
-    //                 Vector3.up,
-    //                 dir.sqrMagnitude > 0.001f
-    //                     ? dir.normalized
-    //                     : Vector3.forward
-    //             ) * Random.Range(
-    //                 -comboSideScatter,
-    //                 comboSideScatter
-    //             );
-
-    //         float t = 0f;
-
-    //         while (t < 1f)
-    //         {
-    //             if (dice == null)
-    //                 yield break;
-
-    //             if (target != null &&
-    //                 !target.gameObject.activeInHierarchy)
-    //             {
-    //                 break;
-    //             }
-
-    //             t +=
-    //                 Time.deltaTime /
-    //                 comboDuration;
-
-    //             Vector3 end =
-    //                 targetPos;
-
-    //             finalPos = end;
-
-    //             Vector3 pos =
-    //                 Vector3.Lerp(
-    //                     start,
-    //                     end,
-    //                     t
-    //                 );
-
-    //             // ARC
-    //             pos.y +=
-    //                 Mathf.Sin(
-    //                     t * Mathf.PI
-    //                 ) * comboArcHeight;
-    //             pos +=
-    //                 sideOffset *
-    //                 Mathf.Sin(
-    //                     t * Mathf.PI
-    //                 );
-
-    //             dice.transform.position = pos;
-    //             dice.transform.rotation =
-    //                 Quaternion.SlerpUnclamped(
-    //                     startRotation,
-    //                     endRotation,
-    //                     t
-    //                 );
-
-    //             yield return null;
-    //         }
-
-    //         if (target != null && target.gameObject.activeInHierarchy)
-    //         {
-    //             float distToTarget =
-    //                 Vector3.Distance(
-    //                     dice.transform.position,
-    //                     target.transform.position
-    //                 );
-
-    //             if (distToTarget <= 1f)
-    //             {
-    //                 TryMerge(
-    //                     dice,
-    //                     target
-    //                 );
-
-    //                 yield break;
-    //             }
-    //         }
-
-    //         dice.transform.rotation =
-    //             endRotation;
-
-    //         // if (Physics.Raycast(
-    //         //     finalPos +
-    //         //     Vector3.up * 2f,
-    //         //     Vector3.down,
-    //         //     out RaycastHit hit,
-    //         //     5f
-    //         // ))
-    //         // {
-    //         //     finalPos =
-    //         //         new Vector3(
-    //         //             finalPos.x,
-    //         //             hit.point.y + 0.5f,
-    //         //             finalPos.z
-    //         //         );
-    //         // }
-
-    //         // finalPos =
-    //         //     FindClearPosition(
-    //         //         finalPos,
-    //         //         dice
-    //         //     );
-    //         // dice.PlaceUpright(
-    //         //     finalPos
-    //         // );
-
-    //         // dice.state =
-    //         //     DiceState.Idle;
-    //         Collider col =
-    //      dice.GetComponent<Collider>();
-
-    //         float bottomOffset =
-    //             dice.transform.position.y -
-    //             col.bounds.min.y;
-
-    //         if (Physics.Raycast(
-    //             finalPos + Vector3.up * 3f,
-    //             Vector3.down,
-    //             out RaycastHit hit,
-    //             10f
-    //         ))
-    //         {
-    //             finalPos.y =
-    //                 hit.point.y +
-    //                 bottomOffset +
-    //                 1f;
-    //         }
-
-    //         dice.transform.position = finalPos;
-
-    //         dice.rb.isKinematic = false;
-
-    //         dice.rb.linearVelocity =
-    //             Vector3.down * 1.5f;
-
-    //         dice.rb.angularVelocity =
-    //             Vector3.zero;
-
-    //         dice.SetCollisionEnabled(true);
-
-    //         dice.state = DiceState.Idle;
-
-    //         StartCoroutine(
-    //             RecoverUprightRoutine(dice)
-    //         );
-    //     }
-    IEnumerator ComboJumpRoutine(
-        Dice dice,
-        Dice target,
-        Vector3 targetPos,
-        Vector3 dir,
+    IEnumerator ComboJumpRoutine(Dice dice, Dice target, Vector3 targetPos, Vector3 dir,
         bool shouldFullBounce
     )
     {
         if (dice == null)
             yield break;
 
-        dice.state =
-            DiceState.FlyingCombo;
+        dice.state = DiceState.FlyingCombo;
 
         dice.canMerge = true;
 
         dice.rb.isKinematic = true;
 
-        dice.rb.linearVelocity =
-            Vector3.zero;
+        dice.rb.linearVelocity = Vector3.zero;
 
-        dice.rb.angularVelocity =
-            Vector3.zero;
+        dice.rb.angularVelocity = Vector3.zero;
 
         // Keep collider enabled so jumping dice can collide with other dice
         // dice.SetCollisionEnabled(false);
 
-        Vector3 start =
-            dice.transform.position;
+        Vector3 start = dice.transform.position;
 
         // If we have a valid merge target, land on it directly.
         // Otherwise, keep the landing position clear so the combo can finish safely.
@@ -866,8 +579,7 @@ public class DiceManager : MonoBehaviour
 
         if (!canAimForTarget)
         {
-            finalDestination =
-                FindClearPosition(finalDestination, dice);
+            finalDestination = FindClearPosition(finalDestination, dice);
         }
 
         // Bounces will carry forward momentum in the jump direction (dir)
@@ -892,24 +604,18 @@ public class DiceManager : MonoBehaviour
         comboLastTime[dice] = Time.time;
 
         // RANDOM SIDE ARC
-        Vector3 sideOffset =
-            Vector3.Cross(
-                Vector3.up,
-                dir.sqrMagnitude > 0.001f
-                    ? dir.normalized
-                    : Vector3.forward
+        Vector3 sideOffset = Vector3.Cross(Vector3.up, dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward
             ) * Random.Range(
                 -comboSideScatter,
                 comboSideScatter
             );
 
         // NATURAL SPIN
-        Vector3 angularSpin =
-     new Vector3(
+        Vector3 angularSpin = new Vector3(
          Random.Range(comboSpinTurnsX.x, comboSpinTurnsX.y),
          Random.Range(comboSpinTurnsY.x, comboSpinTurnsY.y),
          Random.Range(comboSpinTurnsZ.x, comboSpinTurnsZ.y)
-     );
+         );
         // OCCASIONAL CRAZY SPIN
         if (Random.value < 0.2f)
         {
@@ -917,12 +623,10 @@ public class DiceManager : MonoBehaviour
         }
 
         float t = 0f;
-        float dynamicDuration =
-    Mathf.Min(
-        comboDuration +
+        float dynamicDuration = Mathf.Min(comboDuration +
         comboCount * comboDurationPerChain,
         maxComboDuration
-    );
+        );
 
         while (t < 1f)
         {
@@ -939,41 +643,18 @@ public class DiceManager : MonoBehaviour
 
             t += Time.deltaTime / dynamicDuration;
 
-            Vector3 end =
-                mainJumpEnd;
+            Vector3 end = mainJumpEnd;
 
             finalPos = end;
 
             // POSITION
-            Vector3 pos =
-                Vector3.Lerp(
-                    start,
-                    end,
-                    t
-                );
-
-            // NATURAL ARC
-            // =========================
-            // COMBO CHAIN
-            // =========================
-
-
-
-            // if (comboChainMap.ContainsKey(dice))
-            // {
-            //     comboCount =
-            //         comboChainMap[dice] + 1;
-            // }
-
-            // comboChainMap[dice] =
-            //     comboCount;
+            Vector3 pos = Vector3.Lerp(start, end, t);
 
             // =========================
             // DYNAMIC ARC
             // =========================
 
-            float dynamicArcHeight =
-                Mathf.Min(
+            float dynamicArcHeight = Mathf.Min(
                     comboArcHeight +
                     comboCount *
                     comboArcPerChain,
@@ -981,43 +662,22 @@ public class DiceManager : MonoBehaviour
                 );
 
             // NATURAL ARC
-            float arc =
-     Mathf.Sin(t * Mathf.PI);
-
+            float arc = Mathf.Sin(t * Mathf.PI);
             arc = Mathf.Clamp01(arc);
-
             arc = Mathf.Pow(arc, 0.7f);
 
-            pos.y +=
-                arc * dynamicArcHeight;
+            pos.y += arc * dynamicArcHeight;
 
             // SIDE MOTION
-            pos +=
-                sideOffset *
-                Mathf.Sin(
-                    t * Mathf.PI
-                );
-
-            dice.transform.position =
-                pos;
+            pos += sideOffset * Mathf.Sin(t * Mathf.PI);
+            dice.transform.position = pos;
 
             // NATURAL SPIN DECAY
-            float spinDamping =
-                1f -
-                Mathf.Pow(
-                    t,
-                    1.8f
-                );
+            float spinDamping = 1f - Mathf.Pow(t, 1.8f);
 
-            Vector3 currentSpin =
-                angularSpin *
-                spinDamping;
+            Vector3 currentSpin = angularSpin * spinDamping;
 
-            dice.transform.Rotate(
-                currentSpin *
-                Time.deltaTime,
-                Space.Self
-            );
+            dice.transform.Rotate(currentSpin * Time.deltaTime, Space.Self);
 
             yield return null;
         }
@@ -1025,27 +685,19 @@ public class DiceManager : MonoBehaviour
         // TRY MERGE
         if (target != null && target.gameObject.activeInHierarchy)
         {
-            float distToTarget =
-                Vector3.Distance(
+            float distToTarget = Vector3.Distance(
                     dice.transform.position,
                     target.transform.position
                 );
 
-            float mergeDistance =
-                Mathf.Max(1.2f, diceSpacingRadius * 1.25f);
+            float mergeDistance = Mathf.Max(1.2f, diceSpacingRadius * 1.25f);
 
-            if (distToTarget <= mergeDistance &&
-                target.Level == dice.Level &&
-                !target.isMerging &&
-                !dice.isMerging)
+            if (distToTarget <= mergeDistance && target.Level == dice.Level &&
+                !target.isMerging && !dice.isMerging)
             {
-                comboChainMap[target] =
-                    comboCount;
+                comboChainMap[target] = comboCount;
 
-                TryMerge(
-                    dice,
-                    target
-                );
+                TryMerge(dice, target);
                 yield break;
             }
         }
@@ -1055,32 +707,16 @@ public class DiceManager : MonoBehaviour
             comboChainMap.Remove(target);
         }
 
+        Quaternion targetRot = Quaternion.Euler(0f, dice.transform.eulerAngles.y, 0f);
 
-        // UPRIGHT RECOVERY & BOUNCING LANDING WITH FORWARD MOMENTUM
-        Quaternion targetRot =
-            Quaternion.Euler(
-                0f,
-                dice.transform.eulerAngles.y,
-                0f
-            );
+        Quaternion startRot = dice.transform.rotation;
 
-        Quaternion startRot =
-            dice.transform.rotation;
+        int numBounces = shouldFullBounce ? 3 : 1;
 
-        int numBounces =
-            shouldFullBounce
-                ? 3
-                : 1;
+        float[] bounceHeights = shouldFullBounce ? new float[] { 1.2f, 0.6f, 0.25f } : new float[] { 0.9f };
 
-        float[] bounceHeights =
-            shouldFullBounce
-                ? new float[] { 1.2f, 0.6f, 0.25f }
-                : new float[] { 0.9f };
+        float[] bounceDurations = shouldFullBounce ? new float[] { 0.35f, 0.25f, 0.18f } : new float[] { 0.3f };
 
-        float[] bounceDurations =
-            shouldFullBounce
-                ? new float[] { 0.35f, 0.25f, 0.18f }
-                : new float[] { 0.3f };
         float totalBounceDuration = 0f;
         foreach (float bd in bounceDurations) totalBounceDuration += bd;
 
@@ -1103,22 +739,19 @@ public class DiceManager : MonoBehaviour
                 elapsedBounceTime += Time.deltaTime;
                 float currentBounceT = Mathf.Clamp01(elapsedBounceTime / totalBounceDuration);
 
-                // Smoothly progress forward along dir using a quadratic ease-out
                 float forwardEase = 1f - Mathf.Pow(1f - currentBounceT, 2f);
                 Vector3 horizontalPos = Vector3.Lerp(horizontalStart, horizontalEnd, forwardEase);
 
-                // Calculate vertical bouncing arc
                 float heightSin = Mathf.Sin(Mathf.Clamp01(bt) * Mathf.PI);
                 float currentY = GetBoardSurfaceY() + heightSin * bounceHeight;
 
                 Vector3 pos = new Vector3(horizontalPos.x, currentY, horizontalPos.z);
                 dice.transform.position = pos;
 
-                // Smoothly slerp rotation towards target upright rotation across total bounces
                 dice.transform.rotation = Quaternion.Slerp(
                     startRot,
                     targetRot,
-                    1f - Mathf.Pow(1f - currentBounceT, 3f) // cubic ease-out
+                    1f - Mathf.Pow(1f - currentBounceT, 3f)
                 );
 
                 yield return null;
@@ -1135,31 +768,19 @@ public class DiceManager : MonoBehaviour
             Physics.SyncTransforms();
 
             dice.rb.isKinematic = false;
-
-            dice.rb.linearVelocity =
-                Vector3.zero;
-
-            dice.rb.angularVelocity =
-                Vector3.zero;
-
+            dice.rb.linearVelocity = Vector3.zero;
+            dice.rb.angularVelocity = Vector3.zero;
             dice.rb.Sleep();
-
-            dice.rb.angularVelocity =
-                Vector3.zero;
-
+            dice.rb.angularVelocity = Vector3.zero;
             dice.SetCollisionEnabled(true);
-
-            dice.state =
-                DiceState.Idle;
+            dice.state = DiceState.Idle;
 
             StartCoroutine(
                 RecoverUprightRoutine(dice)
             );
         }
     }
-    IEnumerator RecoverUprightRoutine(
-    Dice dice
-)
+    IEnumerator RecoverUprightRoutine(Dice dice)
     {
         float duration = 0.35f;
 
@@ -1170,12 +791,7 @@ public class DiceManager : MonoBehaviour
         Quaternion startRot =
             dice.transform.rotation;
 
-        Quaternion targetRot =
-            Quaternion.Euler(
-                0f,
-                dice.transform.eulerAngles.y,
-                0f
-            );
+        Quaternion targetRot = Quaternion.Euler(0f, dice.transform.eulerAngles.y, 0f);
 
         while (t < 1f)
         {
@@ -1184,53 +800,28 @@ public class DiceManager : MonoBehaviour
 
             t += Time.deltaTime / duration;
 
-            // smooth rotation
-            dice.transform.rotation =
-                Quaternion.Slerp(
-                    startRot,
-                    targetRot,
-                    1f - Mathf.Pow(1f - t, 3f)
-                );
+            dice.transform.rotation = Quaternion.Slerp(startRot, targetRot, 1f - Mathf.Pow(1f - t, 3f));
 
-            // giảm velocity
-            rb.linearVelocity =
-                Vector3.Lerp(
-                    rb.linearVelocity,
-                    Vector3.zero,
-                    Time.deltaTime * 8f
-                );
+            rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, Vector3.zero, Time.deltaTime * 8f);
 
-            rb.angularVelocity =
-                Vector3.Lerp(
-                    rb.angularVelocity,
-                    Vector3.zero,
-                    Time.deltaTime * 10f
-                );
+            rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, Vector3.zero, Time.deltaTime * 10f);
 
             yield return null;
         }
 
-        dice.transform.rotation =
-            targetRot;
-
-        rb.linearVelocity =
-            Vector3.zero;
-
-        rb.angularVelocity =
-            Vector3.zero;
+        dice.transform.rotation = targetRot;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
     }
     #endregion
 
     #region SEARCH
 
-    public Dice FindNearestSameLevelDice(
-        Dice source
-    )
+    public Dice FindNearestSameLevelDice(Dice source)
     {
         Dice nearest = null;
 
-        float best =
-            Mathf.Infinity;
+        float best = Mathf.Infinity;
 
         foreach (Dice d in boardDices)
         {
@@ -1250,11 +841,7 @@ public class DiceManager : MonoBehaviour
                 d.state == DiceState.FlyingCombo)
                 continue;
 
-            float dist =
-                Vector3.Distance(
-                    source.transform.position,
-                    d.transform.position
-                );
+            float dist = Vector3.Distance(source.transform.position, d.transform.position);
 
             if (dist < best)
             {
@@ -1276,11 +863,9 @@ public class DiceManager : MonoBehaviour
 
     bool IsOccupied(Vector3 position, Dice ignore)
     {
-        Vector3 halfExtents =
-            new Vector3(1f, 0.45f, 1f);
+        Vector3 halfExtents = new Vector3(1f, 0.45f, 1f);
 
-        Collider[] hits =
-            Physics.OverlapBox(
+        Collider[] hits = Physics.OverlapBox(
                 position,
                 halfExtents,
                 Quaternion.identity
@@ -1304,10 +889,7 @@ public class DiceManager : MonoBehaviour
 
         return false;
     }
-    Vector3 FindClearPosition(
-        Vector3 center,
-        Dice ignore = null
-    )
+    Vector3 FindClearPosition(Vector3 center, Dice ignore = null)
     {
         center.y = GetBoardSurfaceY();
 
@@ -1329,30 +911,13 @@ public class DiceManager : MonoBehaviour
                 float angle =
                     i / 16f * Mathf.PI * 2f;
 
-                Vector3 candidate =
-                    center +
-                    new Vector3(
-                        Mathf.Cos(angle) * radius,
-                        0f,
-                        Mathf.Sin(angle) * radius
-                    );
+                Vector3 candidate = center + new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
 
-                candidate.x =
-                    Mathf.Clamp(
-                        candidate.x,
-                        b.min.x + spawnPadding,
-                        b.max.x - spawnPadding
-                    );
+                candidate.x = Mathf.Clamp(candidate.x, b.min.x + spawnPadding, b.max.x - spawnPadding);
 
-                candidate.z =
-                    Mathf.Clamp(
-                        candidate.z,
-                        b.min.z + spawnPadding,
-                        b.max.z - spawnPadding
-                    );
+                candidate.z = Mathf.Clamp(candidate.z, b.min.z + spawnPadding, b.max.z - spawnPadding);
 
-                candidate.y =
-                    GetBoardSurfaceY();
+                candidate.y = GetBoardSurfaceY();
 
                 if (!IsOccupied(candidate, ignore))
                     return candidate;
@@ -1362,11 +927,7 @@ public class DiceManager : MonoBehaviour
         return center;
     }
 
-    Vector3 FindRandomClearPositionWithinRadius(
-        Vector3 origin,
-        float maxRadius,
-        Dice ignore = null
-    )
+    Vector3 FindRandomClearPositionWithinRadius(Vector3 origin, float maxRadius, Dice ignore = null)
     {
         origin.y = GetBoardSurfaceY();
 
@@ -1374,43 +935,23 @@ public class DiceManager : MonoBehaviour
             return origin;
 
         Bounds b = boardCollider.bounds;
-        Vector3 fallback =
-            origin;
+        Vector3 fallback = origin;
         float bestScore = float.MinValue;
 
         for (int i = 0; i < 24; i++)
         {
             Vector2 circle = Random.insideUnitCircle.normalized * Random.Range(0.4f, 1f);
-            // Vector2 circle =
-            //     Random.insideUnitCircle;
 
             if (circle.sqrMagnitude < 0.001f)
                 continue;
 
-            Vector3 candidate =
-                origin +
-                new Vector3(
-                    circle.x,
-                    0f,
-                    circle.y
-                ) * maxRadius;
+            Vector3 candidate = origin + new Vector3(circle.x, 0f, circle.y) * maxRadius;
 
-            candidate.x =
-                Mathf.Clamp(
-                    candidate.x,
-                    b.min.x + spawnPadding,
-                    b.max.x - spawnPadding
-                );
+            candidate.x = Mathf.Clamp(candidate.x, b.min.x + spawnPadding, b.max.x - spawnPadding);
 
-            candidate.z =
-                Mathf.Clamp(
-                    candidate.z,
-                    b.min.z + spawnPadding,
-                    b.max.z - spawnPadding
-                );
+            candidate.z = Mathf.Clamp(candidate.z, b.min.z + spawnPadding, b.max.z - spawnPadding);
 
-            candidate.y =
-                GetBoardSurfaceY();
+            candidate.y = GetBoardSurfaceY();
 
             if (!IsOccupied(candidate, ignore))
                 return candidate;
@@ -1425,15 +966,7 @@ public class DiceManager : MonoBehaviour
             }
         }
         return fallback;
-
-        // return FindClearPosition(
-        //     fallback,
-        //     ignore
-        // );
     }
 
     #endregion
-
-
-
 }
