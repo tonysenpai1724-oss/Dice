@@ -409,7 +409,7 @@ public class DiceManager : MonoBehaviour
 
         SpawnMergeFloatingText(
             merged != null ? merged.transform.position : mergePos,
-            (a.data.level + 1).ToString(), merged.data.diceColor
+            merged.data.level.ToString(), merged.data.diceColor
         );
         if (merged.data != null && merged.data.hitEffectPrefab != null)
         {
@@ -858,7 +858,7 @@ public class DiceManager : MonoBehaviour
         if (boardCollider == null)
             return 0.5f;
 
-        return boardCollider.bounds.max.y + 1f;
+        return boardCollider.bounds.max.y + 1.5f;
     }
 
     bool IsOccupied(Vector3 position, Dice ignore)

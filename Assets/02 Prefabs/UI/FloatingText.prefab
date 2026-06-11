@@ -284,8 +284,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26e9251304c8b634293a687d74dd3f73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FloatingText
-  moveSpeed: 2
-  duration: 2
+  moveSpeed: 1
+  duration: 1
   blinkDuration: 0.7
   blinkSpeed: 18
   colorTransitionDuration: 0.2
