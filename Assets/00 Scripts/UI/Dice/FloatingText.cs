@@ -5,9 +5,12 @@ public class FloatingText : MonoBehaviour
 {
     public float moveSpeed = 1f;
     public float duration = 1f;
+    public float blinkDuration = 0.25f;
+    public float blinkSpeed = 18f;
+    public float colorTransitionDuration = 0.25f;
 
     public TextMeshProUGUI text;
-    private Color startColor;
+    private Color targetColor = Color.white;
     private float timer;
     private RectTransform textRectTransform;
     private RectTransform canvasRectTransform;
@@ -15,6 +18,7 @@ public class FloatingText : MonoBehaviour
     private Camera worldCamera;
     private Vector3 worldPosition;
     private bool useWorldPosition;
+    private bool isBlinking = true;
 
     void Awake()
     {
@@ -29,13 +33,19 @@ public class FloatingText : MonoBehaviour
             if (canvas != null)
                 canvasRectTransform = canvas.transform as RectTransform;
 
-            startColor = text.color;
+            targetColor = text.color;
         }
     }
 
     void Update()
     {
         timer += Time.deltaTime;
+
+        if (isBlinking && timer >= blinkDuration)
+        {
+            isBlinking = false;
+            timer = 0f;
+        }
 
         if (useWorldPosition)
         {
@@ -52,12 +62,27 @@ public class FloatingText : MonoBehaviour
 
         if (text != null)
         {
-            Color color = startColor;
-            color.a = Mathf.Lerp(1, 0, timer / duration);
+            Color color;
+
+            if (isBlinking)
+            {
+                float blinkPercent = Mathf.PingPong(timer * blinkSpeed, 1f);
+                color = Color.Lerp(Color.white, targetColor, blinkPercent);
+            }
+            else
+            {
+                float colorPercent = colorTransitionDuration > 0f
+                    ? Mathf.Clamp01(timer / colorTransitionDuration)
+                    : 1f;
+
+                color = Color.Lerp(Color.white, targetColor, colorPercent);
+                color.a = Mathf.Lerp(1, 0, timer / duration);
+            }
+
             text.color = color;
         }
 
-        if (timer >= duration)
+        if (!isBlinking && timer >= duration)
             Destroy(gameObject);
     }
 
@@ -67,8 +92,10 @@ public class FloatingText : MonoBehaviour
             return;
 
         text.text = value;
-        startColor = color;
-        text.color = color;
+        targetColor = color;
+        timer = 0f;
+        isBlinking = true;
+        text.color = Color.white;
     }
 
     public void SetWorldPosition(Vector3 position, Camera camera = null)

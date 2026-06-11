@@ -3901,6 +3901,7 @@ MonoBehaviour:
   maxStableWaitTime: 5
   diceQueue: {fileID: 0}
   diceHighlight: {fileID: 361750720}
+  canLook: 1
 --- !u!114 &760913350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3948,6 +3949,8 @@ MonoBehaviour:
   maxComboArcHeight: 12
   comboDurationPerChain: 0.03
   maxComboDuration: 0.75
+  floatingTextPrefab: {fileID: 7478165434859771322, guid: f0646a6dafe80e34f8f7c9ff7dde8657, type: 3}
+  floatingTextOffset: {x: 0, y: 1.5, z: 0}
   maxComboDistance: 6
 --- !u!4 &760913351
 Transform:
@@ -7136,7 +7139,7 @@ GameObject:
   - component: {fileID: 1255898939}
   - component: {fileID: 1255898940}
   - component: {fileID: 1255898941}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7990,7 +7993,7 @@ GameObject:
   - component: {fileID: 1471202524}
   - component: {fileID: 1471202525}
   - component: {fileID: 1471202526}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9832,7 +9835,7 @@ GameObject:
   - component: {fileID: 1965115106}
   - component: {fileID: 1965115107}
   - component: {fileID: 1965115108}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10718,7 +10721,7 @@ GameObject:
   - component: {fileID: 2126704374}
   - component: {fileID: 2126704375}
   - component: {fileID: 2126704376}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
