@@ -194,7 +194,7 @@ public class UIManager : Singleton<UIManager>
         Transform parent = null;
         switch (resouceType)
         {
-            case ECommonResource.Coin:
+            case ECommonResource.Token:
                 parent = uIHome.coinBar;
                 break;
             case ECommonResource.Energy:
@@ -384,7 +384,7 @@ public class UIManager : Singleton<UIManager>
     {
         UIBase ui = GetUI("Popup Partner Referal");
         ui.Show();
-    }    
+    }
     public void ShowPopupMailBox()
     {
         UIBase ui = GetUI("Popup Mail Box");

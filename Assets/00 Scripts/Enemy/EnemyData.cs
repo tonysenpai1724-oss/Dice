@@ -14,10 +14,12 @@ public class EnemyData : SerializedScriptableObject
     [Header("Scale")]
     public Vector3 scale = Vector3.one;
     public EnemyType type;
+    public EnemyLevel enemyLevel;
     public SkeletonDataAsset skeletonData;
-    public int startDistance = 3;
-    public int attackRange = 1;
+    // public int startDistance = 3;
+    // public int attackRange = 1;
     public int level = 1;
+    public int coinReward;
 
 
 }

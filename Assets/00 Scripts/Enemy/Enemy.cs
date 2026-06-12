@@ -8,10 +8,11 @@ public class Enemy : GameUnit
     public event Action<Enemy> DeathCompleted;
 
     public EnemyType type;
+    public EnemyLevel enemyLevel;
     public int damage;
     public EnemyData data;
-    public int distanceToPlayer;
-    public int attackRange;
+    // public int distanceToPlayer;
+    //public int attackRange;
     public int gridRow;
     public int gridColumn;
 
@@ -35,8 +36,8 @@ public class Enemy : GameUnit
         data = newData;
         type = data.type;
         SetHp(data.hp, data.damage);
-        distanceToPlayer = Mathf.Max(0, data.startDistance);
-        attackRange = Mathf.Max(1, data.attackRange);
+        // distanceToPlayer = Mathf.Max(0, data.startDistance);
+        // attackRange = Mathf.Max(1, data.attackRange);
 
         transform.localScale = data.scale;
 
@@ -74,7 +75,7 @@ public class Enemy : GameUnit
 
         gridColumn -= amount;
 
-        distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
+        //   distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
     }
 
     public override void OnDie()
@@ -102,6 +103,10 @@ public enum EnemyType
     // Normal,
     Range,
     Melee,
+}
+public enum EnemyLevel
+{
+    Normal,
     MiniBoss,
     Boss,
 }

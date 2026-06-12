@@ -33,6 +33,8 @@ public class EnemyManager : Singleton<EnemyManager>
     public int gridColumns = 6;
     public int playerColumn = 0;
     public int meleeAttackColumn = 1;
+    public int meleeSpawnColumn = 4;
+    public int rangeSpawnColumn = 5;
     public float gridMoveStagger = 0.08f;
     public bool snapSpawnedEnemiesToGrid = true;
 
@@ -136,6 +138,98 @@ public class EnemyManager : Singleton<EnemyManager>
             SnapEnemyToGridPosition(enemy);
         }
     }
+
+    public Enemy AddEnemy(EnemyData data)
+    {
+        if (data == null || enemyPrefab == null)
+            return null;
+
+        if (!TryGetEmptySpawnCell(data, out int row, out int column))
+            return null;
+
+        Transform root =
+            combatSpaceRoot != null
+                ? combatSpaceRoot
+                : (enemyRoot != null ? enemyRoot : transform);
+
+        Enemy enemy = Instantiate(enemyPrefab, root, false);
+        RegisterEnemy(enemy);
+        enemy.Setup(data);
+        enemies.Add(enemy);
+
+        SetEnemyGrid(enemy, row, column);
+        SnapEnemyToGridPosition(enemy);
+
+        return enemy;
+    }
+
+    bool TryGetEmptySpawnCell(EnemyData data, out int row, out int column)
+    {
+        row = 0;
+        column = 0;
+
+        int rows = Mathf.Max(1, gridRows);
+        int columns = Mathf.Max(2, gridColumns);
+        int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
+        int startColumn = data.type == EnemyType.Range
+            ? Mathf.Clamp(rangeSpawnColumn, minEnemyColumn, columns - 1)
+            : Mathf.Clamp(meleeSpawnColumn, minEnemyColumn, columns - 1);
+
+        List<int> preferredRows = GetPreferredSpawnRows(data, rows);
+
+        for (int currentColumn = startColumn; currentColumn >= minEnemyColumn; currentColumn--)
+        {
+            for (int i = 0; i < preferredRows.Count; i++)
+            {
+                int currentRow = preferredRows[i];
+                if (IsGridCellOccupied(currentRow, currentColumn))
+                    continue;
+
+                row = currentRow;
+                column = currentColumn;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    List<int> GetPreferredSpawnRows(EnemyData data, int rows)
+    {
+        List<int> preferredRows = new();
+        int middleRow = rows / 2;
+
+        if (data != null && data.enemyLevel == EnemyLevel.Boss)
+        {
+            preferredRows.Add(middleRow);
+            return preferredRows;
+        }
+
+        for (int i = 0; i < rows; i++)
+        {
+            preferredRows.Add(i);
+        }
+
+        return preferredRows;
+    }
+
+    bool IsGridCellOccupied(int row, int column)
+    {
+        CleanupEnemies();
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            if (enemy.gridRow == row && enemy.gridColumn == column)
+                return true;
+        }
+
+        return false;
+    }
+
     void SpawnProjectile(Enemy target, int damage)
     {
         if (projectilePrefab == null || target == null)
@@ -610,8 +704,12 @@ public class EnemyManager : Singleton<EnemyManager>
         if (meleeEnemies.Count == 0)
             yield break;
 
+        meleeEnemies.Sort((a, b) => a.gridColumn.CompareTo(b.gridColumn));
+
         Sequence sequence = DOTween.Sequence();
         int moveIndex = 0;
+        HashSet<string> occupiedCells = BuildOccupiedMeleeCells(meleeEnemies);
+        HashSet<string> reservedCells = new();
 
         for (int i = 0; i < meleeEnemies.Count; i++)
         {
@@ -624,14 +722,29 @@ public class EnemyManager : Singleton<EnemyManager>
                 continue;
 
             int nextColumn = Mathf.Max(meleeAttackColumn, enemy.gridColumn - 1);
+            string currentCell = GetGridCellKey(enemy.gridRow, enemy.gridColumn);
+            string targetCell = GetGridCellKey(enemy.gridRow, nextColumn);
+
+            if (nextColumn == enemy.gridColumn ||
+                occupiedCells.Contains(targetCell) ||
+                reservedCells.Contains(targetCell))
+            {
+                continue;
+            }
+
             Vector3 targetPosition = GetGridLocalPosition(enemy.gridRow, nextColumn);
             float fixedY = rectTransform.localPosition.y;
 
             if (Mathf.Abs(targetPosition.x - rectTransform.localPosition.x) <= 0.1f)
             {
+                occupiedCells.Remove(currentCell);
+                occupiedCells.Add(targetCell);
                 enemy.gridColumn = nextColumn;
                 continue;
             }
+
+            occupiedCells.Remove(currentCell);
+            reservedCells.Add(targetCell);
 
             enemy.PlayAnimation(enemy.moveAnim, true);
             rectTransform.DOKill();
@@ -655,6 +768,9 @@ public class EnemyManager : Singleton<EnemyManager>
                 {
                     if (enemy != null)
                         enemy.gridColumn = nextColumn;
+
+                    reservedCells.Remove(targetCell);
+                    occupiedCells.Add(targetCell);
                 })
             );
 
@@ -672,6 +788,30 @@ public class EnemyManager : Singleton<EnemyManager>
             if (enemy != null && enemy.IsAlive())
                 enemy.PlayAnimation(enemy.idleAnim, true);
         }
+    }
+
+    HashSet<string> BuildOccupiedMeleeCells(List<Enemy> meleeEnemies)
+    {
+        HashSet<string> cells = new();
+
+        if (meleeEnemies == null)
+            return cells;
+
+        for (int i = 0; i < meleeEnemies.Count; i++)
+        {
+            Enemy enemy = meleeEnemies[i];
+            if (enemy == null || !enemy.IsAlive())
+                continue;
+
+            cells.Add(GetGridCellKey(enemy.gridRow, enemy.gridColumn));
+        }
+
+        return cells;
+    }
+
+    string GetGridCellKey(int row, int column)
+    {
+        return row + ":" + column;
     }
 
     void SetEnemyGrid(Enemy enemy, int row, int column)
@@ -774,142 +914,6 @@ public class EnemyManager : Singleton<EnemyManager>
         return targetParent.InverseTransformPoint(worldPoint);
     }
 
-    // bool IsAtAttackPoint(Enemy enemy)
-    // {
-    //     if (enemy == null || attackPoint == null)
-    //         return false;
-
-    //     float enemyX = GetCombatSpaceX(enemy.transform);
-    //     float attackX = GetCombatSpaceX(attackPoint);
-
-    //     return Mathf.Abs(enemyX - attackX) <= 1f;
-    // }
-
-    // IEnumerator MoveFrontEnemyToAttackPoint(Enemy enemy)
-    // {
-    //     if (enemy == null || attackPoint == null)
-    //         yield break;
-
-    //     enemy.PlayAnimation(enemy.moveAnim, true);
-
-    //     RectTransform enemyRect =
-    //         enemy.transform as RectTransform;
-    //     RectTransform attackRect =
-    //         attackPoint as RectTransform;
-
-    //     if (enemyRect == null || attackRect == null)
-    //     {
-    //         if (enemy != null && enemy.IsAlive())
-    //             enemy.PlayAnimation(enemy.idleAnim, true);
-
-    //         yield break;
-    //     }
-
-    //     float enemyX = enemyRect.anchoredPosition.x;
-    //     float targetX = attackRect.anchoredPosition.x;
-    //     float dx = targetX - enemyX;
-
-    //     if (Mathf.Abs(dx) <= 0.1f)
-    //     {
-    //         enemy.PlayAnimation(enemy.idleAnim, true);
-    //         yield break;
-    //     }
-
-    //     float moveDistance =
-    //         Mathf.Min(
-    //             meleeMoveDistance,
-    //             Mathf.Max(0f, Mathf.Abs(dx) - 0.1f)
-    //         );
-
-    //     if (moveDistance <= 0.01f)
-    //     {
-    //         if (enemy != null && enemy.IsAlive())
-    //             enemy.PlayAnimation(enemy.idleAnim, true);
-    //         yield break;
-    //     }
-
-    //     float direction = Mathf.Sign(dx);
-
-    //     Tween tween =
-    //         enemyRect.DOAnchorPosX(
-    //             enemyRect.anchoredPosition.x + (direction * moveDistance),
-    //             enemyMoveDuration
-    //         );
-
-    //     yield return tween.WaitForCompletion();
-
-    //     if (enemyRect != null)
-    //     {
-    //         enemyRect.anchoredPosition =
-    //             new Vector2(
-    //                 attackRect.anchoredPosition.x,
-    //                 enemyRect.anchoredPosition.y
-    //             );
-    //     }
-
-    //     if (enemy != null && enemy.IsAlive())
-    //         enemy.PlayAnimation(enemy.idleAnim, true);
-    // }
-
-    // IEnumerator MoveEnemyRowToAttackPoint(EnemyType type)
-    // {
-    //     if (attackPoint == null)
-    //         yield break;
-
-    //     List<Enemy> row =
-    //         GetAliveEnemiesOfType(type);
-
-    //     if (row.Count == 0)
-    //         yield break;
-
-    //     Enemy frontEnemy = row[0];
-    //     float frontX = GetCombatSpaceX(frontEnemy.transform);
-    //     float targetX = GetCombatSpaceX(attackPoint);
-    //     float dx = targetX - frontX;
-
-    //     if (Mathf.Abs(dx) <= 1f)
-    //         yield break;
-
-    //     float moveDistance =
-    //         Mathf.Min(
-    //             meleeMoveDistance,
-    //             Mathf.Max(0f, Mathf.Abs(dx) - 1f)
-    //         );
-
-    //     if (moveDistance <= 0.01f)
-    //         yield break;
-
-    //     float direction = Mathf.Sign(dx);
-
-    //     Sequence seq = DOTween.Sequence();
-    //     for (int i = 0; i < row.Count; i++)
-    //     {
-    //         Enemy enemy = row[i];
-    //         if (enemy == null || !enemy.IsAlive())
-    //             continue;
-
-    //         RectTransform rectTransform = enemy.transform as RectTransform;
-    //         if (rectTransform == null)
-    //             continue;
-
-    //         enemy.PlayAnimation(enemy.moveAnim, true);
-    //         seq.Join(
-    //             rectTransform.DOAnchorPosX(
-    //                 rectTransform.anchoredPosition.x + (direction * moveDistance),
-    //                 enemyMoveDuration
-    //             )
-    //         );
-    //     }
-
-    //     yield return seq.WaitForCompletion();
-
-    //     for (int i = 0; i < row.Count; i++)
-    //     {
-    //         Enemy enemy = row[i];
-    //         if (enemy != null && enemy.IsAlive())
-    //             enemy.PlayAnimation(enemy.idleAnim, true);
-    //     }
-    // }
 
     List<Enemy> GetAliveEnemiesOfType(EnemyType type)
     {
@@ -937,11 +941,7 @@ public class EnemyManager : Singleton<EnemyManager>
         return row;
     }
 
-    void SetEnemyPosition(
-        Enemy enemy,
-        Vector3 position,
-        bool useUIPosition
-    )
+    void SetEnemyPosition(Enemy enemy, Vector3 position, bool useUIPosition)
     {
         RectTransform rectTransform = enemy.transform as RectTransform;
         if (useUIPosition && rectTransform != null)

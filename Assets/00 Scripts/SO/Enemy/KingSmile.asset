@@ -26,7 +26,7 @@ MonoBehaviour:
   damage: 1
   scale: {x: 0.3, y: 0.3, z: 1}
   type: 0
+  enemyLevel: 2
   skeletonData: {fileID: 11400000, guid: 01cc62cc71d0add4897f50054f5ce20d, type: 2}
-  startDistance: 3
-  attackRange: 100000000
   level: 1
+  coinReward: 0

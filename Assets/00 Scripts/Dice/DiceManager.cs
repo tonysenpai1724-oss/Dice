@@ -377,13 +377,13 @@ public class DiceManager : MonoBehaviour
         a.FreezeForMerge();
         b.FreezeForMerge();
 
-        diceQueue.AddDice(a.data);
-        diceQueue.AddDice(b.data);
-
         Vector3 mergePos =
             (a.transform.position +
             b.transform.position) * 0.5f;
         mergePos.y = GetBoardSurfaceY();
+
+        diceQueue.AddDice(a.data, mergePos);
+        diceQueue.AddDice(b.data, mergePos);
 
 
         int nextLevel = Mathf.Clamp(a.Level + 1, 1, diceDatabase.Count);

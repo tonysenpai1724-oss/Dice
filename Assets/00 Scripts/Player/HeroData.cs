@@ -15,6 +15,8 @@ public class HeroData : SerializedScriptableObject
     public int level;
     public int damage;
     public int shield;
+    public float critDmg = 1;
+    public float critRate;
     public HeroType type;
     public Dictionary<int, List<DiceData>> startDiceLevelConfig;
     public SkeletonDataAsset skeletonData;

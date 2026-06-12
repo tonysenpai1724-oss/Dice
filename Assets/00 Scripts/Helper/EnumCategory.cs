@@ -61,11 +61,30 @@ public enum ERarity
 }
 public enum ECommonResource
 {
-    Coin,
+    Token,
     Gem,
     Energy,
     Exp,
     ActivePoint,
+}
+public enum EBlueprint
+{
+
+    Blueprint2,
+    Blueprint3,
+    Blueprint4,
+    Blueprint5
+}
+public enum DiceCommonResource
+{
+
+
+}
+public enum EChestType
+{
+    CommonKey,
+    Gold,
+    LegendaryKey,
 }
 public enum EVirtualResource
 {

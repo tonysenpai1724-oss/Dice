@@ -196,11 +196,11 @@ public class PlayerResourceLocalData : IControllerCachedData
                 _commonResources[cr.resourceType] += cr.resourceValue;
                 dicItemResource["cm" + cr.resourceType] = _commonResources[cr.resourceType];
                 DebugCustom.LogColor("AddResource", cr.resourceType.ToString(), _commonResources[cr.resourceType]);
-                if(cr.resourceValue < 0)
+                if (cr.resourceValue < 0)
                 {
-                    if(cr.resourceType == ECommonResource.Coin)
+                    if (cr.resourceType == ECommonResource.Token)
                         IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.SpendCoin, -cr.resourceValue);
-                    else if(cr.resourceType == ECommonResource.Energy)
+                    else if (cr.resourceType == ECommonResource.Energy)
                         IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.SpendEnergy, -cr.resourceValue);
                 }
             }

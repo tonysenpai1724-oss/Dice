@@ -12,6 +12,9 @@ public class DiceQueue : MonoBehaviour
 
     [Header("Layout")]
     public float spacing = 0.5f;
+    public bool useHorizontalLayout = true;
+    public Vector3 horizontalOffset = new Vector3(1.5f, 0f, 0f);
+    public Vector3 verticalOffset = new Vector3(0.3f, 0f, 1.5f);
     public Vector3 startPosition =
     new Vector3(
         -18.7f,
@@ -20,19 +23,16 @@ public class DiceQueue : MonoBehaviour
     );
 
     public Vector3 stackOffset =
-        new Vector3(
-            0.3f,
-            0f,
-            1.5f
-        );
-
-    [Header("Conveyor")]
-    public Vector3 consumeOffset =
     new Vector3(
-        1.2f,
+        1.5f,
         0f,
-        -2.5f
+        0f
     );
+
+    [Header("Spawn Fly")]
+    public bool flyFromMergePosition = true;
+    public float spawnFlyDuration = 0.25f;
+    public float spawnFlyArcHeight = 2f;
 
     public float itemMoveDuration = 0.25f;
     public float shiftMoveDuration = 0.2f;
@@ -47,7 +47,14 @@ public class DiceQueue : MonoBehaviour
         new();
 
     bool processing;
-    List<DiceData> pendingItems =
+    struct PendingQueueItem
+    {
+        public DiceData data;
+        public Vector3 spawnPosition;
+        public bool hasSpawnPosition;
+    }
+
+    List<PendingQueueItem> pendingItems =
         new();
     bool flushingPendingItems;
     bool fastFlushRequested;
@@ -61,10 +68,27 @@ public class DiceQueue : MonoBehaviour
 
     public void AddDice(DiceData data)
     {
+        AddDice(data, Vector3.zero, false);
+    }
+
+    public void AddDice(DiceData data, Vector3 spawnPosition)
+    {
+        AddDice(data, spawnPosition, true);
+    }
+
+    void AddDice(DiceData data, Vector3 spawnPosition, bool hasSpawnPosition)
+    {
         if (data == null)
             return;
 
-        pendingItems.Add(data);
+        pendingItems.Add(
+            new PendingQueueItem
+            {
+                data = data,
+                spawnPosition = spawnPosition,
+                hasSpawnPosition = hasSpawnPosition
+            }
+        );
 
         if (!flushingPendingItems)
         {
@@ -131,7 +155,7 @@ public class DiceQueue : MonoBehaviour
 
                 yield return MoveItem(
                     first.transform,
-                    first.transform.position + consumeOffset,
+                    GetConsumeTargetPosition(first.transform),
                     GetItemMoveDuration()
                 );
 
@@ -184,7 +208,7 @@ public class DiceQueue : MonoBehaviour
                     !TurnManager.Instance.IsResettingBoard
             );
 
-            DiceData data =
+            PendingQueueItem pendingItem =
                 pendingItems[0];
 
             pendingItems.RemoveAt(0);
@@ -192,7 +216,7 @@ public class DiceQueue : MonoBehaviour
             DiceQueueItem item =
                 ObjectPooler.Spawn(itemPrefab);
 
-            item.SetDice(data);
+            item.SetDice(pendingItem.data);
 
             int index =
                 items.Count;
@@ -201,10 +225,15 @@ public class DiceQueue : MonoBehaviour
                 item.transform;
 
             Vector3 pos =
-                startPosition +
-                stackOffset * index;
+                GetPosition(index);
 
-            t.position = pos;
+            bool shouldFlyFromSpawn =
+                flyFromMergePosition &&
+                pendingItem.hasSpawnPosition;
+
+            t.position = shouldFlyFromSpawn
+                ? pendingItem.spawnPosition
+                : pos;
 
             t.rotation =
                 Quaternion.Euler(
@@ -217,6 +246,16 @@ public class DiceQueue : MonoBehaviour
                 Vector3.one * 100f;
 
             items.Add(item);
+
+            if (shouldFlyFromSpawn)
+            {
+                yield return MoveItemWithArc(
+                    t,
+                    pos,
+                    spawnFlyDuration,
+                    spawnFlyArcHeight
+                );
+            }
         }
 
         flushingPendingItems = false;
@@ -312,10 +351,75 @@ public class DiceQueue : MonoBehaviour
         }
     }
 
+    IEnumerator MoveItemWithArc(
+        Transform item,
+        Vector3 target,
+        float duration,
+        float arcHeight
+    )
+    {
+        if (item == null)
+            yield break;
+
+        Vector3 start =
+            item.position;
+        float timer = 0f;
+        duration =
+            Mathf.Max(
+                0.01f,
+                duration
+            );
+
+        while (timer < duration)
+        {
+            if (item == null)
+                yield break;
+
+            timer += Time.deltaTime;
+
+            float t =
+                Mathf.Clamp01(
+                    timer / duration
+                );
+
+            Vector3 position =
+                Vector3.Lerp(
+                    start,
+                    target,
+                    t
+                );
+
+            position.y +=
+                Mathf.Sin(t * Mathf.PI) * arcHeight;
+
+            item.position = position;
+
+            yield return null;
+        }
+
+        item.position = target;
+    }
+
     Vector3 GetPosition(int index)
     {
+        Vector3 offset = useHorizontalLayout
+            ? horizontalOffset
+            : stackOffset != Vector3.zero
+                ? stackOffset
+                : verticalOffset;
+
         return startPosition +
-            stackOffset * index;
+            offset * index;
+    }
+
+    Vector3 GetConsumeTargetPosition(Transform item)
+    {
+        if (contentRoot != null)
+            return contentRoot.position;
+
+        return item != null
+            ? item.position
+            : startPosition;
     }
 
     float GetItemMoveDuration()

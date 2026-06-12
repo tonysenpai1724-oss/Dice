@@ -172,17 +172,23 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         int rows = Mathf.Max(1, gridRows);
         int columns = Mathf.Max(2, gridColumns);
         int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
+        int middleRow = rows / 2;
 
         for (int i = 0; i < enemiesToPlace.Count; i++)
         {
             int row = i % rows;
+            EnemyData data = enemiesToPlace[i];
+
+            if (data != null && data.enemyLevel == EnemyLevel.Boss)
+                row = middleRow;
+
             int columnOffset = i / rows;
             int column = Mathf.Max(minEnemyColumn, startColumn - columnOffset);
 
             placements.Add(
                 new EnemySpawnPlacement
                 {
-                    data = enemiesToPlace[i],
+                    data = data,
                     position = GetGridPoint(row, column, rows, columns),
                     useUIPosition = true,
                     isBackRow = isBackRow,

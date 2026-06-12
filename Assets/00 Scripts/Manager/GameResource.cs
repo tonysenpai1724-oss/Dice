@@ -144,7 +144,7 @@ public class PackageResource
 
     public void ReceiveAndShow(EResourceFrom resourceFrom, bool updateServer = false, Action actionComplete = null)
     {
-        actionComplete += () => UIManager.Instance.PendingAction(()=> UIManager.Instance.ShowPopupReward(this));
+        actionComplete += () => UIManager.Instance.PendingAction(() => UIManager.Instance.ShowPopupReward(this));
         ReceiveResource(resourceFrom, updateServer, actionComplete);
     }
 
@@ -246,7 +246,7 @@ public class CommonResource : ItemResource
     {
         switch (resourceType)
         {
-            case ECommonResource.Coin:
+            case ECommonResource.Token:
                 return ERarity.Common;
             case ECommonResource.Gem:
                 return ERarity.Epic;

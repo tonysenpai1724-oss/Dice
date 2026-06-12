@@ -25,8 +25,8 @@ MonoBehaviour:
   enemyName: Golblin
   damage: 1
   scale: {x: 0.3, y: 0.3, z: 1}
-  type: 1
+  type: 0
+  enemyLevel: 0
   skeletonData: {fileID: 11400000, guid: 4eb51745291ee6d4da979e520ed7bcdf, type: 2}
-  startDistance: 7
-  attackRange: 2
   level: 1
+  coinReward: 0

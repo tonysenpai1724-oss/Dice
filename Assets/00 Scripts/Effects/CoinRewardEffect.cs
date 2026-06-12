@@ -10,7 +10,7 @@ public static class CoinRewardEffect
         IPlayerResource.Instance.AddResource(
             new List<GameResource>
             {
-                new CommonResource(ECommonResource.Coin, amount)
+                new CommonResource(ECommonResource.Token, amount)
             },
             EResourceFrom.TimeReward
         );
