@@ -24,7 +24,7 @@ MonoBehaviour:
   hp: 50
   enemyName: kIng Smile
   damage: 1
-  scale: {x: 0.5, y: 0.5, z: 1}
+  scale: {x: 0.3, y: 0.3, z: 1}
   type: 0
   skeletonData: {fileID: 11400000, guid: 01cc62cc71d0add4897f50054f5ce20d, type: 2}
   startDistance: 3

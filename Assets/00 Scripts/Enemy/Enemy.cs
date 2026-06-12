@@ -12,6 +12,8 @@ public class Enemy : GameUnit
     public EnemyData data;
     public int distanceToPlayer;
     public int attackRange;
+    public int gridRow;
+    public int gridColumn;
 
     [Header("anim")]
     public string moveAnim = "Move";
@@ -59,16 +61,18 @@ public class Enemy : GameUnit
         if (!IsAlive())
             return false;
 
-        if (type == EnemyType.Melee)
+        if (type == EnemyType.Range)
             return true;
 
-        return distanceToPlayer <= attackRange;
+        return gridColumn <= 1;
     }
 
     public virtual void MoveTowardPlayer(int amount)
     {
         if (!IsAlive())
             return;
+
+        gridColumn -= amount;
 
         distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
     }

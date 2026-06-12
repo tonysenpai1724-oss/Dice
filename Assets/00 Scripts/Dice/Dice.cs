@@ -29,7 +29,7 @@ public enum DiceType
 
 }
 
-public class Dice : MonoBehaviour
+public class Dice : PoolingObject
 {
     [Header("Data")]
     public DiceData data;
@@ -179,6 +179,18 @@ public class Dice : MonoBehaviour
             return;
 
         data.ExecuteSkill();
+    }
+
+    public override void Despawn()
+    {
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = false;
+        }
+
+        base.Despawn();
     }
 
     public void FreezeForMerge()

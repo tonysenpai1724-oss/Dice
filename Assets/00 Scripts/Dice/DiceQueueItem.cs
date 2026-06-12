@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
 
-public class DiceQueueItem : MonoBehaviour
+public class DiceQueueItem : PoolingObject
 {
     public MeshRenderer meshRenderer;
 
@@ -14,6 +14,9 @@ public class DiceQueueItem : MonoBehaviour
 
     public void SetDice(DiceData data)
     {
+        if (data == null)
+            return;
+
         this.data = data;
         meshRenderer.material = data.diceMaterial;
         foreach (var d in decals)

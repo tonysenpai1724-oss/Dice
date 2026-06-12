@@ -12,6 +12,8 @@ public class EnemySpawnPlacement
     public Vector3 position;
     public bool useUIPosition;
     public bool isBackRow;
+    public int gridRow;
+    public int gridColumn;
 }
 
 public class EnemyLevelPositionGenerator : MonoBehaviour
@@ -27,6 +29,11 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         new();
 
     [Header("Fallback")]
+    public int gridRows = 3;
+    public int gridColumns = 6;
+    public int playerColumn = 0;
+    public int meleeStartColumn = 4;
+    public int rangeStartColumn = 5;
     public float fallbackSpacing = 120f;
     public float minSpacing = 80f;
     public int maxRandomAttempts = 24;
@@ -117,8 +124,8 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         if (spawnArea == null || !spawnArea.HasValidArea)
             return BuildFallbackPlacements(enemyDatas);
 
-        List<EnemyData> meleeRow = new();
-        List<EnemyData> rangeRow = new();
+        List<EnemyData> meleeEnemies = new();
+        List<EnemyData> rangeEnemies = new();
 
         for (int i = 0; i < enemyDatas.Count; i++)
         {
@@ -126,21 +133,23 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             if (data == null)
                 continue;
 
-            if (data.type == EnemyType.Melee)
-                rangeRow.Add(data);
+            if (data.type == EnemyType.Range)
+                rangeEnemies.Add(data);
             else
-                meleeRow.Add(data);
+                meleeEnemies.Add(data);
         }
 
-        AddRowPlacements(
+        AddGridPlacements(
             placements,
-            meleeRow,
+            meleeEnemies,
+            Mathf.Clamp(meleeStartColumn, playerColumn + 1, gridColumns - 1),
             false
         );
 
-        AddRowPlacements(
+        AddGridPlacements(
             placements,
-            rangeRow,
+            rangeEnemies,
+            Mathf.Clamp(rangeStartColumn, playerColumn + 1, gridColumns - 1),
             true
         );
 
@@ -148,6 +157,47 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             return BuildFallbackPlacements(enemyDatas);
 
         return placements;
+    }
+
+    void AddGridPlacements(
+        List<EnemySpawnPlacement> placements,
+        List<EnemyData> enemiesToPlace,
+        int startColumn,
+        bool isBackRow
+    )
+    {
+        if (enemiesToPlace == null || enemiesToPlace.Count == 0)
+            return;
+
+        int rows = Mathf.Max(1, gridRows);
+        int columns = Mathf.Max(2, gridColumns);
+        int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
+
+        for (int i = 0; i < enemiesToPlace.Count; i++)
+        {
+            int row = i % rows;
+            int columnOffset = i / rows;
+            int column = Mathf.Max(minEnemyColumn, startColumn - columnOffset);
+
+            placements.Add(
+                new EnemySpawnPlacement
+                {
+                    data = enemiesToPlace[i],
+                    position = GetGridPoint(row, column, rows, columns),
+                    useUIPosition = true,
+                    isBackRow = isBackRow,
+                    gridRow = row,
+                    gridColumn = column
+                }
+            );
+        }
+    }
+
+    Vector3 GetGridPoint(int row, int column, int rows, int columns)
+    {
+        float x01 = columns <= 1 ? 0.5f : (float)column / (columns - 1);
+        float y01 = rows <= 1 ? 0.5f : 1f - ((float)row / (rows - 1));
+        return spawnArea.GetPoint(x01, y01);
     }
 
     public List<EnemySpawnPlacement> BuildBottomRowPlacements(

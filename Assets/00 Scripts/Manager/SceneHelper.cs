@@ -61,7 +61,7 @@ public class SceneHelper : Singleton<SceneHelper>
     IEnumerator IEChangeSceneGameplay()
     {
         Debug.Log("ChangeScene Gameplay");
-        var async = SceneManager.LoadSceneAsync(Constant.SCENE_GAME_PLAY_2);
+        var async = SceneManager.LoadSceneAsync(Constant.SCENE_GAME_PLAY);
         while (!async.isDone)
         {
             //totalProgress = async.progress;

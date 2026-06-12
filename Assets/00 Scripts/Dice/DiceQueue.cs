@@ -149,9 +149,7 @@ public class DiceQueue : MonoBehaviour
                 if (destroyDelay > 0f)
                     yield return new WaitForSeconds(destroyDelay);
 
-                Destroy(
-                    first.gameObject
-                );
+                first.Despawn();
             }
 
             yield return ShiftItems();
@@ -192,7 +190,7 @@ public class DiceQueue : MonoBehaviour
             pendingItems.RemoveAt(0);
 
             DiceQueueItem item =
-                Instantiate(itemPrefab);
+                ObjectPooler.Spawn(itemPrefab);
 
             item.SetDice(data);
 

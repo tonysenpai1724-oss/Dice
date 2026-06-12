@@ -3903,8 +3903,9 @@ MonoBehaviour:
   comboSpinTurnsZ: {x: 1265, y: 2530}
   comboDistancePerChain: 4
   maxComboDistanceLimit: 30
-  bombExplosionRadius: 5
-  bombExplosionForce: 8
+  bombExplosionRadius: 10
+  bombExplosionForce: 20
+  bombExplosionMinForce: 15
   bombExplosionPrefab: {fileID: 0}
   diceQueue: {fileID: 961475775}
   comboArcPerChain: 3

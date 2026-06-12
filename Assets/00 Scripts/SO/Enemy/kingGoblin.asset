@@ -24,7 +24,7 @@ MonoBehaviour:
   hp: 50
   enemyName: King Goblin
   damage: 1
-  scale: {x: 0.5, y: 0.5, z: 1}
+  scale: {x: 0.3, y: 0.3, z: 1}
   type: 0
   skeletonData: {fileID: 11400000, guid: f8322f75a9e0cb64d9c5a19aa919ca7d, type: 2}
   startDistance: 3

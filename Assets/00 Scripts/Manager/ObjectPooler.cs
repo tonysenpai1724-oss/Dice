@@ -104,6 +104,9 @@ public class ObjectPooler : Singleton<ObjectPooler>
 
     public PoolingObject GetObject(PoolingObject _refPrefabs)
     {
+        if (string.IsNullOrEmpty(_refPrefabs.poolingKey))
+            _refPrefabs.poolingKey = _refPrefabs.name;
+
         if (!dicPooling.ContainsKey(_refPrefabs.poolingKey))
         {
             dicPooling.Add(_refPrefabs.poolingKey, new Pooling(_refPrefabs));
@@ -174,6 +177,13 @@ public class ObjectPooler : Singleton<ObjectPooler>
     {
         T obj = Spawn(refPrefabs, parent);
         obj.transform.position = pos;
+        return obj;
+    }
+
+    public static T Spawn<T>(T refPrefabs, Vector3 pos, Quaternion rotation, Transform parent = null) where T : PoolingObject
+    {
+        T obj = Spawn(refPrefabs, pos, parent);
+        obj.transform.rotation = rotation;
         return obj;
     }
 

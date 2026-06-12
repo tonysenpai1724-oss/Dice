@@ -85,7 +85,9 @@ public static class PoisonDiceSkillData
         if (gameplay == null)
             return;
 
-        Enemy target = gameplay.GetTargetEnemy();
+        Enemy target = gameplay.skillEnemyManager != null
+            ? gameplay.skillEnemyManager.GetRightmostAliveEnemy()
+            : gameplay.GetTargetEnemy();
         if (target == null)
             return;
 

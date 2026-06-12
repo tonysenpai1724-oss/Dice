@@ -189,8 +189,7 @@ public class DiceManager : MonoBehaviour
     {
         Quaternion rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
 
-        GameObject obj = ObjectPool.Instance.Get(pos, rotation);
-        Dice d = obj.GetComponent<Dice>();
+        Dice d = ObjectPooler.Spawn(dicePrefab, pos, rotation);
         d.Setup(data);
 
         // FORCE STABLE
@@ -333,9 +332,7 @@ public class DiceManager : MonoBehaviour
 
         boardDices.Remove(dice);
 
-        ObjectPool.Instance.Return(
-            dice.gameObject
-        );
+        dice.Despawn();
     }
 
     #endregion
