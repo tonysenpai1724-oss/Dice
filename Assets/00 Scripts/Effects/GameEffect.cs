@@ -40,6 +40,7 @@ public abstract class GameEffect : MonoBehaviour
             return false;
 
         Stacks--;
+        Debug.Log("Stacks: " + Stacks);
         NotifyStacksChanged();
 
         if (Stacks <= 0)

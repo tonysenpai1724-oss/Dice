@@ -36,14 +36,14 @@ public class PlayerController : GameUnit
         }
     }
 
-    protected override void PlayHurtAnimation()
-    {
-        StartCoroutine(PlayHurtDelayed());
-    }
+    // protected override void PlayHurtAnimation()
+    // {
+    //     StartCoroutine(PlayHurtDelayed());
+    // }
 
     IEnumerator PlayHurtDelayed()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0f);
         PlayAnimation(hurtAnim, false);
         QueueIdleAnimation();
     }

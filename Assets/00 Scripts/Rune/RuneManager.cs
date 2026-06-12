@@ -106,6 +106,26 @@ public class RuneManager : Singleton<RuneManager>
         if (!IsSlotUnlocked(index))
             return;
 
+        EnemyManager enemyManager = EnemyManager.Instance;
+        PlayerController player =
+            enemyManager != null
+                ? enemyManager.player
+                : null;
+        Enemy targetEnemy =
+            enemyManager != null
+                ? enemyManager.GetNearestAliveEnemy()
+                : null;
+
+        GameplayManager gameplay = GameplayManager.Instance;
+        gameplay?.BeginDiceSkill(
+            null,
+             null,
+            null,
+            enemyManager,
+            player,
+            targetEnemy
+        );
+
         slots[index].runeSkill?.Execute();
     }
 

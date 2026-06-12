@@ -82,6 +82,7 @@ public class GameplayManager : Singleton<GameplayManager>
 
     public void AddDamageAllEnemiesAfterAttack(int amount)
     {
+        Debug.Log("AddDamageAllEnemiesAfterAttack: " + amount);
         if (amount <= 0)
             return;
 
@@ -91,6 +92,9 @@ public class GameplayManager : Singleton<GameplayManager>
     public void RunAfterAttackActions()
     {
         TigerForge.EventManager.EmitEvent(Constant.ON_DICE_AFTER_ATTACK);
+
+        if (skillAfterAttackDamageAllEnemies > 0)
+            OnDiceAfterAttack();
     }
 
     void OnDiceAfterAttack()
@@ -100,6 +104,7 @@ public class GameplayManager : Singleton<GameplayManager>
 
         DamageAllEnemiesEffect damageAllEnemiesEffect =
             skillEnemyManager.effectManager?.AddEffect<DamageAllEnemiesEffect>();
+        Debug.Log("OnDiceAfterAttack: " + skillAfterAttackDamageAllEnemies);
 
         if (damageAllEnemiesEffect != null)
             damageAllEnemiesEffect.Apply(skillAfterAttackDamageAllEnemies);

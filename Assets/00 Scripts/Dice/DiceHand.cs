@@ -106,7 +106,6 @@ public class DiceHand : MonoBehaviour
             while (true)
             {
                 AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-                Debug.Log(stateInfo.normalizedTime + "state:" + stateInfo.IsName(animationName));
                 if (stateInfo.IsName(animationName) && stateInfo.normalizedTime >= 1f)
                     break;
 

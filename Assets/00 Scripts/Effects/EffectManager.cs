@@ -55,6 +55,7 @@ public class EffectManager : MonoBehaviour
         if (effect == null)
             return;
 
+        Debug.Log("UnregisterEffect" + effect);
         currentEffects.Remove(effect);
     }
 

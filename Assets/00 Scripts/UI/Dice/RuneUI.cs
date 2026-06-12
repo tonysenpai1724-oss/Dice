@@ -102,6 +102,33 @@ public class RuneUI : MonoBehaviour,
 
         manager.ExecuteRune(slotIndex);
     }
+    bool IsDropOnBoard(PointerEventData eventData)
+    {
+        if (Camera.main == null)
+            return false;
+
+        if (DiceManager.Instance == null || DiceManager.Instance.boardCollider == null)
+            return false;
+
+        Collider boardCollider = DiceManager.Instance.boardCollider;
+
+        Ray ray = Camera.main.ScreenPointToRay(eventData.position);
+
+        RaycastHit[] hits = Physics.RaycastAll(
+            ray,
+            Mathf.Infinity,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Collide
+        );
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider == boardCollider)
+                return true;
+        }
+
+        return false;
+    }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -141,10 +168,37 @@ public class RuneUI : MonoBehaviour,
 
         dragging = false;
         canvasGroup.blocksRaycasts = true;
+
+        RuneManager manager = RuneManager.Instance;
+
+        bool used = false;
+
+        if (manager != null && IsDropOnBoard(eventData))
+        {
+            manager.ExecuteRune(slotIndex);
+            manager.RemoveRune(slotIndex); // hoặc SetRune(slotIndex, null)
+            used = true;
+        }
+
         draggingSlot = null;
-        ResetDragPosition();
+
+        if (!used)
+        {
+            ResetDragPosition();
+        }
+
         RefreshAllRuneSlots();
+
         TigerForge.EventManager.EmitEvent(Constant.ON_DROP_RUNE);
+        // if (!dragging)
+        //     return;
+
+        // dragging = false;
+        // canvasGroup.blocksRaycasts = true;
+        // draggingSlot = null;
+        // ResetDragPosition();
+        // RefreshAllRuneSlots();
+        // TigerForge.EventManager.EmitEvent(Constant.ON_DROP_RUNE);
     }
 
     public void OnDrop(PointerEventData eventData)

@@ -118,6 +118,7 @@ public static class ShieldDiceSkillData
 
     public static void Execute(int stackApply, int valueApply)
     {
+        Debug.Log("ShieldDiceSkillData");
         GameplayManager gameplay = GameplayManager.Instance;
         ShieldEffect shieldEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<ShieldEffect>();
         if (shieldEffect == null)
@@ -186,6 +187,7 @@ public static class BombDiceSkillData
         if (gameplay == null || gameplay.skillEnemyManager == null)
             return;
 
+        gameplay.CancelAttack();
         gameplay.AddDamageAllEnemiesAfterAttack(valueApply);
     }
 }

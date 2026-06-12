@@ -343,13 +343,22 @@ public class EnemyManager : Singleton<EnemyManager>
         if (attackTrack != null)
             attackTrack.Complete += _ => attackCompleted = true;
 
-        player.OnTakeDamage(enemy.damage);
+        float halfTime = attackTrack.Animation.Duration * 0.5f;
 
-        if (attackTrack != null)
+        while (enemy != null && enemy.IsAlive())
         {
-            while (!attackCompleted && enemy != null && enemy.IsAlive())
-                yield return null;
+            if (!attackCompleted && attackTrack.TrackTime >= halfTime)
+            {
+                attackCompleted = true;
+                player.OnTakeDamage(enemy.damage);
+            }
+
+            if (attackTrack.IsComplete)
+                break;
+
+            yield return null;
         }
+
 
         if (enemy.skeletonGraphic != null)
         {
@@ -363,6 +372,7 @@ public class EnemyManager : Singleton<EnemyManager>
                 0
             );
         }
+        // player.OnTakeDamage(enemy.damage);
     }
 
     public void SkipNextEnemyTurns(int amount = 1)

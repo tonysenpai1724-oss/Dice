@@ -44,6 +44,12 @@ public class DiceManager : MonoBehaviour
     public float maxComboDistanceLimit = 12f;
     Dictionary<Dice, float> comboLastTime = new Dictionary<Dice, float>();
     //  public Transform point;
+    [Header("Bomb Explosion")]
+    public float bombExplosionRadius = 12f;
+    public float bombExplosionForce = 18f;
+    public float bombExplosionMinForce = 5f;
+    public GameObject bombExplosionPrefab;
+
     [Header("Stack")]
 
     List<Dice> boardDices =
@@ -395,6 +401,10 @@ public class DiceManager : MonoBehaviour
 
         ReturnBoardDice(b);
 
+        DiceData bombData = GetBombDiceData(a.data, b.data);
+        if (bombData != null)
+            ExplodeBoardDice(mergePos, bombData);
+
         DiceData nextData = GetDiceData(a.Level + 1, DiceType.Normal);
 
         if (nextData == null)
@@ -438,6 +448,66 @@ public class DiceManager : MonoBehaviour
 
         TryComboChain(merged);
         yield break;
+    }
+
+    DiceData GetBombDiceData(DiceData first, DiceData second)
+    {
+        if (first != null && first.type == DiceType.Bomb)
+            return first;
+
+        if (second != null && second.type == DiceType.Bomb)
+            return second;
+
+        return null;
+    }
+
+    void ExplodeBoardDice(Vector3 position, DiceData sourceData)
+    {
+        GameObject prefab = sourceData != null && sourceData.hitEffectPrefab != null
+            ? sourceData.hitEffectPrefab
+            : bombExplosionPrefab;
+
+        if (prefab != null)
+        {
+            GameObject fx = Instantiate(prefab, position, Quaternion.identity);
+            Destroy(fx, 1f);
+        }
+
+        float radius = Mathf.Max(0.01f, bombExplosionRadius);
+
+        for (int i = boardDices.Count - 1; i >= 0; i--)
+        {
+            Dice dice = boardDices[i];
+            if (dice == null)
+            {
+                boardDices.RemoveAt(i);
+                continue;
+            }
+
+            if (!dice.gameObject.activeInHierarchy ||
+                dice.rb == null ||
+                dice.rb.isKinematic ||
+                dice.state == DiceState.Merging ||
+                dice.state == DiceState.FlyingCombo)
+            {
+                continue;
+            }
+
+            Vector3 direction = dice.transform.position - position;
+            direction.y = 0f;
+
+            float distance = direction.magnitude;
+            if (distance > radius || distance <= 0.001f)
+                continue;
+
+            float forceMultiplier = 1f - Mathf.Clamp01(distance / radius);
+            float impulse = Mathf.Max(bombExplosionMinForce, bombExplosionForce * forceMultiplier);
+            Vector3 force = direction.normalized * impulse;
+
+            dice.ApplyBoardMoveConstraints();
+            dice.rb.WakeUp();
+            dice.rb.AddForce(force, ForceMode.VelocityChange);
+        }
     }
 
     void SpawnMergeFloatingText(Vector3 position, string value, Color color)

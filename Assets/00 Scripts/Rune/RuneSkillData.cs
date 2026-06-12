@@ -64,7 +64,6 @@ public static class ProtectionRuneSkillData
 {
     public static void Execute(int stackApply, int valueApply)
     {
-
         GameplayManager gameplay = GameplayManager.Instance;
         ShieldEffect shieldEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<ShieldEffect>();
         if (shieldEffect == null)

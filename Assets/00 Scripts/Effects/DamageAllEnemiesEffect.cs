@@ -1,10 +1,13 @@
-﻿public class DamageAllEnemiesEffect : GameEffect
+﻿using UnityEngine;
+
+public class DamageAllEnemiesEffect : GameEffect
 {
     EnemyManager enemyManager;
 
     protected override void Awake()
     {
-        enemyManager = GetComponent<EnemyManager>();
+        enemyManager = EnemyManager.Instance;
+
     }
 
     public void Apply(int amount)
@@ -14,6 +17,7 @@
             RemoveSelf();
             return;
         }
+        Debug.Log("DamageAllEnemiesEffect" + amount);
 
         for (int i = 0; i < enemyManager.enemies.Count; i++)
         {
