@@ -168,21 +168,83 @@ public class DiceManager : MonoBehaviour
         {
             attempts++;
 
-            Vector3 candidate =
-                new Vector3(Random.Range(minX, maxX), boardY, Random.Range(minZ, maxZ));
-
-            Vector3 pos =
-                FindClearPosition(candidate);
-
             int level = Random.Range(minStartLevel, maxStartLevel + 1);
-            DiceData data = GetRandomDiceDataByLevel(level);
+            DiceData data = GetDiceData(level, DiceType.Normal);
 
-            if (IsOccupied(pos, null))
+            if (TrySpawnStartDice(data, minX, maxX, minZ, maxZ, boardY))
+                spawned++;
+        }
+
+        SpawnPlayerStartDiceDatas(minX, maxX, minZ, maxZ, boardY);
+    }
+
+    bool TrySpawnStartDice(
+        DiceData data,
+        float minX,
+        float maxX,
+        float minZ,
+        float maxZ,
+        float boardY
+    )
+    {
+        if (data == null)
+            return false;
+
+        Vector3 candidate =
+            new Vector3(Random.Range(minX, maxX), boardY, Random.Range(minZ, maxZ));
+
+        Vector3 pos =
+            FindClearPosition(candidate);
+
+        if (IsOccupied(pos, null))
+            return false;
+
+        SpawnDice(data, pos);
+        return true;
+    }
+
+    void SpawnPlayerStartDiceDatas(
+        float minX,
+        float maxX,
+        float minZ,
+        float maxZ,
+        float boardY
+    )
+    {
+        PlayerController player = GetPlayerController();
+        if (player == null)
+            return;
+
+        if (player.diceDatas == null || player.diceDatas.Count == 0)
+            player.InitializeDiceDatas();
+
+        if (player.diceDatas == null)
+            return;
+
+        for (int i = 0; i < player.diceDatas.Count; i++)
+        {
+            DiceData data = player.diceDatas[i];
+            if (data == null)
                 continue;
 
-            SpawnDice(data, pos);
-            spawned++;
+            int attempts = 0;
+            int maxAttempts = Mathf.Max(12, startSpawnCount * 12);
+            while (attempts < maxAttempts)
+            {
+                attempts++;
+
+                if (TrySpawnStartDice(data, minX, maxX, minZ, maxZ, boardY))
+                    break;
+            }
         }
+    }
+
+    PlayerController GetPlayerController()
+    {
+        if (EnemyManager.Instance != null && EnemyManager.Instance.player != null)
+            return EnemyManager.Instance.player;
+
+        return FindFirstObjectByType<PlayerController>();
     }
 
     public Dice SpawnDice(DiceData data, Vector3 pos, bool registerOnBoard = true)

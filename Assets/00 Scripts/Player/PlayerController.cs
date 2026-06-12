@@ -1,13 +1,17 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 
 public class PlayerController : GameUnit
 {
     public HeroData data;
+    public List<DiceData> diceDatas = new();
+
     public void Setup(HeroData newData)
     {
         data = newData;
+        InitializeDiceDatas();
         SetHealth(data.hp, data.hp);
 
         if (skeletonGraphic != null)
@@ -21,6 +25,45 @@ public class PlayerController : GameUnit
     {
         Setup(data);
         // SetHp(1000, 1000);
+    }
+
+    public void InitializeDiceDatas()
+    {
+        diceDatas.Clear();
+
+        if (data == null || data.startDiceLevelConfig == null)
+            return;
+
+        if (!data.startDiceLevelConfig.TryGetValue(data.level, out List<DiceData> startDices))
+            return;
+
+        if (startDices == null)
+            return;
+
+        for (int i = 0; i < startDices.Count; i++)
+        {
+            if (startDices[i] != null)
+                diceDatas.Add(startDices[i]);
+        }
+    }
+
+    public void AddDiceData(DiceData diceData)
+    {
+        if (diceData == null)
+            return;
+
+        diceDatas.Add(diceData);
+    }
+
+    public void AddDiceDatas(List<DiceData> newDiceDatas)
+    {
+        if (newDiceDatas == null)
+            return;
+
+        for (int i = 0; i < newDiceDatas.Count; i++)
+        {
+            AddDiceData(newDiceDatas[i]);
+        }
     }
     public void SetHp(int hp, int currentHp)
     {

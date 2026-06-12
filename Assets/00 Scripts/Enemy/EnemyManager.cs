@@ -399,6 +399,8 @@ public class EnemyManager : Singleton<EnemyManager>
             yield break;
         }
 
+        yield return MoveMeleeEnemiesOneGridStep();
+
         List<Enemy> attackers = GetEnemyTurnAttackers(null);
 
         for (int i = 0; i < attackers.Count; i++)
@@ -416,7 +418,6 @@ public class EnemyManager : Singleton<EnemyManager>
                 yield return new WaitForSeconds(enemyActionDelay);
         }
 
-        yield return MoveMeleeEnemiesOneGridStep();
     }
 
     public void RemoveEnemy(Enemy enemy)
