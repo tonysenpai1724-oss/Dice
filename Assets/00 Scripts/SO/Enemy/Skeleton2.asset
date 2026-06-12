@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c52947749b5fc2845a84118fd20cc9e7, type: 3}
-  m_Name: kingGoblin
+  m_Name: Skeleton2
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   serializationData:
     SerializedFormat: 2
@@ -22,11 +22,11 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   hp: 50
-  enemyName: King Goblin
+  enemyName: Skeleton1
   damage: 1
-  scale: {x: 0.5, y: 0.5, z: 1}
-  type: 1
-  enemyLevel: 2
-  skeletonData: {fileID: 11400000, guid: f8322f75a9e0cb64d9c5a19aa919ca7d, type: 2}
+  scale: {x: 0.2, y: 0.2, z: 1}
+  type: 0
+  enemyLevel: 0
+  skeletonData: {fileID: 11400000, guid: 43c2bffeea95c534b8a33000a4d2987a, type: 2}
   level: 1
   coinReward: 0

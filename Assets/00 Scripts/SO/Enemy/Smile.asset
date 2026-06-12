@@ -24,9 +24,9 @@ MonoBehaviour:
   hp: 50
   enemyName: Smile
   damage: 1
-  scale: {x: 0.3, y: 0.3, z: 1}
+  scale: {x: 0.2, y: 0.2, z: 1}
   type: 1
+  enemyLevel: 0
   skeletonData: {fileID: 11400000, guid: b40952925ee9a8940954f73d0ed16014, type: 2}
-  startDistance: 7
-  attackRange: 2
   level: 1
+  coinReward: 0
