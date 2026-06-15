@@ -21,7 +21,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 50
+  hp: 1
   enemyName: King Goblin
   damage: 1
   scale: {x: 0.5, y: 0.5, z: 1}

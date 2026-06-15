@@ -7,7 +7,7 @@ using DG.Tweening;
 using static Cinemachine.DocumentationSortingAttribute;
 using System.Linq;
 
-public class GameplayManager : Singleton<GameplayManager>
+public class GameplayManager : MonoBehaviour
 {
     public EGamePlayState State => state;
     [SerializeField, ReadOnly] protected EGamePlayState state;
@@ -29,8 +29,14 @@ public class GameplayManager : Singleton<GameplayManager>
     public int skillDamage;
     public bool skillSkipAttack;
     public int skillAfterAttackDamageAllEnemies;
+    public static GameplayManager Instance;
 
     public int DiceDamage => skillDiceData != null ? Mathf.Max(0, skillDiceData.damage) : 0;
+    public void Awake()
+    {
+        Instance = this;
+
+    }
 
     public void BeginDiceSkill(
         DiceData diceData,

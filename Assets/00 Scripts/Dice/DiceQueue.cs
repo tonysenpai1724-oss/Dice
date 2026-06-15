@@ -139,10 +139,10 @@ public class DiceQueue : MonoBehaviour
                         : null;
 
                 GameplayManager gameplay = GameplayManager.Instance;
-                if (gameplay == null)
-                {
-                    gameplay = FindAnyObjectByType<GameplayManager>();
-                }
+                // if (gameplay == null)
+                // {
+                //     gameplay = FindAnyObjectByType<GameplayManager>();
+                // }
                 gameplay?.BeginDiceSkill(
                     diceData,
                     this,
@@ -446,3 +446,4 @@ public class DiceQueue : MonoBehaviour
         return fastFlushRequested ? fastFlushDestroyDelay : delayDestoyTime;
     }
 }
+
