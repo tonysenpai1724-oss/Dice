@@ -27,10 +27,13 @@ public class PopupEndgame : UIBase
     }
     public void OnClickPlay()
     {
+        Hide();
         GameManager.Instance.PlayGame(GameManager.Instance.GameType);
     }
     public void OnClickHome()
     {
+        Hide();
         GameManager.Instance.GoSceneHome();
     }
 }
+

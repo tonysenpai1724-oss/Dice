@@ -20,8 +20,6 @@ public class HomePlayButton : HomeFeatureButton
             currentLevelIndex = levels.Count - 1;
 
         ChapterManager.Instance.SetCurrentLevelIndex(currentLevelIndex);
-        Debug.Log(currentLevelIndex);
-        Debug.Log(ChapterManager.Instance.CurrentLevelIndex);
         GameManager.Instance.PlayGame(EGameType.Campaign);
     }
 

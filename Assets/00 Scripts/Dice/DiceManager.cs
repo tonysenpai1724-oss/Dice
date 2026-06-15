@@ -78,7 +78,15 @@ public class DiceManager : MonoBehaviour
     void Start()
     {
         SpawnStartBoard();
+        TigerForge.EventManager.StartListening(Constant.ON_END_GAME, ClearBoard);
     }
+    void OnDestroy()
+    {
+
+        TigerForge.EventManager.StopListening(Constant.ON_END_GAME, ClearBoard);
+
+    }
+
     void Update()
     {
         HandleHover();
@@ -518,6 +526,14 @@ public class DiceManager : MonoBehaviour
             return second;
 
         return null;
+    }
+    public void ClearBoard()
+    {
+
+        foreach (Dice dice in boardDices)
+        {
+            ObjectPooler.Despawn(dice);
+        }
     }
 
     void ExplodeBoardDice(Vector3 position, DiceData sourceData)

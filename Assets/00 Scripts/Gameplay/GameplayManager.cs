@@ -15,7 +15,7 @@ public class GameplayManager : Singleton<GameplayManager>
     public bool winGame { get; private set; }
     public int CurrentLevel { get; set; }
     public int LevelTime { get; private set; }
-    public bool IsGameEnded => state == EGamePlayState.GameOver;
+    public bool IsGameEnded;
     public int Score { get; private set; }
     public PackageResource PackReward { get; private set; }
 
@@ -150,6 +150,7 @@ public class GameplayManager : Singleton<GameplayManager>
             IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.EndlessPlay);
         UIManager.Instance.uIGameplay.Initialize();
         StartGame();
+        IsGameEnded = false;
         TigerForge.EventManager.StartListening(Constant.EVENT_TIMER_TICK, OnTick);
         TigerForge.EventManager.StartListening(Constant.ON_DICE_AFTER_ATTACK, OnDiceAfterAttack);
         TigerForge.EventManager.EmitEvent(Constant.EVENT_LEVEL_INITED);
@@ -209,9 +210,11 @@ public class GameplayManager : Singleton<GameplayManager>
         DebugCustom.LogColor("End Game");
         winGame = win;
         SetState(EGamePlayState.GameOver);
+        IsGameEnded = true;
 
         if (winGame)
         {
+            TigerForge.EventManager.EmitEvent(Constant.ON_END_GAME);
             IPlayerInfoController.Instance.WinLevel();
             IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
             if (GameManager.Instance.GameType == EGameType.Endless)
@@ -225,9 +228,11 @@ public class GameplayManager : Singleton<GameplayManager>
 
             PackReward.ReceiveResource(EResourceFrom.ReviveIngame);
             UIManager.Instance.ShowPopupEndGame();
+
         }
         else
         {
+            TigerForge.EventManager.EmitEvent(Constant.ON_END_GAME);
             if (GameManager.Instance.GameType == EGameType.Endless)
             {
                 PackReward = new PackageResource();
@@ -242,6 +247,7 @@ public class GameplayManager : Singleton<GameplayManager>
         DebugCustom.LogColor("OnClick", pos);
     }
 }
+
 
 
 

@@ -42,12 +42,15 @@ public class DiceThrowController : MonoBehaviour
         SpawnCurrentDice();
         TigerForge.EventManager.StartListening(Constant.ON_DRAG_RUNE, OnRuneDragStarted);
         TigerForge.EventManager.StartListening(Constant.ON_DROP_RUNE, OnRuneDragEnded);
+        TigerForge.EventManager.StartListening(Constant.ON_END_GAME, Clear);
     }
 
     void OnDestroy()
     {
         TigerForge.EventManager.StopListening(Constant.ON_DRAG_RUNE, OnRuneDragStarted);
         TigerForge.EventManager.StopListening(Constant.ON_DROP_RUNE, OnRuneDragEnded);
+        TigerForge.EventManager.StopListening(Constant.ON_END_GAME, Clear);
+
     }
 
     void OnRuneDragStarted()
@@ -263,6 +266,13 @@ public class DiceThrowController : MonoBehaviour
     {
         return GameplayManager.Instance != null &&
             GameplayManager.Instance.IsGameEnded;
+    }
+    public void Clear()
+    {
+        if (currentDice != null)
+        {
+            currentDice.gameObject.SetActive(false);
+        }
     }
     bool IsPointerOverBoardMesh()
     {

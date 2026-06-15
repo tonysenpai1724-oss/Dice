@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Singleton.cs
  * 
  * - Unity Implementation of Singleton template

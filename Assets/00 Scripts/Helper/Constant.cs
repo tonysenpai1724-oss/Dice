@@ -110,6 +110,7 @@ public static class Constant
     public const string ON_RUNE_CHANGE = "ON_RUNE_CHANGE";
     public const string ON_DRAG_RUNE = "ON_DRAG_RUNE";
     public const string ON_DROP_RUNE = "ON_DROP_RUNE";
+    public const string ON_END_GAME = "ON_END_GAME";
 
     #endregion
 }
