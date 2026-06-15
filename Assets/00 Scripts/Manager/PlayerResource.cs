@@ -198,7 +198,7 @@ public class PlayerResourceLocalData : IControllerCachedData
                 DebugCustom.LogColor("AddResource", cr.resourceType.ToString(), _commonResources[cr.resourceType]);
                 if (cr.resourceValue < 0)
                 {
-                    if (cr.resourceType == ECommonResource.Token)
+                    if (cr.resourceType == ECommonResource.Coin)
                         IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.SpendCoin, -cr.resourceValue);
                     else if (cr.resourceType == ECommonResource.Energy)
                         IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.SpendEnergy, -cr.resourceValue);

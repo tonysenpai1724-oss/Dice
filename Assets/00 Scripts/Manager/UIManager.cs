@@ -194,7 +194,7 @@ public class UIManager : Singleton<UIManager>
         Transform parent = null;
         switch (resouceType)
         {
-            case ECommonResource.Token:
+            case ECommonResource.Coin:
                 parent = uIHome.coinBar;
                 break;
             case ECommonResource.Energy:

@@ -7,6 +7,7 @@ public class LevelManager : Singleton<LevelManager>
 
     void Start()
     {
+        currentLevel = ChapterManager.Instance.GetCurrentLevel();
         LoadCurrentLevel();
     }
     [Button]
@@ -31,3 +32,4 @@ public class LevelManager : Singleton<LevelManager>
             EnemyManager.Instance.SpawnEnemies(level);
     }
 }
+

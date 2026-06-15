@@ -219,7 +219,7 @@ public class GameplayManager : Singleton<GameplayManager>
             IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
 
             PackReward = new PackageResource();
-            PackReward.AddResource(new CommonResource(ECommonResource.Token, 15));
+            PackReward.AddResource(new CommonResource(ECommonResource.Coin, 15));
             PackReward.AddResource(new CommonResource(ECommonResource.Gem, 10));
             PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, 1));
 
@@ -231,7 +231,7 @@ public class GameplayManager : Singleton<GameplayManager>
             if (GameManager.Instance.GameType == EGameType.Endless)
             {
                 PackReward = new PackageResource();
-                PackReward.AddResource(new CommonResource(ECommonResource.Token, Score));
+                PackReward.AddResource(new CommonResource(ECommonResource.Coin, Score));
                 PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, Score / 10));
             }
             UIManager.Instance.ShowPopupEndGame();
@@ -242,3 +242,6 @@ public class GameplayManager : Singleton<GameplayManager>
         DebugCustom.LogColor("OnClick", pos);
     }
 }
+
+
+

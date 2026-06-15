@@ -61,7 +61,7 @@ public enum ERarity
 }
 public enum ECommonResource
 {
-    Token,
+    Coin,
     Gem,
     Energy,
     Exp,

@@ -9,7 +9,7 @@ public class HomeHackButton : HomeFeatureButton
         PackageResource package = new PackageResource();
         package.AddResource(new CommonResource(ECommonResource.Gem, 50));
         package.AddResource(new CommonResource(ECommonResource.Energy, 5));
-        package.AddResource(new CommonResource(ECommonResource.Token, 500));
+        package.AddResource(new CommonResource(ECommonResource.Coin, 500));
         package.ReceiveAndShow(EResourceFrom.Hack);
     }
 

@@ -246,7 +246,7 @@ public class CommonResource : ItemResource
     {
         switch (resourceType)
         {
-            case ECommonResource.Token:
+            case ECommonResource.Coin:
                 return ERarity.Common;
             case ECommonResource.Gem:
                 return ERarity.Epic;
