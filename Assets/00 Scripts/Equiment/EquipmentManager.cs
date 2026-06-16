@@ -41,6 +41,7 @@ public class EquipmentManager : MonoBehaviour
     [Header("Refs")]
     public PlayerController player;
     public HeroData heroDataOverride;
+    public EquipmentDatabaseSO equipmentDatabase;
 
     [Header("Equipped Items")]
     public List<EquippedItemSlot> equippedSlots = new();
@@ -54,6 +55,17 @@ public class EquipmentManager : MonoBehaviour
     {
         Instance = this;
         InitializeSlots();
+        ApplySessionLoadout();
+    }
+
+    void OnEnable()
+    {
+        EventManager.StartListening(Constant.ON_EQUIPMENT_SESSION_CHANGED, RefreshFromSessionEvent);
+    }
+
+    void OnDisable()
+    {
+        EventManager.StopListening(Constant.ON_EQUIPMENT_SESSION_CHANGED, RefreshFromSessionEvent);
     }
 
     void Reset()
@@ -146,49 +158,18 @@ public class EquipmentManager : MonoBehaviour
 
     public bool Equip(BaseEquiment equipment)
     {
-        if (equipment == null)
-            return false;
+        return EquipInternal(equipment, true);
+    }
 
-        InitializeSlots();
-
-        EquippedItemSlot slot = GetSlot(equipment.equipmentType);
-        if (slot == null)
-            return false;
-
-        BaseEquiment previousEquipment = slot.equippedItem;
-        if (previousEquipment == equipment)
-            return true;
-
-        if (previousEquipment != null)
-        {
-            previousEquipment.ApplyUnequipEffects(player);
-            OnEquipmentUnequipped?.Invoke(previousEquipment);
-            EmitEquipmentEvent(Constant.ON_EQUIPMENT_UNEQUIPPED, previousEquipment, previousEquipment.equipmentType);
-        }
-
-        slot.equippedItem = equipment;
-        equipment.ApplyEquipEffects(player);
-
-        OnEquipmentEquipped?.Invoke(equipment);
-        EmitEquipmentEvent(Constant.ON_EQUIPMENT_EQUIPPED, equipment, equipment.equipmentType);
-        NotifyEquipmentChanged();
-        return true;
+    public bool EquipById(string equipmentId)
+    {
+        BaseEquiment equipment = FindEquipmentById(equipmentId);
+        return equipment != null && Equip(equipment);
     }
 
     public bool Unequip(EquipmentType equipmentType)
     {
-        EquippedItemSlot slot = GetSlot(equipmentType);
-        if (slot == null || slot.equippedItem == null)
-            return false;
-
-        BaseEquiment removedEquipment = slot.equippedItem;
-        slot.equippedItem = null;
-
-        removedEquipment.ApplyUnequipEffects(player);
-        OnEquipmentUnequipped?.Invoke(removedEquipment);
-        EmitEquipmentEvent(Constant.ON_EQUIPMENT_UNEQUIPPED, removedEquipment, removedEquipment.equipmentType);
-        NotifyEquipmentChanged();
-        return true;
+        return UnequipInternal(equipmentType, true);
     }
 
     public bool Unequip(BaseEquiment equipment)
@@ -229,6 +210,80 @@ public class EquipmentManager : MonoBehaviour
         return modifiers;
     }
 
+    public void ApplySessionLoadout()
+    {
+        EquipmentSession session = EquipmentSession.Instance;
+        if (session == null)
+            return;
+
+        List<BaseEquiment> equippedItems = session.GetAllEquipped();
+        for (int i = 0; i < equippedItems.Count; i++)
+        {
+            EquipInternal(equippedItems[i], false);
+        }
+
+        NotifyEquipmentChanged();
+    }
+
+    bool EquipInternal(BaseEquiment equipment, bool syncSession)
+    {
+        if (equipment == null)
+            return false;
+
+        InitializeSlots();
+
+        EquippedItemSlot slot = GetSlot(equipment.equipmentType);
+        if (slot == null)
+            return false;
+
+        BaseEquiment previousEquipment = slot.equippedItem;
+        if (previousEquipment == equipment)
+            return true;
+
+        if (previousEquipment != null)
+        {
+            previousEquipment.ApplyUnequipEffects(player);
+            OnEquipmentUnequipped?.Invoke(previousEquipment);
+            EmitEquipmentEvent(Constant.ON_EQUIPMENT_UNEQUIPPED, previousEquipment, previousEquipment.equipmentType);
+        }
+
+        slot.equippedItem = equipment;
+        equipment.ApplyEquipEffects(player);
+
+        if (syncSession)
+            EquipmentSession.GetOrCreate().Equip(equipment);
+
+        OnEquipmentEquipped?.Invoke(equipment);
+        EmitEquipmentEvent(Constant.ON_EQUIPMENT_EQUIPPED, equipment, equipment.equipmentType);
+        NotifyEquipmentChanged();
+        return true;
+    }
+
+    bool UnequipInternal(EquipmentType equipmentType, bool syncSession)
+    {
+        EquippedItemSlot slot = GetSlot(equipmentType);
+        if (slot == null || slot.equippedItem == null)
+            return false;
+
+        BaseEquiment removedEquipment = slot.equippedItem;
+        slot.equippedItem = null;
+
+        removedEquipment.ApplyUnequipEffects(player);
+
+        if (syncSession)
+            EquipmentSession.GetOrCreate().Unequip(equipmentType);
+
+        OnEquipmentUnequipped?.Invoke(removedEquipment);
+        EmitEquipmentEvent(Constant.ON_EQUIPMENT_UNEQUIPPED, removedEquipment, removedEquipment.equipmentType);
+        NotifyEquipmentChanged();
+        return true;
+    }
+
+    BaseEquiment FindEquipmentById(string equipmentId)
+    {
+        return equipmentDatabase != null ? equipmentDatabase.FindById(equipmentId) : null;
+    }
+
     EquippedItemSlot GetSlot(EquipmentType equipmentType)
     {
         if (equippedSlots == null)
@@ -241,6 +296,11 @@ public class EquipmentManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    void RefreshFromSessionEvent()
+    {
+        ApplySessionLoadout();
     }
 
     void NotifyEquipmentChanged()

@@ -169,6 +169,7 @@ public class BaseEquiment : SerializedScriptableObject, IHeroEquipment
     public const int UpgradeRequireCount = 3;
 
     [Title("Info")]
+    public string equipmentId;
     public string equipmentName;
     [TextArea] public string description;
     public Sprite icon;
@@ -323,7 +324,8 @@ public class BaseEquiment : SerializedScriptableObject, IHeroEquipment
 
     string GetModifierSourceId()
     {
-        return $"equipment:{name}";
+        string resolvedId = !string.IsNullOrEmpty(equipmentId) ? equipmentId : name;
+        return $"equipment:{resolvedId}";
     }
 
     void InvokeEffects(PlayerController player, Action<BaseEquipmentEffect, PlayerController> callback)

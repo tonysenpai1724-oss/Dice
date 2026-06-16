@@ -21,11 +21,16 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  equipmentName: 
+  equipmentId: rof6
+  equipmentName: Ring of Fortune Level 6
   description: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 63be2807c03f939459172c2bd1d18caf, type: 3}
   equipmentType: 5
   rarity: 7
   upgradeResult: {fileID: 0}
-  statBonuses: []
-  rarityEffects: []
+  statBonuses:
+  - statType: 0
+    modifierType: 0
+    amount: 10
+  rarityEffects:
+  - {fileID: 11400000, guid: 2a716f49b88b5c64b916ddf7c7677d6d, type: 2}

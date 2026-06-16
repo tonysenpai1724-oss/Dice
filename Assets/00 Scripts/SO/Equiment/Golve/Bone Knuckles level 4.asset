@@ -21,14 +21,15 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  equipmentName: 
+  equipmentId: bn4
+  equipmentName: Bone Knuckles Lv4
   description: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 856b02d6b448b3c4b898883e0db277ce, type: 3}
   equipmentType: 3
   rarity: 4
   upgradeResult: {fileID: 11400000, guid: efafeffb1b7858a4b89c78dff42513b6, type: 2}
   statBonuses:
   - statType: 0
     modifierType: 0
-    amount: 0
+    amount: 13
   rarityEffects: []

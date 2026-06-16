@@ -116,7 +116,8 @@ public class PlayerController : GameUnit
 
         HeroStatSnapshot finalStats = runtimeStats.FinalStats;
         int currentHpValue = currentHp > 0 ? currentHp : finalStats.hp;
-        SetHealth(finalStats.hp, Mathf.Min(currentHpValue, finalStats.hp));
+        SetHealth(finalStats.hp, finalStats.hp);
+        Debug.Log("dam base:" + data.damage + "- dam runtime:" + finalStats.damage);
     }
 
     void RefreshStatsFromEquipmentEvent()
