@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56537877f6e05a44ba7a6186d09cbbdc, type: 3}
+  m_Name: Ring of Fortune Level 3
+  m_EditorClassIdentifier: Assembly-CSharp::BaseEquiment
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  equipmentName: 
+  description: 
+  icon: {fileID: 0}
+  equipmentType: 5
+  rarity: 3
+  upgradeResult: {fileID: 11400000, guid: 57d0a3b8611e9df4e94b0d8fb095f417, type: 2}
+  statBonuses:
+  - statType: 3
+    modifierType: 1
+    amount: 10
+  rarityEffects: []

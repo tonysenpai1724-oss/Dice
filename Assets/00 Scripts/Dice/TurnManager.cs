@@ -31,6 +31,11 @@ public class TurnManager : MonoBehaviour
 
     public void AddTurn()
     {
+        if (DiceManager.Instance != null)
+        {
+            DiceManager.Instance.ConsumeBindTurns();
+        }
+
         turnsUntilReset--;
 
         if (turnsUntilReset <= 0)
@@ -75,3 +80,5 @@ public class TurnManager : MonoBehaviour
             maxTurnBeforeReset;
     }
 }
+
+

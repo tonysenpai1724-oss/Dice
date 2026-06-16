@@ -12,6 +12,8 @@ public class DiceData : SerializedScriptableObject
     public int level;
 
     public int damage;
+    [Min(1)] public int attackCount = 1;
+    public ERarity rarity;
 
     //public Mesh mesh;
 
@@ -26,6 +28,28 @@ public class DiceData : SerializedScriptableObject
     public DiceType type;
     [Header("Skill")]
     public DiceSkillData skillData;
+
+    public bool CanUpgrade
+    {
+        get
+        {
+            return DiceManager.Instance != null &&
+                   DiceManager.Instance.GetDiceDataByLevelAndType(level + 1, type) != null;
+        }
+    }
+
+    public DiceData GetUpgradeData()
+    {
+        return DiceManager.Instance != null
+            ? DiceManager.Instance.GetDiceDataByLevelAndType(level + 1, type)
+            : null;
+    }
+
+    public bool TryUpgrade(out DiceData upgradedDiceData)
+    {
+        upgradedDiceData = GetUpgradeData();
+        return upgradedDiceData != null;
+    }
 
     public void ExecuteSkill()
     {
@@ -52,3 +76,6 @@ public class DiceData : SerializedScriptableObject
         }
     }
 }
+
+
+

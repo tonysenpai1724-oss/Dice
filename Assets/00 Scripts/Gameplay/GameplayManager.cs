@@ -27,11 +27,23 @@ public class GameplayManager : MonoBehaviour
     public Dice skillDice;
     public Enemy skillTargetEnemy;
     public int skillDamage;
+    public int skillAttackCount;
     public bool skillSkipAttack;
     public int skillAfterAttackDamageAllEnemies;
     public static GameplayManager Instance;
 
-    public int DiceDamage => skillDiceData != null ? Mathf.Max(0, skillDiceData.damage) : 0;
+    public int DiceDamage
+    {
+        get
+        {
+            int baseDamage = skillDiceData != null ? Mathf.Max(0, skillDiceData.damage) : 0;
+
+            if (skillPlayer == null)
+                return baseDamage;
+
+            return Mathf.Max(0, baseDamage + skillPlayer.RuntimeDamage);
+        }
+    }
     public void Awake()
     {
         Instance = this;
@@ -56,6 +68,7 @@ public class GameplayManager : MonoBehaviour
         skillPlayer = player;
         skillTargetEnemy = targetEnemy;
         skillDamage = DiceDamage;
+        skillAttackCount = diceData != null ? Mathf.Max(1, diceData.attackCount) : 1;
     }
 
     public void AddDamage(int amount)
@@ -66,6 +79,21 @@ public class GameplayManager : MonoBehaviour
     public void SetDamage(int amount)
     {
         skillDamage = Mathf.Max(0, amount);
+    }
+
+    public void AddAttackCount(int amount)
+    {
+        skillAttackCount = Mathf.Max(1, skillAttackCount + amount);
+    }
+
+    public void SetAttackCount(int amount)
+    {
+        skillAttackCount = Mathf.Max(1, amount);
+    }
+
+    public int GetAttackCount()
+    {
+        return Mathf.Max(1, skillAttackCount);
     }
 
     public void CancelAttack()
@@ -127,6 +155,7 @@ public class GameplayManager : MonoBehaviour
         skillDice = null;
         skillTargetEnemy = null;
         skillDamage = 0;
+        skillAttackCount = 1;
         skillSkipAttack = false;
         skillAfterAttackDamageAllEnemies = 0;
     }
@@ -253,6 +282,12 @@ public class GameplayManager : MonoBehaviour
         DebugCustom.LogColor("OnClick", pos);
     }
 }
+
+
+
+
+
+
 
 
 

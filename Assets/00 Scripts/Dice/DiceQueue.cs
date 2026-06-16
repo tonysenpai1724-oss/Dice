@@ -167,7 +167,12 @@ public class DiceQueue : MonoBehaviour
                     gameplay != null &&
                     !gameplay.skillSkipAttack)
                 {
-                    enemyManager.PlayerAttack(gameplay.skillDamage);
+                    int attackCount = gameplay.GetAttackCount();
+
+                    for (int attackIndex = 0; attackIndex < attackCount; attackIndex++)
+                    {
+                        enemyManager.PlayerAttack(gameplay.skillDamage);
+                    }
                 }
 
                 gameplay?.RunAfterAttackActions();
@@ -446,4 +451,5 @@ public class DiceQueue : MonoBehaviour
         return fastFlushRequested ? fastFlushDestroyDelay : delayDestoyTime;
     }
 }
+
 

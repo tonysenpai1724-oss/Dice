@@ -53,10 +53,12 @@ public enum ESfx
 public enum ERarity
 {
     Common,
+    Uncommon,
     Great,
     Rare,
     Epic,
     Legend,
+    Legendary,
     Mythical,
 }
 public enum ECommonResource
@@ -283,3 +285,4 @@ public enum EUIResourceResolution
     x100,
     x200,
 }
+

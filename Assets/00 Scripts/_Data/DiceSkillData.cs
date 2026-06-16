@@ -4,11 +4,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum DiceSkillEffectType
+{
+    DefaultByDiceType,
+    MultiAttack
+}
 
 [CreateAssetMenu(menuName = "RuneDice/Skill/Skill Base")]
 public class DiceSkillData : SerializedScriptableObject
 {
     public DiceType TargetType;
+    public DiceSkillEffectType effectType = DiceSkillEffectType.DefaultByDiceType;
 
     public int stackApply;
 
@@ -16,6 +22,13 @@ public class DiceSkillData : SerializedScriptableObject
 
     public virtual void Execute()
     {
+        switch (effectType)
+        {
+            case DiceSkillEffectType.MultiAttack:
+                MultiAttackDiceSkillData.Execute(stackApply, valueApply);
+                return;
+        }
+
         switch (TargetType)
         {
             case DiceType.Normal:
@@ -51,11 +64,12 @@ public class DiceSkillData : SerializedScriptableObject
             case DiceType.Enemy:
                 EnemyDiceSKillData.Execute(stackApply, valueApply);
                 break;
-
+            case DiceType.MultiAttack:
+                MultiAttackDiceSkillData.Execute(stackApply, valueApply);
+                break;
         }
     }
 }
-
 
 public static class NormalDiceSkillData
 {
@@ -101,7 +115,6 @@ public static class PoisonDiceSkillData
 
 public static class HealDiceSkillData
 {
-
     public static void Execute(int stackApply, int valueApply)
     {
         GameplayManager gameplay = GameplayManager.Instance;
@@ -117,7 +130,6 @@ public static class HealDiceSkillData
 
 public static class ShieldDiceSkillData
 {
-
     public static void Execute(int stackApply, int valueApply)
     {
         Debug.Log("ShieldDiceSkillData");
@@ -132,7 +144,6 @@ public static class ShieldDiceSkillData
 
 public static class BackstabDiceSkillData
 {
-
     public static void Execute(int stackApply, int valueApply)
     {
         GameplayManager gameplay = GameplayManager.Instance;
@@ -142,7 +153,6 @@ public static class BackstabDiceSkillData
 
 public static class CoinDiceSkillData
 {
-
     public static void Execute(int stackApply, int valueApply)
     {
         GameplayManager gameplay = GameplayManager.Instance;
@@ -158,7 +168,6 @@ public static class CoinDiceSkillData
 
 public static class BlindStrikeDiceSkillData
 {
-
     public static void Execute(int stackApply, int valueApply)
     {
         GameplayManager gameplay = GameplayManager.Instance;
@@ -170,7 +179,6 @@ public static class BlindStrikeDiceSkillData
 
 public static class StunDiceSkillData
 {
-
     public static void Execute(int stackApply, int valueApply)
     {
         GameplayManager gameplay = GameplayManager.Instance;
@@ -182,7 +190,6 @@ public static class StunDiceSkillData
 
 public static class BombDiceSkillData
 {
-
     public static void Execute(int stackApply, int valueApply)
     {
         GameplayManager gameplay = GameplayManager.Instance;
@@ -193,18 +200,30 @@ public static class BombDiceSkillData
         gameplay.AddDamageAllEnemiesAfterAttack(valueApply);
     }
 }
-public static class EnemyDiceSKillData
-{
 
+public static class MultiAttackDiceSkillData
+{
     public static void Execute(int stackApply, int valueApply)
     {
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay == null)
+            return;
 
+        int attackCount = Mathf.Max(1, valueApply);
+        gameplay.SetAttackCount(attackCount);
+    }
+}
+
+public static class EnemyDiceSKillData
+{
+    public static void Execute(int stackApply, int valueApply)
+    {
     }
 }
 
 public static class DiceSkillFactory
 {
-    static readonly System.Collections.Generic.Dictionary<DiceType, DiceSkillData> cachedSkills =
+    static readonly Dictionary<DiceType, DiceSkillData> cachedSkills =
         new();
 
     public static DiceSkillData Create(DiceType type)
@@ -216,43 +235,6 @@ public static class DiceSkillFactory
         }
 
         DiceSkillData skill = new DiceSkillData();
-
-        // DiceSkillData skill;
-        // switch (type)
-        // {
-        //     case DiceType.Dodge:
-        //         skill = ScriptableObject.CreateInstance<DodgeDiceSkillData>();
-        //         break;
-        //     case DiceType.Poison:
-        //         skill = ScriptableObject.CreateInstance<PoisonDiceSkillData>();
-        //         break;
-        //     case DiceType.Heal:
-        //         skill = ScriptableObject.CreateInstance<HealDiceSkillData>();
-        //         break;
-        //     case DiceType.Shield:
-        //         skill = ScriptableObject.CreateInstance<ShieldDiceSkillData>();
-        //         break;
-        //     case DiceType.Backstab:
-        //         skill = ScriptableObject.CreateInstance<BackstabDiceSkillData>();
-        //         break;
-        //     case DiceType.Coin:
-        //         skill = ScriptableObject.CreateInstance<CoinDiceSkillData>();
-        //         break;
-        //     case DiceType.BlindStrike:
-        //         skill = ScriptableObject.CreateInstance<BlindStrikeDiceSkillData>();
-        //         break;
-        //     case DiceType.Stun:
-        //         skill = ScriptableObject.CreateInstance<StunDiceSkillData>();
-        //         break;
-        //     case DiceType.Bomb:
-        //         skill = ScriptableObject.CreateInstance<BombDiceSkillData>();
-        //         break;
-        //     case DiceType.Normal:
-        //     default:
-        //         skill = ScriptableObject.CreateInstance<NormalDiceSkillData>();
-        //         break;
-        // }
-
         skill.hideFlags = HideFlags.HideAndDontSave;
         cachedSkills[type] = skill;
         return skill;

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -244,17 +244,17 @@ public class EnemyManager : Singleton<EnemyManager>
         RectTransform targetRect =
             target.GetComponent<RectTransform>();
 
-        // Spawn táº¡i vá»‹ trÃ­ player
+        // Spawn tại vị trí player
         projectile.position = playerRect.position + projectileOffset;
 
-        // TÃ­nh hÆ°á»›ng bay
+        // Tính hướng bay
         Vector3 targetPos = targetRect.position;
-        targetPos.y += projectileRotationOffset; // Äiá»u chá»‰nh Ä‘á»™ cao náº¿u cáº§n
+        targetPos.y += projectileRotationOffset; // Điều chỉnh độ cao nếu cần
         Vector3 dir = targetPos - projectile.position;
 
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
-        // Náº¿u sprite gá»‘c hÆ°á»›ng lÃªn
+        // Nếu sprite gốc hướng lên
         projectile.rotation = Quaternion.Euler(0, 0, angle - 90f);
 
         projectile.DOMove(
@@ -353,7 +353,9 @@ public class EnemyManager : Singleton<EnemyManager>
         if (diceData == null)
             return;
 
-        PlayerAttack(diceData.damage);
+        int baseDamage = diceData.damage + (player != null ? player.RuntimeDamage : 0);
+        int finalDamage = CombatSystem.CalculateFinalPlayerAttackDamage(player, diceData.damage);
+        PlayerAttack(finalDamage);
     }
 
     public void PlayerAttack(int damage)
@@ -487,7 +489,8 @@ public class EnemyManager : Singleton<EnemyManager>
             if (!attackCompleted && attackTrack.TrackTime >= halfTime)
             {
                 attackCompleted = true;
-                player.OnTakeDamage(enemy.damage);
+                int finalDamage = CombatSystem.ApplyDefenseToPlayer(player, enemy.damage);
+                player.OnTakeDamage(finalDamage);
             }
 
             if (attackTrack.IsComplete)
@@ -1066,3 +1069,9 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnArea.uiArea.TransformPoint(areaPoint);
     }
 }
+
+
+
+
+
+

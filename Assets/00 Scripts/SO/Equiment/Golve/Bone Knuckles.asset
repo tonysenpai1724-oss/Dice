@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56537877f6e05a44ba7a6186d09cbbdc, type: 3}
+  m_Name: Bone Knuckles
+  m_EditorClassIdentifier: Assembly-CSharp::BaseEquiment
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  equipmentName: Bone Knuckles
+  description: SDFSFS
+  icon: {fileID: 21300000, guid: 2c3eea38b5c5fe141805b841cdd5004d, type: 3}
+  equipmentType: 3
+  rarity: 0
+  upgradeResult: {fileID: 11400000, guid: 724fc4b374035a649aaacd1f6eab6037, type: 2}
+  statBonuses:
+  - statType: 0
+    modifierType: 0
+    amount: 7
+  rarityEffects: []

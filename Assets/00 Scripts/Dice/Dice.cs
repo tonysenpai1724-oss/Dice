@@ -24,7 +24,8 @@ public enum DiceType
     BlindStrike,
     Stun,
     Bomb,
-    Enemy
+    Enemy,
+    MultiAttack
 
 
 }

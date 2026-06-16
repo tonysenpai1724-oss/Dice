@@ -65,6 +65,8 @@ public class DiceManager : MonoBehaviour
 
     Dictionary<Dice, int> comboChainMap =
         new Dictionary<Dice, int>();
+    Dictionary<Dice, int> bindTurnsMap =
+        new Dictionary<Dice, int>();
 
     Dice currentHover;
 
@@ -90,6 +92,38 @@ public class DiceManager : MonoBehaviour
     void Update()
     {
         HandleHover();
+    }
+
+    public void ConsumeBindTurns()
+    {
+        CleanupBindTurnMap();
+
+        List<Dice> releasedDices = null;
+
+        foreach (KeyValuePair<Dice, int> pair in bindTurnsMap)
+        {
+            int turnsRemaining = pair.Value - 1;
+
+            bindTurnsMap[pair.Key] = turnsRemaining;
+
+            if (turnsRemaining > 0)
+                continue;
+
+            if (releasedDices == null)
+            {
+                releasedDices = new List<Dice>();
+            }
+
+            releasedDices.Add(pair.Key);
+        }
+
+        if (releasedDices == null)
+            return;
+
+        for (int i = 0; i < releasedDices.Count; i++)
+        {
+            ReleaseBoundDice(releasedDices[i]);
+        }
     }
     void HandleHover()
     {
@@ -151,6 +185,278 @@ public class DiceManager : MonoBehaviour
     {
         return diceDatabase.Find(x => x.level == level);
     }
+    public DiceData GetDiceDataByLevelAndType(int level, DiceType type)
+    {
+        return GetDiceData(level, type);
+    }
+
+    public List<Dice> GetBoardDices()
+    {
+        CleanupBoardDiceList();
+        return new List<Dice>(boardDices);
+    }
+    #region Dice Function
+
+    public List<Dice> GetBoardDicesByType(DiceType type)
+    {
+        CleanupBoardDiceList();
+
+        List<Dice> result = new List<Dice>();
+
+        for (int i = 0; i < boardDices.Count; i++)
+        {
+            Dice dice = boardDices[i];
+
+            if (dice == null || dice.data == null)
+                continue;
+
+            if (!dice.gameObject.activeInHierarchy)
+                continue;
+
+            if (dice.type != type)
+                continue;
+
+            result.Add(dice);
+        }
+
+        return result;
+    }
+
+    public Dice GetRandomBoardDice(System.Predicate<Dice> predicate = null)
+    {
+        CleanupBoardDiceList();
+
+        List<Dice> candidates = new List<Dice>();
+
+        for (int i = 0; i < boardDices.Count; i++)
+        {
+            Dice dice = boardDices[i];
+
+            if (!IsDiceValidForEnemyInteraction(dice))
+                continue;
+
+            if (predicate != null && !predicate(dice))
+                continue;
+
+            candidates.Add(dice);
+        }
+
+        if (candidates.Count == 0)
+            return null;
+
+        return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    public bool BindDice(Dice targetDice, int bindTurns, bool canMerge = false, bool zeroVelocity = true)
+    {
+        if (!IsDiceValidForEnemyInteraction(targetDice))
+            return false;
+
+        if (bindTurns <= 0)
+        {
+            ReleaseBoundDice(targetDice, canMerge);
+            return true;
+        }
+
+        bindTurnsMap[targetDice] = bindTurns;
+        targetDice.canMerge = canMerge;
+        targetDice.state = DiceState.Idle;
+
+        if (targetDice.rb != null)
+        {
+            if (zeroVelocity)
+            {
+                targetDice.rb.linearVelocity = Vector3.zero;
+                targetDice.rb.angularVelocity = Vector3.zero;
+            }
+
+            targetDice.rb.isKinematic = false;
+            targetDice.ApplyGroundedConstraints();
+            targetDice.rb.Sleep();
+        }
+
+        return true;
+    }
+
+    public bool StealDice(Dice targetDice)
+    {
+        if (!IsDiceValidForEnemyInteraction(targetDice))
+            return false;
+
+        ReturnBoardDice(targetDice);
+        return true;
+    }
+
+    public Dice StealRandomDice(System.Predicate<Dice> predicate = null)
+    {
+        Dice targetDice = GetRandomBoardDice(predicate);
+
+        if (targetDice == null)
+            return null;
+
+        return StealDice(targetDice) ? targetDice : null;
+    }
+
+    public bool TransformDice(Dice targetDice, DiceData newData, bool keepCurrentPosition = true)
+    {
+        if (!IsDiceValidForEnemyInteraction(targetDice))
+            return false;
+
+        if (newData == null)
+            return false;
+
+        Vector3 targetPosition = keepCurrentPosition
+            ? FindClearPosition(targetDice.transform.position, targetDice)
+            : targetDice.transform.position;
+
+        targetDice.Setup(newData);
+        targetDice.PlaceUpright(targetPosition);
+        targetDice.canMerge = false;
+        return true;
+    }
+
+    public bool TransformDiceType(Dice targetDice, DiceType newType)
+    {
+        if (targetDice == null || targetDice.data == null)
+            return false;
+
+        DiceData newData = GetDiceData(targetDice.Level, newType);
+        if (newData == null)
+            return false;
+
+        return TransformDice(targetDice, newData);
+    }
+
+    public bool TransformRandomDice(DiceType newType, System.Predicate<Dice> predicate = null)
+    {
+        Dice targetDice = GetRandomBoardDice(predicate);
+
+        if (targetDice == null)
+            return false;
+
+        return TransformDiceType(targetDice, newType);
+    }
+
+    public int TransformAllDiceOfType(DiceType fromType, DiceType toType)
+    {
+        CleanupBoardDiceList();
+
+        int transformedCount = 0;
+
+        for (int i = 0; i < boardDices.Count; i++)
+        {
+            Dice dice = boardDices[i];
+
+            if (!IsDiceValidForEnemyInteraction(dice))
+                continue;
+
+            if (dice.type != fromType)
+                continue;
+
+            if (TransformDiceType(dice, toType))
+            {
+                transformedCount++;
+            }
+        }
+
+        return transformedCount;
+    }
+
+    public int GetBindTurnsRemaining(Dice dice)
+    {
+        if (dice == null)
+            return 0;
+
+        return bindTurnsMap.TryGetValue(dice, out int turnsRemaining)
+            ? Mathf.Max(0, turnsRemaining)
+            : 0;
+    }
+
+    public bool IsDiceBound(Dice dice)
+    {
+        return GetBindTurnsRemaining(dice) > 0;
+    }
+
+    void ReleaseBoundDice(Dice dice, bool canMerge = false)
+    {
+        if (dice == null)
+            return;
+
+        bindTurnsMap.Remove(dice);
+
+        if (!dice.gameObject.activeInHierarchy)
+            return;
+
+        dice.canMerge = canMerge;
+        dice.state = DiceState.Idle;
+    }
+
+    void CleanupBindTurnMap()
+    {
+        List<Dice> invalidDices = null;
+
+        foreach (KeyValuePair<Dice, int> pair in bindTurnsMap)
+        {
+            Dice dice = pair.Key;
+
+            if (dice != null && dice.gameObject.activeInHierarchy)
+                continue;
+
+            if (invalidDices == null)
+            {
+                invalidDices = new List<Dice>();
+            }
+
+            invalidDices.Add(dice);
+        }
+
+        if (invalidDices == null)
+            return;
+
+        for (int i = 0; i < invalidDices.Count; i++)
+        {
+            bindTurnsMap.Remove(invalidDices[i]);
+        }
+    }
+
+    bool IsDiceValidForEnemyInteraction(Dice dice)
+    {
+        if (dice == null)
+            return false;
+
+        if (dice.data == null)
+            return false;
+
+        if (!dice.gameObject.activeInHierarchy)
+            return false;
+
+        if (dice.isMerging ||
+            dice.state == DiceState.Merging ||
+            dice.state == DiceState.FlyingCombo)
+            return false;
+
+        return true;
+    }
+
+    void CleanupBoardDiceList()
+    {
+        for (int i = boardDices.Count - 1; i >= 0; i--)
+        {
+            Dice dice = boardDices[i];
+
+            if (dice == null)
+            {
+                boardDices.RemoveAt(i);
+                continue;
+            }
+
+            if (!dice.gameObject.activeInHierarchy)
+            {
+                boardDices.RemoveAt(i);
+            }
+        }
+    }
+    #endregion
     #region SPAWN
     [Button]
 
@@ -186,14 +492,7 @@ public class DiceManager : MonoBehaviour
         SpawnPlayerStartDiceDatas(minX, maxX, minZ, maxZ, boardY);
     }
 
-    bool TrySpawnStartDice(
-        DiceData data,
-        float minX,
-        float maxX,
-        float minZ,
-        float maxZ,
-        float boardY
-    )
+    bool TrySpawnStartDice(DiceData data, float minX, float maxX, float minZ, float maxZ, float boardY)
     {
         if (data == null)
             return false;
@@ -211,13 +510,7 @@ public class DiceManager : MonoBehaviour
         return true;
     }
 
-    void SpawnPlayerStartDiceDatas(
-        float minX,
-        float maxX,
-        float minZ,
-        float maxZ,
-        float boardY
-    )
+    void SpawnPlayerStartDiceDatas(float minX, float maxX, float minZ, float maxZ, float boardY)
     {
         PlayerController player = GetPlayerController();
         if (player == null)
@@ -1115,3 +1408,6 @@ public class DiceManager : MonoBehaviour
 
     #endregion
 }
+
+
+

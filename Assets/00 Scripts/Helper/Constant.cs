@@ -111,6 +111,12 @@ public static class Constant
     public const string ON_DRAG_RUNE = "ON_DRAG_RUNE";
     public const string ON_DROP_RUNE = "ON_DROP_RUNE";
     public const string ON_END_GAME = "ON_END_GAME";
+    public const string ON_EQUIPMENT_CHANGED = "ON_EQUIPMENT_CHANGED";
+    public const string ON_EQUIPMENT_EQUIPPED = "ON_EQUIPMENT_EQUIPPED";
+    public const string ON_EQUIPMENT_UNEQUIPPED = "ON_EQUIPMENT_UNEQUIPPED";
+    public const string ON_PLAYER_EQUIPMENT_STATS_CHANGED = "ON_PLAYER_EQUIPMENT_STATS_CHANGED";
 
     #endregion
 }
+
+
