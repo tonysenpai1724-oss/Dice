@@ -23,11 +23,13 @@ MonoBehaviour:
     SerializationNodes: []
   equipmentId: bn2
   equipmentName: Bone Knuckles Lv2
-  description: 
+  description: Tony Senpai
   icon: {fileID: 21300000, guid: 856b02d6b448b3c4b898883e0db277ce, type: 3}
   equipmentType: 3
   rarity: 1
   upgradeResult: {fileID: 11400000, guid: 459ead5e6753c4d4286dcc9a132db987, type: 2}
+  canStack: 0
+  maxStack: 99
   statBonuses:
   - statType: 1
     modifierType: 1

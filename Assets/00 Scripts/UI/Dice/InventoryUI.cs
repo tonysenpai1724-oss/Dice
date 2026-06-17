@@ -11,6 +11,7 @@ public class InventoryUI : MonoBehaviour
     public EquipmentDetailPanel detailPanel;
 
     readonly List<InventoryItemUI> spawnedItems = new();
+
     void Start()
     {
         EventManager.StartListening(Constant.ON_EQUIPMENT_INVENTORY_CHANGED, RefreshInventory);
@@ -18,6 +19,10 @@ public class InventoryUI : MonoBehaviour
         RefreshInventory();
     }
 
+    void OnEnable()
+    {
+        RefreshInventory();
+    }
 
     [Button]
     public void RefreshInventory()
@@ -27,26 +32,26 @@ public class InventoryUI : MonoBehaviour
         if (contentRoot == null || itemPrefab == null)
             return;
 
-        List<BaseEquiment> equipments = EquipmentInventoryManager.GetOrCreate().GetAllEquipments();
+        List<EquipmentInventoryEntry> entries = EquipmentInventoryManager.GetOrCreate().GetAllEntries();
 
-        for (int i = 0; i < equipments.Count; i++)
+        for (int i = 0; i < entries.Count; i++)
         {
-            BaseEquiment equipment = equipments[i];
-            if (equipment == null)
+            EquipmentInventoryEntry entry = entries[i];
+            if (entry == null || entry.equipment == null || entry.quantity <= 0)
                 continue;
 
             InventoryItemUI itemUI = Instantiate(itemPrefab, contentRoot);
-            itemUI.Setup(equipment, OnSelectEquipment);
+            itemUI.Setup(entry, OnSelectEquipment);
             spawnedItems.Add(itemUI);
         }
     }
 
-    void OnSelectEquipment(BaseEquiment equipment)
+    void OnSelectEquipment(EquipmentInventoryEntry entry)
     {
-        if (detailPanel == null)
+        if (detailPanel == null || entry == null)
             return;
 
-        detailPanel.Show(equipment);
+        detailPanel.Show(entry);
     }
 
     void ClearItems()

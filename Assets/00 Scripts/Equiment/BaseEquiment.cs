@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -179,6 +179,10 @@ public class BaseEquiment : SerializedScriptableObject, IHeroEquipment
     [Title("Upgrade")]
     public BaseEquiment upgradeResult;
 
+    [Title("Stack")]
+    public bool canStack = true;
+    [Min(1)] public int maxStack = 99;
+
     [Title("Stats")]
     public List<EquipmentStatBonus> statBonuses = new();
 
@@ -274,10 +278,15 @@ public class BaseEquiment : SerializedScriptableObject, IHeroEquipment
 
     public virtual bool CanMergeForUpgrade(BaseEquiment other)
     {
-        return other != null &&
-               other != this &&
-               other.equipmentType == equipmentType &&
-               other.rarity == rarity;
+        if (other == null)
+            return false;
+
+        string currentId = !string.IsNullOrEmpty(equipmentId) ? equipmentId : name;
+        string otherId = !string.IsNullOrEmpty(other.equipmentId) ? other.equipmentId : other.name;
+
+        return other.equipmentType == equipmentType &&
+               other.rarity == rarity &&
+               otherId == currentId;
     }
 
     public virtual bool CanUpgradeFromMaterials(IList<BaseEquiment> materials)

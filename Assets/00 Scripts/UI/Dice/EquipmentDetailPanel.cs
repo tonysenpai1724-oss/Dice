@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,54 +13,55 @@ public class EquipmentDetailPanel : MonoBehaviour
     public Button btnUnequip;
     public Button btnUpgrade;
 
-    BaseEquiment currentEquipment;
+    EquipmentInventoryEntry currentEntry;
+    BaseEquiment CurrentEquipment => currentEntry != null ? currentEntry.equipment : null;
 
     void Awake()
     {
         gameObject.SetActive(false);
     }
 
-    public void Show(BaseEquiment equipment)
+    public void Show(EquipmentInventoryEntry entry)
     {
-        currentEquipment = equipment;
+        currentEntry = entry;
         gameObject.SetActive(true);
         RefreshView();
     }
 
     public void Hide()
     {
-        currentEquipment = null;
+        currentEntry = null;
         gameObject.SetActive(false);
     }
 
     public void OnClickEquip()
     {
-        if (currentEquipment == null)
+        if (currentEntry == null)
             return;
 
-        EquipmentSession.GetOrCreate().Equip(currentEquipment);
+        EquipmentSession.GetOrCreate().EquipEntry(currentEntry.entryId);
         RefreshView();
         Hide();
     }
 
     public void OnClickUnequip()
     {
-        if (currentEquipment == null)
+        if (CurrentEquipment == null)
             return;
 
-        EquipmentSession.GetOrCreate().Unequip(currentEquipment.equipmentType);
+        EquipmentSession.GetOrCreate().Unequip(CurrentEquipment.equipmentType);
         RefreshView();
         Hide();
     }
 
     public void OnClickUpgrade()
     {
-        if (currentEquipment == null)
+        if (CurrentEquipment == null)
             return;
 
-        if (EquipmentUpgradeService.GetOrCreate().TryUpgrade(currentEquipment, out BaseEquiment upgradedEquipment))
+        if (currentEntry != null && EquipmentUpgradeService.GetOrCreate().TryUpgrade(currentEntry.entryId, out BaseEquiment upgradedEquipment))
         {
-            currentEquipment = upgradedEquipment;
+            currentEntry = null;
         }
 
         RefreshView();
@@ -69,28 +70,28 @@ public class EquipmentDetailPanel : MonoBehaviour
 
     void RefreshView()
     {
-        if (currentEquipment == null)
+        if (CurrentEquipment == null)
         {
             Hide();
             return;
         }
 
         if (icon != null)
-            icon.sprite = currentEquipment.icon;
+            icon.sprite = CurrentEquipment.icon;
 
         if (txtName != null)
-            txtName.text = currentEquipment.equipmentName;
+            txtName.text = CurrentEquipment.equipmentName;
 
         if (txtRarity != null)
-            txtRarity.text = currentEquipment.rarity.ToString();
+            txtRarity.text = CurrentEquipment.rarity.ToString();
 
         if (txtDescription != null)
-            txtDescription.text = currentEquipment.description;
+            txtDescription.text = CurrentEquipment.description;
 
         if (txtStats != null)
-            txtStats.text = currentEquipment.StatsPreview;
+            txtStats.text = CurrentEquipment.StatsPreview;
 
-        bool isEquipped = EquipmentSession.GetOrCreate().GetEquipped(currentEquipment.equipmentType) == currentEquipment;
+        bool isEquipped = currentEntry != null && EquipmentSession.GetOrCreate().IsEntryEquipped(currentEntry.entryId);
 
         if (btnEquip != null)
         {

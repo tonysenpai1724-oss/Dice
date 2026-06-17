@@ -23,11 +23,13 @@ MonoBehaviour:
     SerializationNodes: []
   equipmentId: bn1
   equipmentName: Bone Knuckles
-  description: SDFSFS
+  description: Tony Senpai
   icon: {fileID: 21300000, guid: 856b02d6b448b3c4b898883e0db277ce, type: 3}
   equipmentType: 3
   rarity: 0
   upgradeResult: {fileID: 11400000, guid: 724fc4b374035a649aaacd1f6eab6037, type: 2}
+  canStack: 0
+  maxStack: 99
   statBonuses:
   - statType: 1
     modifierType: 0

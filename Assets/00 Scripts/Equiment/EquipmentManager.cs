@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using TigerForge;
@@ -55,6 +55,7 @@ public class EquipmentManager : MonoBehaviour
     {
         Instance = this;
         InitializeSlots();
+        EquipmentSession.GetOrCreate().SetDatabase(equipmentDatabase);
         ApplySessionLoadout();
     }
 
@@ -324,3 +325,8 @@ public class EquipmentManager : MonoBehaviour
             new EquipmentChangedEventData(this, player, equipment, equipmentType, finalStats));
     }
 }
+
+
+
+
+
