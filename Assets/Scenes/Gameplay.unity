@@ -3136,7 +3136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 208ea555d1a7f8247a2606293b48f658, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
-  maxTurnBeforeReset: 5
+  maxTurnBeforeReset: 4
   turnsUntilReset: 0
   resetText: {fileID: 549198304}
   diceQueue: {fileID: 955452519}
@@ -6118,13 +6118,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 812b4f6583c304047b38637a512f8dc8, type: 2}
   - {fileID: 11400000, guid: 9b60c657fe2af5a4397e33ee38ce07a3, type: 2}
   boardCollider: {fileID: 1917797493}
-  startSpawnCount: 12
+  minStartSpawnCount: 14
+  maxStartSpawnCount: 16
+  maxSingleDiceShare: 0.5
   minStartLevel: 1
   maxStartLevel: 3
   spawnPadding: 4
-  sideSpawnPercent: 0.6
+  sideSpawnPercent: 0.9
   topSpawnPercent: 0.6
   diceSpacingRadius: 0.95
+  startSpawnGridJitter: 0.35
   spawnSearchSteps: 18
   spawnSearchRadiusStep: 0.6
   comboArcHeight: 4

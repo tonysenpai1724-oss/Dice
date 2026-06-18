@@ -21,7 +21,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 1
+  hp: 50
   enemyName: Skeleton1
   damage: 1
   scale: {x: 0.2, y: 0.2, z: 1}

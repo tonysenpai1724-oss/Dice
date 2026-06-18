@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c882cd1d42b217b4285fb2d23994fc36, type: 3}
+  m_Name: Chapter 2
+  m_EditorClassIdentifier: Assembly-CSharp::ChapterDatabase
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  chapters:
+  - chapterId: 2
+    chapterName: 2
+    easy:
+      levels:
+      - {fileID: 11400000, guid: 28ca4a38c1c808b40ac5bf740a4e3488, type: 2}
+      - {fileID: 11400000, guid: 98fc278ac85b7b24e979ebda8e7a1e98, type: 2}
+      - {fileID: 11400000, guid: 992b1be2c0fd2784eb64f80c8ac7272c, type: 2}
+      - {fileID: 11400000, guid: 98109c121ca4fed4fb1e18307957fd87, type: 2}
+      - {fileID: 11400000, guid: c3540f995bc8d6241aca7691f0c2f6f6, type: 2}
+      - {fileID: 11400000, guid: 21422f9ccc09e474cb14d4a166aebc2b, type: 2}
+      - {fileID: 11400000, guid: 3f9570b9c2ffa9747bfac02548998873, type: 2}
+      - {fileID: 11400000, guid: fd6c3fd46dae6954b91f0e9d800728f4, type: 2}
+      - {fileID: 11400000, guid: 9bb8ca2c96178de42b4164bdf0b7c5af, type: 2}
+      - {fileID: 11400000, guid: 669e953aa7f01ec468f59351f23f10de, type: 2}
+    hard:
+      levels:
+      - {fileID: 11400000, guid: 86b8b4cdbe60a3c47ae6f98ec202a92d, type: 2}
+      - {fileID: 11400000, guid: 92b2859222208f74d94e1fb3680a21e1, type: 2}
+      - {fileID: 11400000, guid: 8249f50f59aa3cf4ead2093e3eaa7c7a, type: 2}
+      - {fileID: 11400000, guid: bf585814a8d9f054b8c6e8ba61a247d7, type: 2}
+      - {fileID: 11400000, guid: 30824a8fba2fc594d8a5762ab7825e07, type: 2}
+      - {fileID: 11400000, guid: 038775b185289fb42a8b2014a3900aa5, type: 2}
+      - {fileID: 11400000, guid: fbbf9610952fd8c4abee55d5cf3bd9d3, type: 2}
+      - {fileID: 11400000, guid: 5f75ac1cce8d2cf4098e3c908fe7f04e, type: 2}
+      - {fileID: 11400000, guid: c570689010214ec4bb89955b39196343, type: 2}
+      - {fileID: 11400000, guid: 4e9132f8982b6834e96713edaae8e5ae, type: 2}
+    devil:
+      levels:
+      - {fileID: 11400000, guid: df8a67194db961f41b550701fc2f7fbe, type: 2}
+      - {fileID: 11400000, guid: 0022fa49bc9c6ed46a2ef8f82e6c8e2b, type: 2}
+      - {fileID: 11400000, guid: 2fa9b53779adba648a124b98cfe4df7f, type: 2}
+      - {fileID: 11400000, guid: 69a9e70ec9178b048abbe56456b00d31, type: 2}
+      - {fileID: 11400000, guid: d1ac51a27f52a7d419dcc5bfd5bac6a0, type: 2}
+      - {fileID: 11400000, guid: db87765dad756eb4b98599a55b2b783a, type: 2}
+      - {fileID: 11400000, guid: e8738b53db82b744bac22a3c897eb604, type: 2}
+      - {fileID: 11400000, guid: 7f8d184edbc0ab7498b0fd44c72397cf, type: 2}
+      - {fileID: 11400000, guid: 0ba3acc03530269459473162a85a6c82, type: 2}
+      - {fileID: 11400000, guid: b48f8434f40edd74f82facb2622f2b6c, type: 2}

@@ -17,8 +17,9 @@ public class DiceManager : MonoBehaviour
     [Header("Board")]
     public Collider boardCollider;
 
-    [Header("Start Spawn")]
-    public int startSpawnCount = 10;
+    [Header("Start Spawn")] public int minStartSpawnCount = 14;
+    public int maxStartSpawnCount = 16;
+    [Range(0.1f, 0.5f)] public float maxSingleDiceShare = 0.5f;
 
     public int minStartLevel = 1;
     public int maxStartLevel = 3;
@@ -27,7 +28,8 @@ public class DiceManager : MonoBehaviour
     public float sideSpawnPercent = 0.6f;
     [Range(0.1f, 1f)]
     public float topSpawnPercent = 0.6f;
-    public float diceSpacingRadius = 0.95f;
+    public float diceSpacingRadius = 1.35f;
+    public float startSpawnGridJitter = 0.35f;
     public int spawnSearchSteps = 18;
     public float spawnSearchRadiusStep = 0.6f;
 
@@ -467,9 +469,7 @@ public class DiceManager : MonoBehaviour
 
         Bounds b = boardCollider.bounds;
         float boardY = GetBoardSurfaceY();
-        int maxAttempts = startSpawnCount * 12;
-        int spawned = 0;
-        int attempts = 0;
+        int targetSpawnCount = Random.Range(minStartSpawnCount, maxStartSpawnCount + 1);
         float sideMarginPercent = (1f - sideSpawnPercent) * 0.5f;
 
         float minX = Mathf.Lerp(b.min.x + spawnPadding, b.max.x - spawnPadding, sideMarginPercent);
@@ -477,19 +477,146 @@ public class DiceManager : MonoBehaviour
         float minZ = Mathf.Lerp(b.min.z + spawnPadding, b.max.z - spawnPadding, 1f - topSpawnPercent);
         float maxZ = Mathf.Max(b.min.z + spawnPadding, b.max.z - spawnPadding);
 
-        while (spawned < startSpawnCount &&
-            attempts < maxAttempts)
+        List<DiceData> plannedStartDice = BuildBalancedStartDicePlan(targetSpawnCount);
+        List<Vector3> plannedPositions = BuildSpreadSpawnPositions(targetSpawnCount, minX, maxX, minZ, maxZ, boardY);
+
+        int spawnCount = Mathf.Min(plannedStartDice.Count, plannedPositions.Count);
+        for (int i = 0; i < spawnCount; i++)
         {
-            attempts++;
+            DiceData data = plannedStartDice[i];
+            if (data == null)
+                continue;
 
-            int level = Random.Range(minStartLevel, maxStartLevel + 1);
-            DiceData data = GetDiceData(level, DiceType.Normal);
+            Vector3 position = FindClearPosition(plannedPositions[i]);
+            if (IsOccupied(position, null))
+                continue;
 
-            if (TrySpawnStartDice(data, minX, maxX, minZ, maxZ, boardY))
-                spawned++;
+            SpawnDice(data, position);
         }
 
-        SpawnPlayerStartDiceDatas(minX, maxX, minZ, maxZ, boardY);
+        SpawnPlayerStartDiceDatas(minX, maxX, minZ, maxZ, boardY, targetSpawnCount);
+    }
+
+    List<Vector3> BuildSpreadSpawnPositions(int targetSpawnCount, float minX, float maxX, float minZ, float maxZ, float boardY)
+    {
+        List<Vector3> result = new List<Vector3>();
+        if (targetSpawnCount <= 0)
+            return result;
+
+        int columns = Mathf.CeilToInt(Mathf.Sqrt(targetSpawnCount));
+        int rows = Mathf.CeilToInt(targetSpawnCount / (float)columns);
+
+        float width = Mathf.Max(0.1f, maxX - minX);
+        float depth = Mathf.Max(0.1f, maxZ - minZ);
+        float cellWidth = width / columns;
+        float cellDepth = depth / rows;
+
+        List<Vector2Int> cells = new List<Vector2Int>();
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < columns; col++)
+            {
+                cells.Add(new Vector2Int(col, row));
+            }
+        }
+
+        for (int i = 0; i < cells.Count; i++)
+        {
+            int swapIndex = Random.Range(i, cells.Count);
+            Vector2Int temp = cells[i];
+            cells[i] = cells[swapIndex];
+            cells[swapIndex] = temp;
+        }
+
+        int count = Mathf.Min(targetSpawnCount, cells.Count);
+        for (int i = 0; i < count; i++)
+        {
+            Vector2Int cell = cells[i];
+            float centerX = minX + (cell.x + 0.5f) * cellWidth;
+            float centerZ = minZ + (cell.y + 0.5f) * cellDepth;
+
+            float jitterX = Random.Range(-cellWidth * startSpawnGridJitter, cellWidth * startSpawnGridJitter);
+            float jitterZ = Random.Range(-cellDepth * startSpawnGridJitter, cellDepth * startSpawnGridJitter);
+
+            Vector3 candidate = new Vector3(
+                Mathf.Clamp(centerX + jitterX, minX, maxX),
+                boardY,
+                Mathf.Clamp(centerZ + jitterZ, minZ, maxZ)
+            );
+
+            result.Add(candidate);
+        }
+
+        return result;
+    }
+
+    List<DiceData> BuildBalancedStartDicePlan(int targetSpawnCount)
+    {
+        List<DiceData> result = new List<DiceData>();
+        List<DiceData> normalCandidates = new List<DiceData>();
+
+        for (int level = minStartLevel; level <= maxStartLevel; level++)
+        {
+            DiceData data = GetDiceData(level, DiceType.Normal);
+            if (data != null)
+                normalCandidates.Add(data);
+        }
+
+        if (normalCandidates.Count == 0)
+            return result;
+
+        Dictionary<DiceData, int> counts = new Dictionary<DiceData, int>();
+        int maxPerDice = Mathf.Max(1, Mathf.FloorToInt(targetSpawnCount * maxSingleDiceShare));
+
+        List<DiceData> shuffled = new List<DiceData>(normalCandidates);
+        for (int i = 0; i < shuffled.Count; i++)
+        {
+            int swapIndex = Random.Range(i, shuffled.Count);
+            DiceData temp = shuffled[i];
+            shuffled[i] = shuffled[swapIndex];
+            shuffled[swapIndex] = temp;
+        }
+
+        int cursor = 0;
+        while (result.Count < targetSpawnCount)
+        {
+            DiceData candidate = shuffled[cursor % shuffled.Count];
+            cursor++;
+
+            if (!counts.ContainsKey(candidate))
+                counts[candidate] = 0;
+
+            if (counts[candidate] >= maxPerDice)
+            {
+                bool foundAlternative = false;
+                for (int i = 0; i < shuffled.Count; i++)
+                {
+                    DiceData alternative = shuffled[(cursor + i) % shuffled.Count];
+                    if (!counts.ContainsKey(alternative))
+                        counts[alternative] = 0;
+
+                    if (counts[alternative] >= maxPerDice)
+                        continue;
+
+                    candidate = alternative;
+                    foundAlternative = true;
+                    break;
+                }
+
+                if (!foundAlternative)
+                    break;
+            }
+
+            counts[candidate]++;
+            result.Add(candidate);
+        }
+
+        while (result.Count < targetSpawnCount)
+        {
+            result.Add(shuffled[Random.Range(0, shuffled.Count)]);
+        }
+
+        return result;
     }
 
     bool TrySpawnStartDice(DiceData data, float minX, float maxX, float minZ, float maxZ, float boardY)
@@ -510,7 +637,7 @@ public class DiceManager : MonoBehaviour
         return true;
     }
 
-    void SpawnPlayerStartDiceDatas(float minX, float maxX, float minZ, float maxZ, float boardY)
+    void SpawnPlayerStartDiceDatas(float minX, float maxX, float minZ, float maxZ, float boardY, int targetSpawnCount)
     {
         PlayerController player = GetPlayerController();
         if (player == null)
@@ -529,7 +656,7 @@ public class DiceManager : MonoBehaviour
                 continue;
 
             int attempts = 0;
-            int maxAttempts = Mathf.Max(12, startSpawnCount * 12);
+            int maxAttempts = Mathf.Max(12, targetSpawnCount * 12);
             while (attempts < maxAttempts)
             {
                 attempts++;
@@ -770,7 +897,7 @@ public class DiceManager : MonoBehaviour
         if (nextData == null)
         {
             Debug.LogError(
-                $"Không tìm thấy data Level {a.Level + 1} Type {a.type}"
+                $"KhÃ´ng tÃ¬m tháº¥y data Level {a.Level + 1} Type {a.type}"
             );
             yield break;
         }
@@ -1408,6 +1535,11 @@ public class DiceManager : MonoBehaviour
 
     #endregion
 }
+
+
+
+
+
 
 
 
