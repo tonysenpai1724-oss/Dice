@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class HomePlayButton : HomeFeatureButton
@@ -14,11 +14,10 @@ public class HomePlayButton : HomeFeatureButton
             Debug.LogWarning("Current chapter/mode has no level configured.");
             return;
         }
-
-        int currentLevelIndex = Mathf.Max(0, IPlayerInfoController.Instance.CurrentLevel() - 1);
-        if (currentLevelIndex >= levels.Count)
-            currentLevelIndex = levels.Count - 1;
-
+        //   int currentLevelIndex = Mathf.Max(0, IPlayerInfoController.Instance.CurrentLevel() - 1);
+        //         if (currentLevelIndex >= levels.Count)
+        //             currentLevelIndex = levels.Count - 1;
+        int currentLevelIndex = Mathf.Clamp(ChapterManager.Instance.CurrentLevelIndex, 0, levels.Count - 1);
         ChapterManager.Instance.SetCurrentLevelIndex(currentLevelIndex);
         GameManager.Instance.PlayGame(EGameType.Campaign);
     }

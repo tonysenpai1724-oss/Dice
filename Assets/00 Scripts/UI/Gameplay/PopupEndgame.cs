@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -21,7 +21,8 @@ public class PopupEndgame : UIBase
             }
         }
         txtShow.text = GameplayManager.Instance.winGame ? "Level Win" : "Level Lose";
-        bool maxLevel = IPlayerInfoController.Instance.CurrentLevel() >= IPlayerInfoController.Instance.MaxLevel();
+        //bool maxLevel = IPlayerInfoController.Instance.CurrentLevel() >= IPlayerInfoController.Instance.MaxLevel();
+        bool maxLevel = ChapterManager.Instance != null && ChapterManager.Instance.IsAtFinalPlayableLevel();
         btnPlay.gameObject.SetActive(!maxLevel);
         btnPlay.txtVisual.text = GameplayManager.Instance.winGame ? "Next Level" : "Restart";
     }
@@ -36,5 +37,6 @@ public class PopupEndgame : UIBase
         GameManager.Instance.GoSceneHome();
     }
 }
+
 
 

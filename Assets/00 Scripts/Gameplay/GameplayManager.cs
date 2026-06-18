@@ -47,7 +47,6 @@ public class GameplayManager : MonoBehaviour
     public void Awake()
     {
         Instance = this;
-
     }
 
     public void BeginDiceSkill(
@@ -177,7 +176,8 @@ public class GameplayManager : MonoBehaviour
         IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelPlay);
 
         LevelTime = 180;
-        CurrentLevel = IPlayerInfoController.Instance.CurrentLevel();
+        // CurrentLevel = IPlayerInfoController.Instance.CurrentLevel();
+        CurrentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.CurrentLevelIndex + 1 : IPlayerInfoController.Instance.CurrentLevel();
         yield return new WaitUntil(() => ResolutionManager.Instance);
         yield return new WaitUntil(() => ResolutionManager.Instance.IsInitilized);
         yield return new WaitUntil(() => UIManager.Instance.uIGameplay);
@@ -250,7 +250,14 @@ public class GameplayManager : MonoBehaviour
         if (winGame)
         {
             TigerForge.EventManager.EmitEvent(Constant.ON_END_GAME);
-            IPlayerInfoController.Instance.WinLevel();
+            // if (ChapterManager.Instance != null)
+            //     ChapterManager.Instance.AdvanceAfterWin();
+            // else
+            //     IPlayerInfoController.Instance.WinLevel();
+            if (ChapterManager.Instance != null)
+                ChapterManager.Instance.AdvanceAfterWin();
+            else
+                IPlayerInfoController.Instance.WinLevel();
             IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
             if (GameManager.Instance.GameType == EGameType.Endless)
                 IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.WinEndlessStage);
@@ -282,13 +289,3 @@ public class GameplayManager : MonoBehaviour
         DebugCustom.LogColor("OnClick", pos);
     }
 }
-
-
-
-
-
-
-
-
-
-
