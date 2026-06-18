@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TigerForge;
 using UnityEngine;
@@ -50,20 +50,12 @@ public class PlayerController : GameUnit
     {
         diceDatas.Clear();
 
-        if (data == null || data.startDiceLevelConfig == null)
+        if (data == null)
             return;
 
-        if (!data.startDiceLevelConfig.TryGetValue(data.level, out List<DiceData> startDices))
-            return;
-
-        if (startDices == null)
-            return;
-
-        for (int i = 0; i < startDices.Count; i++)
-        {
-            if (startDices[i] != null)
-                diceDatas.Add(startDices[i]);
-        }
+        ChapterDiceSession session = ChapterDiceSession.GetOrCreate();
+        session.InitializeFromHero(data);
+        diceDatas = session.GetRuntimeDiceDatasCopy();
     }
 
     public void AddDiceData(DiceData diceData)
@@ -72,6 +64,7 @@ public class PlayerController : GameUnit
             return;
 
         diceDatas.Add(diceData);
+        ChapterDiceSession.GetOrCreate().AddDiceData(diceData);
     }
 
     public void AddDiceDatas(List<DiceData> newDiceDatas)
@@ -162,5 +155,3 @@ public class PlayerController : GameUnit
             GameplayManager.Instance.EndGame(false);
     }
 }
-
-

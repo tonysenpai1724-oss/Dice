@@ -14,6 +14,10 @@ public class RuneManager : Singleton<RuneManager>
     public int LockedSlotCount => Mathf.Clamp(lockedSlotCount, 0, slotCount);
     public int UnlockedSlotCount => Mathf.Max(0, SlotCount - LockedSlotCount);
 
+    public List<RuneSkillData> RuneSkillDatas;
+
+
+
     protected override void OnAwake()
     {
         base.OnAwake();

@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 937a0f1e92c4c8744955d6383fe275ff, type: 3}
+  m_Name: Dice  Poison 3
+  m_EditorClassIdentifier: Assembly-CSharp::DiceData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  diceName: Poison Dice
+  level: 3
+  damage: 3
+  attackCount: 1
+  rarity: 0
+  useVisualPreset: 1
+  visualPresetDatabase: {fileID: 0}
+  allowManualOverride: 1
+  diceMaterial: {fileID: 2100000, guid: c4a7fdee68a5b194286d35e13840dc72, type: 2}
+  decalMaterial:
+  - {fileID: 2100000, guid: 04eb6e586e81cbe48ae5afb1d5cb3ae9, type: 2}
+  - {fileID: 2100000, guid: 30e579b14dd0f86449fb262e908de8cd, type: 2}
+  baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  targetColor: {r: 1, g: 1, b: 1, a: 1}
+  diceColor: {r: 0, g: 0, b: 0, a: 0}
+  hitEffectPrefab: {fileID: 1936455416814356597, guid: 33f837377e6e7d247ad947ebb5b04eaf, type: 3}
+  type: 2
+  skillData: {fileID: 11400000, guid: 4f6cff16f3556d547a7976eda4c54bf1, type: 2}

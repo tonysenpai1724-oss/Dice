@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 937a0f1e92c4c8744955d6383fe275ff, type: 3}
+  m_Name: Dice  Heal 4
+  m_EditorClassIdentifier: Assembly-CSharp::DiceData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  diceName: Heal Dice
+  level: 4
+  damage: 4
+  attackCount: 1
+  rarity: 0
+  useVisualPreset: 1
+  visualPresetDatabase: {fileID: 11400000, guid: a5f0de09df959bb47aef66d11740ef0c, type: 2}
+  allowManualOverride: 1
+  diceMaterial: {fileID: 2100000, guid: f1823ac621758eb43b155cb74f94fb23, type: 2}
+  decalMaterial:
+  - {fileID: 2100000, guid: 14359cbf863ce244aa4af995140877bc, type: 2}
+  - {fileID: 2100000, guid: 50c4ae62527b22b4faa93b7a247a24a3, type: 2}
+  baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  targetColor: {r: 1, g: 1, b: 1, a: 1}
+  diceColor: {r: 0.4745098, g: 0.99607843, b: 0.54509807, a: 1}
+  hitEffectPrefab: {fileID: 3537892071448097904, guid: 98491fb6a00577b459d1fb605044c137, type: 3}
+  type: 3
+  skillData: {fileID: 11400000, guid: 2215d8b6ce8fc3846b734d8f4fc61c75, type: 2}

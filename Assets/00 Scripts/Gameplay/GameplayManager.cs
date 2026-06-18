@@ -237,6 +237,246 @@ public class GameplayManager : MonoBehaviour
         TigerForge.EventManager.EmitEvent(Constant.ON_GAME_STATE_CHANGE);
     }
 
+    // public List<ChapterRewardChoiceOption> BuildChapterRewardChoices()
+    // {
+    //     List<ChapterRewardChoiceOption> rewardPool = new List<ChapterRewardChoiceOption>();
+    //     List<ChapterRewardChoiceOption> finalOptions = new List<ChapterRewardChoiceOption>();
+
+    //     DiceManager diceManager = DiceManager.Instance;
+    //     ChapterDiceSession diceSession = ChapterDiceSession.GetOrCreate();
+
+    //     if (diceManager != null && diceManager.diceDatabase != null && diceSession != null)
+    //     {
+    //         // Upgrade Dice rewards
+    //         List<DiceData> upgradeable = diceSession.GetUpgradeableDiceOptions(diceManager.diceDatabase);
+    //         for (int i = 0; i < upgradeable.Count; i++)
+    //         {
+    //             DiceData source = upgradeable[i];
+    //             DiceData target = diceManager.diceDatabase.GetDiceData(source.level + 1, source.type);
+
+    //             if (target != null)
+    //             {
+    //                 rewardPool.Add(new ChapterRewardChoiceOption
+    //                 {
+    //                     type = ChapterRewardChoiceType.UpgradeDice,
+    //                     title = $"Upgrade {source.diceName}",
+    //                     description = $"Upgrade to Lv{target.level}",
+    //                     sourceDice = source,
+    //                     targetDice = target
+    //                 });
+    //             }
+    //         }
+
+    //         // Add Dice rewards
+    //         List<DiceData> addable = diceSession.GetAddableDiceOptions(diceManager.diceDatabase);
+    //         for (int i = 0; i < addable.Count; i++)
+    //         {
+    //             DiceData dice = addable[i];
+
+    //             rewardPool.Add(new ChapterRewardChoiceOption
+    //             {
+    //                 type = ChapterRewardChoiceType.AddDice,
+    //                 title = $"Add {dice.diceName}",
+    //                 description = $"Gain 1 new {dice.type} dice",
+    //                 targetDice = dice
+    //             });
+    //         }
+    //     }
+
+    //     // Rune rewards
+    //     List<RuneSkillData> runes = RuneManager.Instance.RuneSkillDatas;
+    //     Debug.Log(runes.Count);
+    //     if (runes != null)
+    //     {
+    //         for (int i = 0; i < runes.Count; i++)
+    //         {
+    //             RuneSkillData rune = runes[i];
+
+    //             rewardPool.Add(new ChapterRewardChoiceOption
+    //             {
+    //                 type = ChapterRewardChoiceType.AddRune,
+    //                 title = $"Add Rune {rune.TargetType}",
+    //                 description = "Gain 1 rune for this run",
+    //                 runeSkill = rune
+    //             });
+    //         }
+    //     }
+
+    //     // Random 3 unique rewards
+    //     while (finalOptions.Count < 3)
+    //     {
+    //         if (!AddRandomUniqueRewardOption(finalOptions, rewardPool))
+    //             break;
+    //     }
+
+    //     return finalOptions;
+    // }
+    public List<ChapterRewardChoiceOption> BuildChapterRewardChoices()
+    {
+        List<ChapterRewardChoiceOption> options = new List<ChapterRewardChoiceOption>();
+
+        int safety = 30;
+
+        while (options.Count < 3 && safety-- > 0)
+        {
+            ChapterRewardChoiceOption option = GenerateRandomReward();
+
+            if (option == null)
+                continue;
+
+            if (!ContainsSameRewardOption(options, option))
+            {
+                options.Add(option);
+            }
+        }
+
+        return options;
+    }
+    ChapterRewardChoiceOption GenerateRandomReward()
+    {
+        DiceManager diceManager = DiceManager.Instance;
+        ChapterDiceSession diceSession = ChapterDiceSession.GetOrCreate();
+        RuneSkillData[] runes = Resources.LoadAll<RuneSkillData>("00 Scripts/SO/Rune");
+
+        int rand = Random.Range(0, 3);
+
+        switch (rand)
+        {
+            case 0: // Upgrade Dice
+                if (diceManager != null && diceManager.diceDatabase != null && diceSession != null)
+                {
+                    List<DiceData> upgradeable = diceSession.GetUpgradeableDiceOptions(diceManager.diceDatabase);
+
+                    if (upgradeable.Count > 0)
+                    {
+                        DiceData source = upgradeable[Random.Range(0, upgradeable.Count)];
+                        DiceData target = diceManager.diceDatabase.GetDiceData(source.level + 1, source.type);
+
+                        if (target != null)
+                        {
+                            return new ChapterRewardChoiceOption
+                            {
+                                type = ChapterRewardChoiceType.UpgradeDice,
+                                title = $"Upgrade {source.diceName}",
+                                description = $"Upgrade to Lv{target.level}",
+                                sourceDice = source,
+                                targetDice = target
+                            };
+                        }
+                    }
+                }
+                break;
+
+            case 1: // Add Dice
+                if (diceManager != null && diceManager.diceDatabase != null && diceSession != null)
+                {
+                    List<DiceData> addable = diceSession.GetAddableDiceOptions(diceManager.diceDatabase);
+
+                    if (addable.Count > 0)
+                    {
+                        DiceData dice = addable[Random.Range(0, addable.Count)];
+
+                        return new ChapterRewardChoiceOption
+                        {
+                            type = ChapterRewardChoiceType.AddDice,
+                            title = $"Add {dice.diceName}",
+                            description = $"Gain 1 new {dice.type} dice",
+                            targetDice = dice
+                        };
+                    }
+                }
+                break;
+
+            case 2: // Rune
+                if (runes != null && runes.Length > 0)
+                {
+                    RuneSkillData rune = runes[Random.Range(0, runes.Length)];
+
+                    return new ChapterRewardChoiceOption
+                    {
+                        type = ChapterRewardChoiceType.AddRune,
+                        title = $"Add Rune {rune.TargetType}",
+                        description = "Gain 1 rune for this run",
+                        runeSkill = rune
+                    };
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    bool AddRandomUniqueRewardOption(List<ChapterRewardChoiceOption> currentOptions, List<ChapterRewardChoiceOption> sourcePool)
+    {
+        if (currentOptions == null || sourcePool == null || sourcePool.Count == 0)
+            return false;
+        List<ChapterRewardChoiceOption> candidates = new List<ChapterRewardChoiceOption>();
+        for (int i = 0; i < sourcePool.Count; i++)
+        {
+            ChapterRewardChoiceOption candidate = sourcePool[i];
+            if (candidate == null)
+                continue;
+            if (ContainsSameRewardOption(currentOptions, candidate))
+                continue;
+            candidates.Add(candidate);
+        }
+        if (candidates.Count == 0)
+            return false;
+        currentOptions.Add(candidates[Random.Range(0, candidates.Count)]);
+        return true;
+    }
+    bool ContainsSameRewardOption(List<ChapterRewardChoiceOption> currentOptions, ChapterRewardChoiceOption candidate)
+    {
+        if (currentOptions == null || candidate == null)
+            return false;
+        for (int i = 0; i < currentOptions.Count; i++)
+        {
+            ChapterRewardChoiceOption current = currentOptions[i];
+            if (current == null)
+                continue;
+            if (current.type != candidate.type)
+                continue;
+            switch (candidate.type)
+            {
+                case ChapterRewardChoiceType.UpgradeDice:
+                    if (current.sourceDice == candidate.sourceDice && current.targetDice == candidate.targetDice)
+                        return true;
+                    break;
+                case ChapterRewardChoiceType.AddDice:
+                    if (current.targetDice == candidate.targetDice)
+                        return true;
+                    break;
+                case ChapterRewardChoiceType.AddRune:
+                    if (current.runeSkill == candidate.runeSkill)
+                        return true;
+                    break;
+            }
+        }
+        return false;
+    }
+    public void ApplyChapterRewardChoice(ChapterRewardChoiceOption option)
+    {
+        if (option == null)
+            return;
+
+        ChapterDiceSession diceSession = ChapterDiceSession.GetOrCreate();
+
+        switch (option.type)
+        {
+            case ChapterRewardChoiceType.UpgradeDice:
+                if (option.sourceDice != null && option.targetDice != null)
+                    diceSession.UpgradeDiceData(option.sourceDice, option.targetDice);
+                break;
+            case ChapterRewardChoiceType.AddDice:
+                if (option.targetDice != null)
+                    diceSession.AddDiceData(option.targetDice);
+                break;
+            case ChapterRewardChoiceType.AddRune:
+                if (option.runeSkill != null)
+                    RuneManager.Instance?.TryAddRune(option.runeSkill);
+                break;
+        }
+    }
     public void EndGame(bool win)
     {
         if (IsGameEnded)
@@ -254,10 +494,7 @@ public class GameplayManager : MonoBehaviour
             //     ChapterManager.Instance.AdvanceAfterWin();
             // else
             //     IPlayerInfoController.Instance.WinLevel();
-            if (ChapterManager.Instance != null)
-                ChapterManager.Instance.AdvanceAfterWin();
-            else
-                IPlayerInfoController.Instance.WinLevel();
+
             IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
             if (GameManager.Instance.GameType == EGameType.Endless)
                 IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.WinEndlessStage);
@@ -269,7 +506,11 @@ public class GameplayManager : MonoBehaviour
             PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, 1));
 
             PackReward.ReceiveResource(EResourceFrom.ReviveIngame);
-            UIManager.Instance.ShowPopupEndGame();
+            List<ChapterRewardChoiceOption> rewardChoices = BuildChapterRewardChoices();
+            if (rewardChoices != null && rewardChoices.Count > 0)
+                UIManager.Instance.ShowPopupChoice(rewardChoices);
+            else
+                UIManager.Instance.ShowPopupEndGame();
 
         }
         else
@@ -289,3 +530,6 @@ public class GameplayManager : MonoBehaviour
         DebugCustom.LogColor("OnClick", pos);
     }
 }
+
+
+

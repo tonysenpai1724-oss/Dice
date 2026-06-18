@@ -21,16 +21,21 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  diceName: Dice 1 Dodge
+  diceName: Dodge Dice
   level: 1
   damage: 1
+  attackCount: 1
+  rarity: 0
+  useVisualPreset: 1
+  visualPresetDatabase: {fileID: 11400000, guid: a5f0de09df959bb47aef66d11740ef0c, type: 2}
+  allowManualOverride: 1
   diceMaterial: {fileID: 2100000, guid: 3e9da65a829ffd74da4be8d551e10479, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 410d91de9be93b34a9edfedad1b0607a, type: 2}
   - {fileID: 2100000, guid: 544b1ecc95b00ef4e9f45189f6e60fd3, type: 2}
-  diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
   baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
   targetColor: {r: 1, g: 1, b: 1, a: 1}
+  diceColor: {r: 1, g: 1, b: 1, a: 1}
   hitEffectPrefab: {fileID: 4859746839628731135, guid: fa5cadda581724947b2860ab128b921f, type: 3}
   type: 1
   skillData: {fileID: 11400000, guid: 555210ebc75bc3d4888155275d185b70, type: 2}

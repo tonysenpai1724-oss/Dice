@@ -12,7 +12,7 @@ public class DiceManager : MonoBehaviour
     [Header("Prefab")]
     public Dice dicePrefab;
 
-    public List<DiceData> diceDatabase;
+    public DiceDatabaseSO diceDatabase;
 
     [Header("Board")]
     public Collider boardCollider;
@@ -185,7 +185,9 @@ public class DiceManager : MonoBehaviour
     }
     public DiceData GetDiceDataByLevel(int level)
     {
-        return diceDatabase.Find(x => x.level == level);
+        return diceDatabase != null
+            ? diceDatabase.GetDiceDataByLevel(level)
+            : null;
     }
     public DiceData GetDiceDataByLevelAndType(int level, DiceType type)
     {
@@ -703,11 +705,11 @@ public class DiceManager : MonoBehaviour
         return d;
 
     }
-    DiceData GetDiceData(int level, DiceType type)
+    public DiceData GetDiceData(int level, DiceType type)
     {
-        return diceDatabase.Find(x =>
-            x.level == level &&
-            x.type == type);
+        return diceDatabase != null
+            ? diceDatabase.GetDiceData(level, type)
+            : null;
     }
 
     public void RegisterBoardDice(
@@ -768,11 +770,11 @@ public class DiceManager : MonoBehaviour
     }
     public DiceData GetRandomDiceDataByLevel(int level)
     {
-        List<DiceData> list = diceDatabase.FindAll(
-            x => x.level == level
-        );
+        List<DiceData> list = diceDatabase != null
+            ? diceDatabase.GetAllByLevel(level)
+            : null;
 
-        if (list.Count == 0)
+        if (list == null || list.Count == 0)
             return null;
 
         return list[
@@ -876,7 +878,7 @@ public class DiceManager : MonoBehaviour
         diceQueue.AddDice(b.data, mergePos);
 
 
-        int nextLevel = Mathf.Clamp(a.Level + 1, 1, diceDatabase.Count);
+        int nextLevel = a.Level + 1;
         int chain = 1;
 
         if (comboChainMap.ContainsKey(a))
@@ -1535,6 +1537,10 @@ public class DiceManager : MonoBehaviour
 
     #endregion
 }
+
+
+
+
 
 
 

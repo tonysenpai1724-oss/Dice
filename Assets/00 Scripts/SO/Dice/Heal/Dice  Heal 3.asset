@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 937a0f1e92c4c8744955d6383fe275ff, type: 3}
-  m_Name: Dice 2 Heal
+  m_Name: Dice  Heal 3
   m_EditorClassIdentifier: Assembly-CSharp::DiceData
   serializationData:
     SerializedFormat: 2
@@ -21,17 +21,21 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  diceName: Dice 2 Heal
-  level: 2
-  damage: 2
-  diceMaterial: {fileID: 2100000, guid: 32b5765d7ebf39143bff10f34d9935d8, type: 2}
+  diceName: Heal Dice
+  level: 3
+  damage: 3
+  attackCount: 1
+  rarity: 0
+  useVisualPreset: 1
+  visualPresetDatabase: {fileID: 11400000, guid: a5f0de09df959bb47aef66d11740ef0c, type: 2}
+  allowManualOverride: 1
+  diceMaterial: {fileID: 2100000, guid: c4a7fdee68a5b194286d35e13840dc72, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 14359cbf863ce244aa4af995140877bc, type: 2}
-  - {fileID: 2100000, guid: 9c17275b6541d9148b9f64bb8a61853d, type: 2}
-  diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
+  - {fileID: 2100000, guid: 30e579b14dd0f86449fb262e908de8cd, type: 2}
   baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
   targetColor: {r: 1, g: 1, b: 1, a: 1}
-  diceColor: {r: 0.9843137, g: 0.83137256, b: 0.70980394, a: 0}
-  hitEffectPrefab: {fileID: 3537892071448097904, guid: 98491fb6a00577b459d1fb605044c137, type: 3}
+  diceColor: {r: 0.8980392, g: 0.92156863, b: 0.47058824, a: 1}
+  hitEffectPrefab: {fileID: 1936455416814356597, guid: 33f837377e6e7d247ad947ebb5b04eaf, type: 3}
   type: 3
   skillData: {fileID: 11400000, guid: 2215d8b6ce8fc3846b734d8f4fc61c75, type: 2}

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using System.Collections;
@@ -15,12 +15,17 @@ public class DiceData : SerializedScriptableObject
     [Min(1)] public int attackCount = 1;
     public ERarity rarity;
 
+    [Header("Visual Config")]
+    public bool useVisualPreset = true;
+    public DiceVisualPresetDatabaseSO visualPresetDatabase;
+    public bool allowManualOverride = true;
+
     //public Mesh mesh;
 
     public Material diceMaterial;
 
-    public List<Material> decalMaterial;
-    public Sprite diceSprite;
+    public List<Material> decalMaterial = new();
+    // public Sprite diceSprite;
     public Color baseOutlineColor;
     public Color targetColor;
     public Color diceColor;
@@ -64,6 +69,23 @@ public class DiceData : SerializedScriptableObject
         resolvedSkill.Execute();
     }
 
+    [Button]
+    public void ApplyVisualPreset()
+    {
+        if (visualPresetDatabase == null)
+            return;
+
+        DiceVisualPresetEntry preset = visualPresetDatabase.GetPreset(type, level);
+        if (preset == null)
+            return;
+
+        diceMaterial = preset.diceMaterial;
+        decalMaterial = new List<Material>(preset.decalMaterial);
+        baseOutlineColor = preset.baseOutlineColor;
+        targetColor = preset.targetColor;
+        diceColor = preset.diceColor;
+    }
+
     void OnValidate()
     {
         if (skillData != null &&
@@ -74,8 +96,8 @@ public class DiceData : SerializedScriptableObject
                 this
             );
         }
+
+        if (useVisualPreset && visualPresetDatabase != null && !allowManualOverride)
+            ApplyVisualPreset();
     }
 }
-
-
-

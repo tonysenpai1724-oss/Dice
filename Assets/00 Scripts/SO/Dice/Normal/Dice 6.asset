@@ -21,13 +21,17 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  diceName: Dice 6
+  diceName: Normal Dice
   level: 6
   damage: 6
+  attackCount: 1
+  rarity: 0
+  useVisualPreset: 1
+  visualPresetDatabase: {fileID: 0}
+  allowManualOverride: 1
   diceMaterial: {fileID: 2100000, guid: 8ccba806aa179c94884b319831e178ac, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 8612e4190aad89b48bde03d5de9e83d9, type: 2}
-  diceSprite: {fileID: 21300000, guid: 2d7a731cd6c84684fafd3ce9ca5e0c06, type: 3}
   baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
   targetColor: {r: 1, g: 1, b: 1, a: 1}
   diceColor: {r: 0.3882353, g: 0.53333336, b: 0.99215686, a: 0}

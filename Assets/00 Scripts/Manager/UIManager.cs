@@ -390,5 +390,15 @@ public class UIManager : Singleton<UIManager>
         UIBase ui = GetUI("Popup Mail Box");
         ui.Show();
     }
+    public void ShowPopupChoice(List<ChapterRewardChoiceOption> options)
+    {
+        PopupChapterRewardChoice ui = GetUI("Popup Chapter Reward Choice") as PopupChapterRewardChoice;
+        if (ui == null)
+            return;
+
+        ui.ShowChoices(options);
+    }
     #endregion
 }
+
+
