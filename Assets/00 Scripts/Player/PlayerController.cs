@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using TigerForge;
 using UnityEngine;
@@ -8,19 +8,35 @@ public class PlayerController : GameUnit
     public HeroData data;
     public List<DiceData> diceDatas = new();
     public EquipmentManager equipmentManager;
-    public PlayerRuntimeStats runtimeStats;
+    public PlayerStats playerStats = PlayerStats.Shared;
 
-    public int RuntimeDamage => runtimeStats != null ? runtimeStats.FinalStats.damage : (data != null ? data.damage : 0);
-    public int RuntimeDefense => runtimeStats != null ? runtimeStats.FinalStats.defense : (data != null ? data.def : 0);
-    public float RuntimeCritDamage => runtimeStats != null ? runtimeStats.FinalStats.critDamage : (data != null ? data.critDmg : 0f);
-    public float RuntimeCritRate => runtimeStats != null ? runtimeStats.FinalStats.critRate : (data != null ? data.critRate : 0f);
-    public float RuntimeLuck => runtimeStats != null ? runtimeStats.FinalStats.luck : (data != null ? data.luck : 0f);
+    public int RuntimeDamage => playerStats != null
+        ? Mathf.RoundToInt(playerStats.GetStatValue(HeroStatType.Damage))
+        : (data != null ? data.damage : 0);
+
+    public int RuntimeDefense => playerStats != null
+        ? Mathf.RoundToInt(playerStats.GetStatValue(HeroStatType.Defense))
+        : (data != null ? data.def : 0);
+
+    public float RuntimeCritDamage => playerStats != null
+        ? playerStats.GetStatValue(HeroStatType.CritDamage)
+        : (data != null ? data.critDmg : 0f);
+
+    public float RuntimeCritRate => playerStats != null
+        ? playerStats.GetStatValue(HeroStatType.CritRate)
+        : (data != null ? data.critRate : 0f);
+
+    public float RuntimeLuck => playerStats != null
+        ? playerStats.GetStatValue(HeroStatType.Luck)
+        : (data != null ? data.luck : 0f);
 
     public void Setup(HeroData newData)
     {
         data = newData;
-        EnsureRuntimeStats();
+        EnsurePlayerStats();
         InitializeDiceDatas();
+        playerStats.InitStats();
+        playerStats.RebuildFromCurrentSources(data);
         RefreshStatsFromEquipment();
 
         if (skeletonGraphic != null)
@@ -94,20 +110,10 @@ public class PlayerController : GameUnit
         if (data == null)
             return;
 
-        EnsureRuntimeStats();
-        runtimeStats.SetBaseStats(data);
+        EnsurePlayerStats();
+        playerStats.RebuildFromCurrentSources(data);
 
-        EquipmentManager resolvedEquipmentManager = equipmentManager != null
-            ? equipmentManager
-            : EquipmentManager.Instance;
-
-        List<HeroStatModifier> modifiers = resolvedEquipmentManager != null
-            ? resolvedEquipmentManager.BuildRuntimeModifiers()
-            : null;
-
-        runtimeStats.SetModifiers(modifiers);
-
-        HeroStatSnapshot finalStats = runtimeStats.FinalStats;
+        HeroStatSnapshot finalStats = playerStats.ToHeroStatSnapshot(data);
         int currentHpValue = currentHp > 0 ? currentHp : finalStats.hp;
         SetHealth(finalStats.hp, finalStats.hp);
         Debug.Log("dam base:" + data.damage + "- dam runtime:" + finalStats.damage);
@@ -118,13 +124,10 @@ public class PlayerController : GameUnit
         RefreshStatsFromEquipment();
     }
 
-    void EnsureRuntimeStats()
+    void EnsurePlayerStats()
     {
-        if (runtimeStats == null)
-            runtimeStats = GetComponent<PlayerRuntimeStats>();
-
-        if (runtimeStats == null)
-            runtimeStats = gameObject.AddComponent<PlayerRuntimeStats>();
+        if (playerStats == null)
+            playerStats = PlayerStats.Shared;
     }
 
     IEnumerator PlayHurtDelayed()

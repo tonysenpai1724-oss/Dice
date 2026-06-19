@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using TigerForge;
@@ -137,8 +137,8 @@ public class EquipmentManager : MonoBehaviour
 
     public HeroStatSnapshot GetCurrentTotalStats()
     {
-        if (player != null && player.runtimeStats != null)
-            return player.runtimeStats.FinalStats;
+        if (player != null && player.playerStats != null)
+            return player.playerStats.ToHeroStatSnapshot(GetHeroData());
 
         return new HeroStatSnapshot(GetHeroData());
     }
@@ -193,22 +193,6 @@ public class EquipmentManager : MonoBehaviour
             return false;
 
         return Equip(upgradedEquipment);
-    }
-
-    public List<HeroStatModifier> BuildRuntimeModifiers()
-    {
-        List<HeroStatModifier> modifiers = new List<HeroStatModifier>();
-        List<BaseEquiment> items = GetAllEquippedItems();
-
-        for (int i = 0; i < items.Count; i++)
-        {
-            if (items[i] == null)
-                continue;
-
-            items[i].CollectModifiers(player, modifiers);
-        }
-
-        return modifiers;
     }
 
     public void ApplySessionLoadout()
@@ -325,8 +309,3 @@ public class EquipmentManager : MonoBehaviour
             new EquipmentChangedEventData(this, player, equipment, equipmentType, finalStats));
     }
 }
-
-
-
-
-

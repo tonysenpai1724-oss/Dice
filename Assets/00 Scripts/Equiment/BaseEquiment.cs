@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -41,19 +41,6 @@ public class EquipmentStatBonus
     [ShowInInspector, ReadOnly]
     public string Preview => GetPreviewText();
 
-    public HeroStatModifier ToRuntimeModifier(string sourceId)
-    {
-        return new HeroStatModifier
-        {
-            sourceId = sourceId,
-            statType = statType,
-            mode = modifierType == EquipmentStatModifierType.Percent
-                ? HeroStatModifierMode.PercentFromBase
-                : HeroStatModifierMode.Flat,
-            amount = amount
-        };
-    }
-
     public string GetPreviewText()
     {
         string suffix = modifierType == EquipmentStatModifierType.Percent ? "%" : string.Empty;
@@ -88,45 +75,6 @@ public class HeroStatSnapshot
         critRate = heroData.critRate;
         luck = heroData.luck;
     }
-
-    public float GetValue(HeroStatType statType)
-    {
-        return statType switch
-        {
-            HeroStatType.Hp => hp,
-            HeroStatType.Damage => damage,
-            HeroStatType.Defense => defense,
-            HeroStatType.CritDamage => critDamage,
-            HeroStatType.CritRate => critRate,
-            HeroStatType.Luck => luck,
-            _ => 0f
-        };
-    }
-
-    public void Add(HeroStatType statType, float value)
-    {
-        switch (statType)
-        {
-            case HeroStatType.Hp:
-                hp += Mathf.RoundToInt(value);
-                break;
-            case HeroStatType.Damage:
-                damage += Mathf.RoundToInt(value);
-                break;
-            case HeroStatType.Defense:
-                defense += Mathf.RoundToInt(value);
-                break;
-            case HeroStatType.CritDamage:
-                critDamage += value;
-                break;
-            case HeroStatType.CritRate:
-                critRate += value;
-                break;
-            case HeroStatType.Luck:
-                luck += value;
-                break;
-        }
-    }
 }
 
 public interface IHeroEquipment
@@ -142,10 +90,6 @@ public abstract class BaseEquipmentEffect : SerializedScriptableObject
     }
 
     public virtual void OnUnequip(PlayerController player, BaseEquiment equipment)
-    {
-    }
-
-    public virtual void CollectModifiers(PlayerController player, BaseEquiment equipment, List<HeroStatModifier> modifiers)
     {
     }
 
@@ -204,28 +148,6 @@ public class BaseEquiment : SerializedScriptableObject, IHeroEquipment
     public virtual void ApplyUnequipEffects(PlayerController player)
     {
         InvokeEffects(player, (effect, owner) => effect.OnUnequip(owner, this));
-    }
-
-    public virtual void CollectModifiers(PlayerController player, List<HeroStatModifier> modifiers)
-    {
-        if (modifiers == null)
-            return;
-
-        string sourceId = GetModifierSourceId();
-
-        if (statBonuses != null)
-        {
-            for (int i = 0; i < statBonuses.Count; i++)
-            {
-                EquipmentStatBonus statBonus = statBonuses[i];
-                if (statBonus == null)
-                    continue;
-
-                modifiers.Add(statBonus.ToRuntimeModifier(sourceId));
-            }
-        }
-
-        InvokeEffects(player, (effect, owner) => effect.CollectModifiers(owner, this, modifiers));
     }
 
     public virtual bool TryGetStatBonus(HeroStatType statType, out float value)
@@ -329,12 +251,6 @@ public class BaseEquiment : SerializedScriptableObject, IHeroEquipment
             ERarity.Legendary => ERarity.Mythical,
             _ => ERarity.Mythical
         };
-    }
-
-    string GetModifierSourceId()
-    {
-        string resolvedId = !string.IsNullOrEmpty(equipmentId) ? equipmentId : name;
-        return $"equipment:{resolvedId}";
     }
 
     void InvokeEffects(PlayerController player, Action<BaseEquipmentEffect, PlayerController> callback)

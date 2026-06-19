@@ -72,6 +72,11 @@ public static class Helper
 
         return false;
     }
+    public static string GetStatsName(EStats stats)
+    {
+        return GetI2Translation($"{stats}_name");
+    }
+
 
     private static bool IsPointInTriangle(Vector2 p, Vector3 a, Vector3 b, Vector3 c)
     {

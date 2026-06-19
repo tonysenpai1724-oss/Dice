@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TMPro;
 using TigerForge;
 using UnityEngine;
@@ -39,7 +38,8 @@ public class PlayerInventoryUI : MonoBehaviour
 
     public void Refresh()
     {
-        HeroStatSnapshot stats = BuildStats();
+        PlayerStats previewStats = BuildPreviewStats();
+        HeroStatSnapshot stats = previewStats.ToHeroStatSnapshot(heroData);
 
         SetText(txtHp, "HP:" + stats.hp);
         SetText(txtDamage, "Dmg:" + stats.damage);
@@ -49,70 +49,55 @@ public class PlayerInventoryUI : MonoBehaviour
         SetText(txtLuck, "Luck:" + $"{stats.luck:0.##}");
     }
 
-    HeroStatSnapshot BuildStats()
+    PlayerStats BuildPreviewStats()
     {
-        HeroStatSnapshot baseStats = new HeroStatSnapshot(heroData);
-        HeroStatSnapshot finalStats = Clone(baseStats);
-        List<HeroStatModifier> modifiers = BuildModifiers();
+        PlayerStats stats = new PlayerStats();
+        stats.InitStats();
+        stats.ClearStats(PlayerStats.HeroBaseKey);
+        stats.ClearStats(PlayerStats.EquipmentKey);
+        stats.ApplyHeroBaseStats(heroData);
 
-        for (int i = 0; i < modifiers.Count; i++)
-        {
-            HeroStatModifier modifier = modifiers[i];
-            if (modifier == null)
-                continue;
-
-            float appliedValue = modifier.mode == HeroStatModifierMode.PercentFromBase
-                ? baseStats.GetValue(modifier.statType) * modifier.amount * 0.01f
-                : modifier.amount;
-
-            finalStats.Add(modifier.statType, appliedValue);
-        }
-
-        return finalStats;
-    }
-
-    List<HeroStatModifier> BuildModifiers()
-    {
-        List<HeroStatModifier> modifiers = new List<HeroStatModifier>();
         EquipmentSession session = EquipmentSession.GetOrCreate();
-
         if (session == null)
-            return modifiers;
+            return stats;
 
         if (equipmentDatabase != null)
             session.SetDatabase(equipmentDatabase);
 
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Weapon));
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Helmet));
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Armor));
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Gloves));
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Boots));
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Ring));
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Necklace));
-        AddEquipmentModifiers(modifiers, session.GetEquipped(EquipmentType.Artifact));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Weapon));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Helmet));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Armor));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Gloves));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Boots));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Ring));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Necklace));
+        ApplyEquipment(stats, session.GetEquipped(EquipmentType.Artifact));
 
-        return modifiers;
+        return stats;
     }
 
-    void AddEquipmentModifiers(List<HeroStatModifier> modifiers, BaseEquiment equipment)
+    void ApplyEquipment(PlayerStats stats, BaseEquiment equipment)
     {
-        if (modifiers == null || equipment == null)
+        if (stats == null || equipment == null || equipment.statBonuses == null)
             return;
 
-        equipment.CollectModifiers(null, modifiers);
-    }
+        string keyLocal = !string.IsNullOrEmpty(equipment.equipmentId)
+            ? equipment.equipmentId
+            : equipment.name;
 
-    HeroStatSnapshot Clone(HeroStatSnapshot source)
-    {
-        return new HeroStatSnapshot
+        for (int i = 0; i < equipment.statBonuses.Count; i++)
         {
-            hp = source != null ? source.hp : 0,
-            damage = source != null ? source.damage : 0,
-            defense = source != null ? source.defense : 0,
-            critDamage = source != null ? source.critDamage : 0f,
-            critRate = source != null ? source.critRate : 0f,
-            luck = source != null ? source.luck : 0f
-        };
+            EquipmentStatBonus bonus = equipment.statBonuses[i];
+            if (bonus == null)
+                continue;
+
+            stats.ApplyStats(
+                bonus.statType,
+                bonus.amount,
+                PlayerStats.EquipmentKey,
+                keyLocal,
+                bonus.modifierType == EquipmentStatModifierType.Flat);
+        }
     }
 
     void SetText(TextMeshProUGUI label, string value)
