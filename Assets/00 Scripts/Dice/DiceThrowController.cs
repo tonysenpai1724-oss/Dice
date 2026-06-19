@@ -319,7 +319,7 @@ public class DiceThrowController : MonoBehaviour
     {
         float boardY =
             DiceManager.Instance != null
-                ? DiceManager.Instance.GetBoardSurfaceY()
+                ? DiceManager.Instance.GetBoardService().GetBoardSurfaceY()
                 : 0f;
 
         Vector2 mousePos =
