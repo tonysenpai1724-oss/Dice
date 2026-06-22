@@ -1,6 +1,7 @@
 using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
+
 public class LevelManager : Singleton<LevelManager>
 {
     public Level currentLevel;
@@ -10,8 +11,8 @@ public class LevelManager : Singleton<LevelManager>
         currentLevel = ChapterManager.Instance.GetCurrentLevel();
         LoadCurrentLevel();
     }
-    [Button]
 
+    [Button]
     public void LoadCurrentLevel()
     {
         if (currentLevel == null)
@@ -27,9 +28,7 @@ public class LevelManager : Singleton<LevelManager>
 
         currentLevel = level;
 
-
         if (EnemyManager.Instance != null)
-            EnemyManager.Instance.SpawnEnemies(level);
+            EnemyManager.Instance.StartLevel(level);
     }
 }
-

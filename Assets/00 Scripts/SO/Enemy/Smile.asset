@@ -21,10 +21,10 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 50
+  hp: 20
   enemyName: Smile
   damage: 1
-  scale: {x: 0.2, y: 0.2, z: 1}
+  scale: {x: 1, y: 1, z: 1}
   type: 1
   enemyLevel: 0
   skeletonData: {fileID: 11400000, guid: b40952925ee9a8940954f73d0ed16014, type: 2}

@@ -39,6 +39,9 @@ public class EnemyManager : Singleton<EnemyManager>
     public bool snapSpawnedEnemiesToGrid = true;
 
     public List<Enemy> enemies = new();
+
+    Level currentLevel;
+    int currentWaveIndex;
     [Header("Projectile")]
     public RectTransform projectilePrefab;
     public Transform projectileRoot;
@@ -54,33 +57,49 @@ public class EnemyManager : Singleton<EnemyManager>
             effectManager = gameObject.AddComponent<EffectManager>();
     }
 
+    public void StartLevel(Level level)
+    {
+        currentLevel = level;
+        currentWaveIndex = 0;
+        SpawnCurrentWave(true);
+    }
+
     public void SpawnEnemies(Level level)
     {
-        // DebugCustom.LogColor(
-        //     "Spawn Enemies: " +
-        //     (level != null && level.enemyDatas != null ? level.enemyDatas.Count : 0)
-        // );
-        ClearEnemies();
-        // DebugCustom.LogColor("Enemy Prefab: " + enemyPrefab);
-        // DebugCustom.LogColor("Enemy Root: " + enemyRoot);
-        // DebugCustom.LogColor("Enemy Datas: " + level);
+        StartLevel(level);
+    }
 
-        if (level == null || enemyPrefab == null)
-        {
-            // DebugCustom.LogColor("Enemy Datas or Prefab is null");
+    public bool HasMoreWaves()
+    {
+        return currentLevel != null && currentWaveIndex + 1 < currentLevel.WaveCount;
+    }
+
+    public int GetCurrentWaveIndex()
+    {
+        return currentWaveIndex;
+    }
+
+    public void SpawnCurrentWave(bool clearExisting)
+    {
+        if (clearExisting)
+            ClearEnemies();
+
+        if (currentLevel == null || enemyPrefab == null)
             return;
-        }
+
+        List<EnemyData> waveEnemyDatas = currentLevel.GetWaveEnemyDatas(currentWaveIndex);
+        List<EnemySpawnPlacement> wavePlacements = currentLevel.GetWaveSpawnPlacements(currentWaveIndex);
 
         Transform root =
             combatSpaceRoot != null
                 ? combatSpaceRoot
                 : (enemyRoot != null ? enemyRoot : transform);
         List<EnemySpawnPlacement> placements =
-            level.enemySpawnPlacements != null &&
-            level.enemySpawnPlacements.Count > 0
-                ? level.enemySpawnPlacements
+            wavePlacements != null &&
+            wavePlacements.Count > 0
+                ? wavePlacements
                 : spawnPositionGenerator != null
-                    ? spawnPositionGenerator.BuildPlacements(level.enemyDatas)
+                    ? spawnPositionGenerator.BuildPlacements(waveEnemyDatas)
                     : null;
 
         if (placements != null && placements.Count > 0)
@@ -93,7 +112,6 @@ public class EnemyManager : Singleton<EnemyManager>
 
                 Enemy enemy = Instantiate(enemyPrefab, root, false);
                 RegisterEnemy(enemy);
-                //                DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
                 enemy.Setup(placement.data);
                 enemies.Add(enemy);
                 SetEnemyPosition(
@@ -111,18 +129,17 @@ public class EnemyManager : Singleton<EnemyManager>
             return;
         }
 
-        List<EnemyData> enemyDatas = level.enemyDatas;
+        if (waveEnemyDatas == null)
+            return;
 
-        for (int i = 0; i < enemyDatas.Count; i++)
+        for (int i = 0; i < waveEnemyDatas.Count; i++)
         {
-            EnemyData data = enemyDatas[i];
-            //    DebugCustom.LogColor("Enemy Data: " + data);
+            EnemyData data = waveEnemyDatas[i];
             if (data == null)
                 continue;
 
             Enemy enemy = Instantiate(enemyPrefab, root, false);
             RegisterEnemy(enemy);
-            //  DebugCustom.LogColor("Spawn Enemy: " + enemy.name);
             enemy.Setup(data);
             enemies.Add(enemy);
             SetEnemyPosition(
@@ -137,6 +154,16 @@ public class EnemyManager : Singleton<EnemyManager>
             SetEnemyGrid(enemy, 1, Mathf.Max(meleeAttackColumn + 1, gridColumns - 2));
             SnapEnemyToGridPosition(enemy);
         }
+    }
+
+    bool TryAdvanceToNextWave()
+    {
+        if (!HasMoreWaves())
+            return false;
+
+        currentWaveIndex++;
+        SpawnCurrentWave(true);
+        return HasAliveEnemies();
     }
 
     public Enemy AddEnemy(EnemyData data)
@@ -456,6 +483,9 @@ public class EnemyManager : Singleton<EnemyManager>
             queue.RequestFastFlush();
             return;
         }
+
+        if (TryAdvanceToNextWave())
+            return;
 
         GameplayManager.Instance.EndGame(true);
     }
@@ -1069,6 +1099,7 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnArea.uiArea.TransformPoint(areaPoint);
     }
 }
+
 
 
 

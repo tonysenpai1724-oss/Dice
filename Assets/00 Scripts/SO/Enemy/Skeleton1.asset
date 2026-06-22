@@ -21,10 +21,10 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 50
+  hp: 20
   enemyName: Skeleton1
   damage: 1
-  scale: {x: 0.2, y: 0.2, z: 1}
+  scale: {x: 1, y: 1, z: 1}
   type: 1
   enemyLevel: 0
   skeletonData: {fileID: 11400000, guid: 774b62fa6e5c0eb43b906ea231f7e2b7, type: 2}
