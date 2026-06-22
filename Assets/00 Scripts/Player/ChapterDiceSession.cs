@@ -31,9 +31,19 @@ public class ChapterDiceSession : MonoBehaviour
         if (sourceHeroData == null)
             return;
 
-        bool sameHero = heroData == sourceHeroData && runtimeDiceDatas.Count > 0;
-        if (sameHero)
+        bool sameHero = heroData == sourceHeroData;
+        bool sameHeroLevel = heroLevel == sourceHeroData.level;
+        bool hasRuntimeDice = runtimeDiceDatas.Count > 0;
+
+        if (sameHero && sameHeroLevel && hasRuntimeDice)
             return;
+
+        if (hasRuntimeDice && sameHeroLevel)
+        {
+            heroData = sourceHeroData;
+            heroLevel = sourceHeroData.level;
+            return;
+        }
 
         heroData = sourceHeroData;
         heroLevel = sourceHeroData.level;
@@ -53,10 +63,12 @@ public class ChapterDiceSession : MonoBehaviour
             if (startDices[i] != null)
                 runtimeDiceDatas.Add(startDices[i]);
         }
+
     }
 
     public List<DiceData> GetRuntimeDiceDatasCopy()
     {
+
         return new List<DiceData>(runtimeDiceDatas);
     }
 
@@ -137,6 +149,7 @@ public class ChapterDiceSession : MonoBehaviour
 
         return result;
     }
+
     public void ResetSession()
     {
         runtimeDiceDatas.Clear();
@@ -144,5 +157,3 @@ public class ChapterDiceSession : MonoBehaviour
         heroLevel = 0;
     }
 }
-
-

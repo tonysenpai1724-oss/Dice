@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "RuneDice/Dice Database")]
@@ -53,6 +53,7 @@ public class DiceDatabaseSO : ScriptableObject
         return result;
     }
 
+
     public List<DiceData> GetAllByType(DiceType type)
     {
         List<DiceData> result = new List<DiceData>();
@@ -69,4 +70,23 @@ public class DiceDatabaseSO : ScriptableObject
 
         return result;
     }
+    public List<DiceData> GetAllByLevelRange(int minLevel, int maxLevel)
+    {
+        List<DiceData> result = new List<DiceData>();
+        int clampedMinLevel = Mathf.Min(minLevel, maxLevel);
+        int clampedMaxLevel = Mathf.Max(minLevel, maxLevel);
+
+        for (int i = 0; i < diceDatas.Count; i++)
+        {
+            DiceData data = diceDatas[i];
+            if (data == null)
+                continue;
+
+            if (data.level >= clampedMinLevel && data.level <= clampedMaxLevel)
+                result.Add(data);
+        }
+
+        return result;
+    }
 }
+

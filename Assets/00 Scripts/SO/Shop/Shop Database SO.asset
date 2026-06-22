@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68b108b8affd55f4db10c9fae9150dfa, type: 3}
+  m_Name: Shop Database SO
+  m_EditorClassIdentifier: Assembly-CSharp::ShopDatabaseSO
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  diceDatabase: {fileID: 11400000, guid: b7f2f8d9e8982064d9e13c46459422bd, type: 2}
+  maxDiceItemsToSpawn: 5
+  maxRuneItemsToSpawn: 3
+  diceItems:
+  - diceData: {fileID: 11400000, guid: 16d229337e386664b878a67129933fa3, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 336153e0446ff9b448f0c4d4b964f597, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 986bce733eb8436892bfd5bb03c685f4, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 6bc187d6c26b43f8a050d3beabd3b3dc, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: bda2a59d29043a749a3b19d18adc5a00, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 98178ae1b3d8a104fae26807199a4b5a, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 922825e2b3415264581ac8f6c20e181c, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 3b238dc5fd0d9774bbc16baef50553e9, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 210eb9c749cd499ca9becf8409bb74e4, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 6f6b2fa15a8f4d4497be0ba3ad13bcc6, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: f707140fbc58caa4fa9dcd9cd483a3c7, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 8b62a7d4026e857479a1f8d5685864f2, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 2e3f046e86104bc3af889075c85a94b3, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: f51e6272eb034f75a9ba34cf3b11c038, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 0e0b9bba998384545a4a47942d402823, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: cf9603f4bcb80c3409fdc257c45edd97, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 3a790bcad9254218b93dc39d7cd3d861, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 62051b69dfab4a6b859f98bc36e510f2, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: ce5ad70b22d13e9469dcda4c792d5374, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 6ce6390d8b6a08347a69172b34106533, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 00a4f1a2e6b01db4fbf64334b1c2fc7a, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 66368813dd3fa9f4c871445e2106ffdb, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: a9267e66a3ff43c8869d634890d7d3d1, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 51bd7a0e577a42e7a9806b170e347c4c, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: b3205a6e7025d4b4cb88dd883a386038, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 42c1acd2f398fba4d9ab78cb705bc72a, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 1df5dc76f389418ebcd81a9c72f66718, type: 2}
+    price: 10
+  - diceData: {fileID: 11400000, guid: 6c3bb502ada846a585912f88738b952e, type: 2}
+    price: 10
+  diceLevelRangeItems:
+  - minLevel: 1
+    maxLevel: 3
+    price: 10
+    spawnCount: 5
+    allowedTypes: 01000000020000000300000004000000070000000b000000090000000800000005000000
+  runeItems:
+  - runeData: {fileID: 11400000, guid: e22ee3deee697b0458a5d1f34724c4b7, type: 2}
+    price: 15
+  - runeData: {fileID: 11400000, guid: 3f3be972fed80a44e845e946e23a4483, type: 2}
+    price: 15
