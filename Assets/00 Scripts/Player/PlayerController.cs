@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TigerForge;
 using UnityEngine;
 
@@ -32,7 +33,12 @@ public class PlayerController : GameUnit
 
     public void Setup(HeroData newData)
     {
-        data = newData;
+        HeroData resolvedData = ResolveHeroData(newData);
+        data = resolvedData;
+        if (resolvedData == null)
+            return;
+
+        ChapterDiceSession.GetOrCreate().SetSelectedHero(resolvedData);
         EnsurePlayerStats();
         InitializeDiceDatas();
         playerStats.InitStats();
@@ -45,6 +51,20 @@ public class PlayerController : GameUnit
             skeletonGraphic.Initialize(true);
             PlayAnimation(idleAnim, true);
         }
+    }
+
+    HeroData ResolveHeroData(HeroData fallbackData)
+    {
+        if (fallbackData != null)
+            return fallbackData;
+
+        ChapterDiceSession diceSession = ChapterDiceSession.GetOrCreate();
+        HeroData sessionHero = diceSession.ResolveHeroData();
+        if (sessionHero != null)
+            return sessionHero;
+
+        HeroSelectionSession heroSession = HeroSelectionSession.GetOrCreate();
+        return heroSession.GetSelectedHero();
     }
 
     void Start()
@@ -64,14 +84,24 @@ public class PlayerController : GameUnit
 
     public void InitializeDiceDatas()
     {
-        diceDatas.Clear();
-
-        if (data == null)
+        HeroData resolvedData = ResolveHeroData(data);
+        if (resolvedData == null)
             return;
 
         ChapterDiceSession session = ChapterDiceSession.GetOrCreate();
-        session.InitializeFromHero(data);
-        diceDatas = session.GetRuntimeDiceDatasCopy();
+        session.InitializeFromHero(resolvedData);
+
+        List<DiceData> runtimeDiceDatas = session.GetRuntimeDiceDatasCopy();
+        diceDatas.Clear();
+
+        if (runtimeDiceDatas == null || runtimeDiceDatas.Count == 0)
+        {
+            DebugLogDiceDatas("InitializeDiceDatas empty-from-session");
+            return;
+        }
+
+        diceDatas.AddRange(runtimeDiceDatas);
+        DebugLogDiceDatas("InitializeDiceDatas after-copy");
     }
 
     public void AddDiceData(DiceData diceData)
@@ -80,7 +110,9 @@ public class PlayerController : GameUnit
             return;
 
         diceDatas.Add(diceData);
+        DebugLogDiceDatas($"AddDiceData before-session added={diceData.diceName}");
         ChapterDiceSession.GetOrCreate().AddDiceData(diceData);
+        DebugLogDiceDatas($"AddDiceData after-session added={diceData.diceName}");
     }
 
     public void AddDiceDatas(List<DiceData> newDiceDatas)
@@ -156,5 +188,28 @@ public class PlayerController : GameUnit
         Debug.Log("Player Died");
         if (GameplayManager.Instance != null)
             GameplayManager.Instance.EndGame(false);
+    }
+
+    void DebugLogDiceDatas(string context)
+    {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < diceDatas.Count; i++)
+        {
+            DiceData diceData = diceDatas[i];
+            if (diceData == null)
+                continue;
+
+            if (builder.Length > 0)
+                builder.Append(", ");
+
+            builder.Append(diceData.diceName)
+                .Append("(L")
+                .Append(diceData.level)
+                .Append("-")
+                .Append(diceData.type)
+                .Append(")");
+        }
+
+        Debug.Log($"[PlayerController] {context} count={diceDatas.Count} list=[{builder}]");
     }
 }

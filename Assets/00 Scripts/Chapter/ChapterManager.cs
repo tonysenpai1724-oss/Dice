@@ -29,6 +29,7 @@ public class ChapterManager : Singleton<ChapterManager>
     {
         LoadProgress();
         ValidateCurrentProgress();
+        DontDestroyOnLoad(this);
         TigerForge.EventManager.StartListening(Constant.ON_END_GAME, AdvanceAfterWin);
     }
 

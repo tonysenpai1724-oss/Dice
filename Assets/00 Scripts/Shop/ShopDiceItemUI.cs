@@ -38,4 +38,3 @@ public class ShopDiceItemUI : ShopItemBase
         MarkPurchased();
     }
 }
-

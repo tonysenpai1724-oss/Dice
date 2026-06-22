@@ -39,7 +39,7 @@ public class EquipmentSession : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(this);
         InitializeSlots();
         LoadFromPrefs();
     }

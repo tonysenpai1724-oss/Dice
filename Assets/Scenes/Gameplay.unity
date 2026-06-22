@@ -2390,64 +2390,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 470231341}
   m_CullTransparentMesh: 1
---- !u!1 &492846270
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 492846271}
-  - component: {fileID: 492846272}
-  m_Layer: 0
-  m_Name: RuneManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &492846271
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 492846270}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1762077914}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &492846272
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 492846270}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b277017235c73843a5555de8505ce3f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RuneManager
-  slotCount: 4
-  lockedSlotCount: 2
-  slots:
-  - locked: 0
-    runeSkill: {fileID: 11400000, guid: 3f3be972fed80a44e845e946e23a4483, type: 2}
-  - locked: 0
-    runeSkill: {fileID: 11400000, guid: e22ee3deee697b0458a5d1f34724c4b7, type: 2}
-  - locked: 1
-    runeSkill: {fileID: 0}
-  - locked: 1
-    runeSkill: {fileID: 0}
-  RuneSkillDatas:
-  - {fileID: 11400000, guid: e22ee3deee697b0458a5d1f34724c4b7, type: 2}
-  - {fileID: 11400000, guid: 3f3be972fed80a44e845e946e23a4483, type: 2}
 --- !u!1 &519415759
 GameObject:
   m_ObjectHideFlags: 0
@@ -10602,6 +10544,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1762077914}
+  - component: {fileID: 1762077915}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -10631,11 +10574,21 @@ Transform:
   - {fileID: 1825280071}
   - {fileID: 1312278166}
   - {fileID: 1907203533}
-  - {fileID: 492846271}
-  - {fileID: 1820294336}
   - {fileID: 537640653}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1762077915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1762077913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb3897be2d863a4448fec5f1e7cc5138, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DontDestroyOnLoad
 --- !u!1 &1798793551
 GameObject:
   m_ObjectHideFlags: 0
@@ -10773,55 +10726,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1798793551}
   m_CullTransparentMesh: 1
---- !u!1 &1820294335
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1820294336}
-  - component: {fileID: 1820294337}
-  m_Layer: 0
-  m_Name: ChapterManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1820294336
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1820294335}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1762077914}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1820294337
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1820294335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e499692586466f4c8883af50f62625b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ChapterManager
-  chapterDatabase: {fileID: 11400000, guid: a6408de72b6edf1459e625283c1d3514, type: 2}
-  currentChapterId: 1
-  currentMode: 0
-  currentLevelIndex: 0
-  chapterDatabases: []
 --- !u!1 &1825280070
 GameObject:
   m_ObjectHideFlags: 0
