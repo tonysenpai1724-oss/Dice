@@ -23,7 +23,7 @@ MonoBehaviour:
     SerializationNodes: []
   chapters:
   - chapterId: 2
-    chapterName: 2
+    chapterName: Forest
     easy:
       levels:
       - {fileID: 11400000, guid: 28ca4a38c1c808b40ac5bf740a4e3488, type: 2}

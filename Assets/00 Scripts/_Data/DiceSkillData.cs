@@ -22,6 +22,14 @@ public class DiceSkillData : SerializedScriptableObject
 
     public virtual void Execute()
     {
+        Execute(null);
+    }
+
+    public void Execute(DiceData sourceDiceData)
+    {
+        if (sourceDiceData != null && DiceEvoSkillRuntime.TryExecute(sourceDiceData))
+            return;
+
         switch (effectType)
         {
             case DiceSkillEffectType.MultiAttack:
@@ -132,7 +140,6 @@ public static class ShieldDiceSkillData
 {
     public static void Execute(int stackApply, int valueApply)
     {
-        Debug.Log("ShieldDiceSkillData");
         GameplayManager gameplay = GameplayManager.Instance;
         ShieldEffect shieldEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<ShieldEffect>();
         if (shieldEffect == null)
@@ -238,5 +245,126 @@ public static class DiceSkillFactory
         skill.hideFlags = HideFlags.HideAndDontSave;
         cachedSkills[type] = skill;
         return skill;
+    }
+}
+
+public static class DiceEvoSkillRuntime
+{
+    public static bool TryExecute(DiceData sourceDiceData)
+    {
+        if (sourceDiceData == null)
+            return false;
+
+        switch (sourceDiceData.evol)
+        {
+            case DiceEvoType.TripleAttack:
+                return ExecuteTripleAttack(sourceDiceData);
+            case DiceEvoType.Ambush:
+                return ExecuteAmbush(sourceDiceData);
+            case DiceEvoType.X2BonusAtk:
+                return ExecuteX2BonusAtk(sourceDiceData);
+            case DiceEvoType.MagicCoin:
+                return ExecuteMagicCoin(sourceDiceData);
+            case DiceEvoType.Cure:
+                return ExecuteCure(sourceDiceData);
+            case DiceEvoType.Armor:
+                return ExecuteArmor(sourceDiceData);
+            default:
+                return false;
+        }
+    }
+
+    static bool ExecuteTripleAttack(DiceData sourceDiceData)
+    {
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay == null)
+            return false;
+
+        int attackCount = Mathf.Max(3, sourceDiceData.attackCount + 1);
+        gameplay.SetAttackCount(attackCount);
+        return true;
+    }
+
+    static bool ExecuteAmbush(DiceData sourceDiceData)
+    {
+        GameplayManager gameplay = GameplayManager.Instance;
+        DodgeEffect dodgeEffect = gameplay?.skillPlayer?.effectManager?.AddEffect<DodgeEffect>();
+        if (dodgeEffect == null)
+            return false;
+
+        int stacks = Mathf.Max(1, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 1);
+        dodgeEffect.AddStacks(stacks);
+        return true;
+    }
+
+    static bool ExecuteX2BonusAtk(DiceData sourceDiceData)
+    {
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay?.skillPlayer == null)
+            return false;
+
+        int basePlayerDamage = Mathf.Max(0, gameplay.skillPlayer.RuntimeDamage);
+        int percentPerDie = Mathf.Max(0, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 10);
+        int bonusDamage = Mathf.RoundToInt(basePlayerDamage * (percentPerDie / 100f) * Mathf.Max(1, sourceDiceData.level));
+        if (bonusDamage <= 0)
+            return false;
+
+        gameplay.AddDamage(bonusDamage);
+        return true;
+    }
+
+    static bool ExecuteMagicCoin(DiceData sourceDiceData)
+    {
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay == null)
+            return false;
+
+        int minCoin = Mathf.Max(0, sourceDiceData.skillData != null ? sourceDiceData.skillData.stackApply : 5);
+        int maxCoin = Mathf.Max(minCoin, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 10);
+        int perDieReward = UnityEngine.Random.Range(minCoin, maxCoin + 1);
+        int coinReward = perDieReward * Mathf.Max(1, sourceDiceData.level);
+
+        gameplay.CancelAttack();
+        CoinRewardEffect.Apply(coinReward);
+        return true;
+    }
+
+    static bool ExecuteCure(DiceData sourceDiceData)
+    {
+        GameplayManager gameplay = GameplayManager.Instance;
+        GameUnit player = gameplay?.skillPlayer;
+        if (gameplay == null || player == null)
+            return false;
+
+        int percentPerDie = Mathf.Max(0, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 10);
+        float totalPercent = (percentPerDie / 100f) * Mathf.Max(1, sourceDiceData.level);
+        int healAmount = Mathf.RoundToInt(player.hp * totalPercent);
+        if (healAmount <= 0)
+            return false;
+
+        gameplay.CancelAttack();
+        player.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
+        return true;
+    }
+
+    static bool ExecuteArmor(DiceData sourceDiceData)
+    {
+        GameplayManager gameplay = GameplayManager.Instance;
+        PlayerController player = gameplay?.skillPlayer;
+        if (gameplay == null || player == null)
+            return false;
+
+        int percentPerDie = Mathf.Max(0, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 10);
+        float totalPercent = (percentPerDie / 100f) * Mathf.Max(1, sourceDiceData.level);
+        int armorAmount = Mathf.RoundToInt(Mathf.Max(0, player.RuntimeDefense) * totalPercent);
+        if (armorAmount <= 0)
+            return false;
+
+        ShieldEffect shieldEffect = player.effectManager?.AddEffect<ShieldEffect>();
+        if (shieldEffect == null)
+            return false;
+
+        shieldEffect.AddStacks(armorAmount);
+        return true;
     }
 }

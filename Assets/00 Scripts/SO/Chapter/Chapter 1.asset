@@ -23,7 +23,7 @@ MonoBehaviour:
     SerializationNodes: []
   chapters:
   - chapterId: 1
-    chapterName: wave
+    chapterName: Field
     easy:
       levels:
       - {fileID: 11400000, guid: 0c6e7f9cff0f09d4da6f739593d0b8a9, type: 2}

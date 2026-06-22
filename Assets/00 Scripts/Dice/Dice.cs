@@ -29,6 +29,16 @@ public enum DiceType
 
 
 }
+public enum DiceEvoType
+{
+    None,
+    TripleAttack,
+    Ambush,
+    X2BonusAtk,
+    MagicCoin,
+    Cure,
+    Armor
+}
 
 public class Dice : PoolingObject
 {
@@ -442,5 +452,6 @@ public class Dice : PoolingObject
     }
 
 }
+
 
 

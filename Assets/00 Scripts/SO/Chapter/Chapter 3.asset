@@ -23,7 +23,7 @@ MonoBehaviour:
     SerializationNodes: []
   chapters:
   - chapterId: 3
-    chapterName: dsfdsf
+    chapterName: Lost Temple
     easy:
       levels:
       - {fileID: 11400000, guid: 1dec2c14b75338b4b9556337452fa22a, type: 2}

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using System.Collections;
@@ -31,6 +31,7 @@ public class DiceData : SerializedScriptableObject
     public Color diceColor;
     public GameObject hitEffectPrefab;
     public DiceType type;
+    public DiceEvoType evol;
     [Header("Skill")]
     public DiceSkillData skillData;
 
@@ -66,7 +67,7 @@ public class DiceData : SerializedScriptableObject
         if (resolvedSkill == null)
             return;
 
-        resolvedSkill.Execute();
+        resolvedSkill.Execute(this);
     }
 
     [Button]
@@ -101,3 +102,5 @@ public class DiceData : SerializedScriptableObject
             ApplyVisualPreset();
     }
 }
+
+

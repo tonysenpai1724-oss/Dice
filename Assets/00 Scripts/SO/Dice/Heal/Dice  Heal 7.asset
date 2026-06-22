@@ -38,4 +38,6 @@ MonoBehaviour:
   diceColor: {r: 0.7058824, g: 0.42745098, b: 0.99215686, a: 1}
   hitEffectPrefab: {fileID: 3537892071448097904, guid: 98491fb6a00577b459d1fb605044c137, type: 3}
   type: 3
+  evol: 5
   skillData: {fileID: 11400000, guid: 2215d8b6ce8fc3846b734d8f4fc61c75, type: 2}
+
