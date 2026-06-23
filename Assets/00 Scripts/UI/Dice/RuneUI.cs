@@ -100,6 +100,7 @@ public class RuneUI : MonoBehaviour,
         if (manager == null || !manager.IsSlotUnlocked(slotIndex))
             return;
 
+        manager.SetLastRuneDropWorldPosition(GetBoardDropWorldPosition(eventData));
         manager.ExecuteRune(slotIndex);
     }
     bool IsDropOnBoard(PointerEventData eventData)
@@ -159,6 +160,8 @@ public class RuneUI : MonoBehaviour,
 
         rectTransform.position = eventData.position;
 
+        UpdateGravityPreview(eventData);
+
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -167,6 +170,7 @@ public class RuneUI : MonoBehaviour,
             return;
 
         dragging = false;
+        RuneManager.Instance?.ClearGravityPreview();
         canvasGroup.blocksRaycasts = true;
 
         RuneManager manager = RuneManager.Instance;
@@ -175,6 +179,7 @@ public class RuneUI : MonoBehaviour,
 
         if (manager != null && IsDropOnBoard(eventData))
         {
+            manager.SetLastRuneDropWorldPosition(GetBoardDropWorldPosition(eventData));
             manager.ExecuteRune(slotIndex);
             manager.RemoveRune(slotIndex); // hoặc SetRune(slotIndex, null)
             used = true;
@@ -214,6 +219,46 @@ public class RuneUI : MonoBehaviour,
         RefreshAllRuneSlots();
     }
 
+    void UpdateGravityPreview(PointerEventData eventData)
+    {
+        RuneManager manager = RuneManager.Instance;
+        if (manager == null)
+            return;
+
+        RuneSkillData runeSkill = manager.GetRune(slotIndex);
+        if (runeSkill == null || runeSkill.TargetType != RuneType.Gravity)
+        {
+            manager.ClearGravityPreview();
+            return;
+        }
+
+        if (!IsDropOnBoard(eventData))
+        {
+            manager.ClearGravityPreview();
+            return;
+        }
+
+        Vector3 worldPosition = GetBoardDropWorldPosition(eventData);
+        float radius = Mathf.Max(1.5f, runeSkill.valueApply);
+        manager.SetGravityPreview(worldPosition, radius);
+    }
+
+    Vector3 GetBoardDropWorldPosition(PointerEventData eventData)
+    {
+        if (Camera.main == null)
+            return Vector3.zero;
+
+        Ray ray = Camera.main.ScreenPointToRay(eventData.position);
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            return hit.point;
+
+        Plane plane = new Plane(Vector3.up, Vector3.zero);
+        if (plane.Raycast(ray, out float enter))
+            return ray.GetPoint(enter);
+
+        return Vector3.zero;
+    }
+
     Sprite GetRuneSprite(RuneSkillData runeSkill)
     {
         RuneViewManager manager = viewManager != null ? viewManager : RuneViewManager.Instance;
@@ -246,4 +291,5 @@ public class RuneUI : MonoBehaviour,
             runeSlots[i].Refresh();
         }
     }
+
 }

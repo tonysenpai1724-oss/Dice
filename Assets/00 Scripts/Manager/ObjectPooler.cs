@@ -104,6 +104,9 @@ public class ObjectPooler : Singleton<ObjectPooler>
 
     public PoolingObject GetObject(PoolingObject _refPrefabs)
     {
+        if (_refPrefabs == null)
+            return null;
+
         if (string.IsNullOrEmpty(_refPrefabs.poolingKey))
             _refPrefabs.poolingKey = _refPrefabs.name;
 

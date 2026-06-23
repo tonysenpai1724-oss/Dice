@@ -30,9 +30,11 @@ public class ChapterRewardChoiceBuilder
         switch (rand)
         {
             case 0:
-                return GenerateUpgradeReward();
+                return GenerateRuneReward();
+            // return GenerateUpgradeReward();
             case 1:
-                return GenerateAddDiceReward();
+                return GenerateRuneReward();
+            // return GenerateAddDiceReward();
             case 2:
                 return GenerateRuneReward();
         }

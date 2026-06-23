@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class RuneManager : Singleton<RuneManager>
 {
@@ -15,6 +18,9 @@ public class RuneManager : Singleton<RuneManager>
     public int UnlockedSlotCount => Mathf.Max(0, SlotCount - LockedSlotCount);
 
     public List<RuneSkillData> RuneSkillDatas;
+    public Vector3 LastRuneDropWorldPosition { get; private set; }
+    public bool ShowGravityPreview { get; private set; }
+    public float GravityPreviewRadius { get; private set; }
 
 
 
@@ -103,6 +109,37 @@ public class RuneManager : Singleton<RuneManager>
         slots[toIndex].runeSkill = fromRune;
         NotifyRuneChanged();
         return true;
+    }
+
+    public void SetGravityPreview(Vector3 worldPosition, float radius)
+    {
+        LastRuneDropWorldPosition = worldPosition;
+        GravityPreviewRadius = radius;
+        ShowGravityPreview = true;
+    }
+
+    public void ClearGravityPreview()
+    {
+        ShowGravityPreview = false;
+    }
+
+    void OnDrawGizmos()
+    {
+        if (!ShowGravityPreview)
+            return;
+
+#if UNITY_EDITOR
+        Handles.color = new Color(0.3f, 0.8f, 1f, 0.9f);
+        Handles.DrawWireDisc(LastRuneDropWorldPosition, Vector3.up, GravityPreviewRadius);
+#else
+        Gizmos.color = new Color(0.3f, 0.8f, 1f, 0.8f);
+        Gizmos.DrawWireSphere(LastRuneDropWorldPosition, GravityPreviewRadius);
+#endif
+    }
+
+    public void SetLastRuneDropWorldPosition(Vector3 worldPosition)
+    {
+        LastRuneDropWorldPosition = worldPosition;
     }
 
     public void ExecuteRune(int index)

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
-public class DiceQueue : MonoBehaviour
+public class DiceQueue : Singleton<DiceQueue>
 {
     [Header("Prefab")]
     public DiceQueueItem itemPrefab;

@@ -16,6 +16,8 @@ public class SceneHelper : Singleton<SceneHelper>
     public IEnumerator IEChangeSceneLoading()
     {
         Debug.Log("ChangeScene Loading");
+        if (ObjectPooler.Instance != null)
+            ObjectPooler.Instance.ClearAll();
         if (UIManager.Instance != null)
             UIManager.Instance.Initialized = false;
         var async = SceneManager.LoadSceneAsync(Constant.SCENE_LOADING);

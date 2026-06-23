@@ -600,22 +600,23 @@ public class DiceManager : MonoBehaviour
 
     public Dice SpawnDice(DiceData data, Vector3 pos, bool registerOnBoard = true)
     {
+        if (data == null || dicePrefab == null)
+            return null;
+
         Quaternion rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
 
         Dice d = ObjectPooler.Spawn(dicePrefab, pos, rotation);
+        if (d == null)
+            return null;
+
         d.Setup(data);
 
-        // FORCE STABLE
         d.transform.position = pos;
-
         d.rb.linearVelocity = Vector3.zero;
         d.rb.angularVelocity = Vector3.zero;
-
         d.rb.position = pos;
         d.rb.rotation = d.GetUprightRotation();
-
         d.rb.Sleep();
-
         d.ApplyGroundedConstraints();
 
         if (registerOnBoard)
@@ -624,8 +625,8 @@ public class DiceManager : MonoBehaviour
         }
 
         return d;
-
     }
+
     public DiceData GetDiceData(int level, DiceType type)
     {
         return diceDatabase != null
@@ -757,6 +758,67 @@ public class DiceManager : MonoBehaviour
         return mergeService != null && mergeService.TryMerge(a, b);
     }
 
+    public bool ForceMergeInRadius(Vector3 center, float radius)
+    {
+        return ForceMergeNearCenter(center, radius, radius);
+    }
+
+    public bool ForceMergeNearCenter(Vector3 center, float searchRadius, float mergeRadius)
+    {
+        CleanupBoardDiceList();
+
+        float sqrSearchRadius = searchRadius * searchRadius;
+        float sqrMergeRadius = mergeRadius * mergeRadius;
+
+        for (int i = 0; i < boardDices.Count; i++)
+        {
+            Dice first = boardDices[i];
+            if (!CanForceMergeCandidate(first, center, sqrSearchRadius))
+                continue;
+
+            for (int j = i + 1; j < boardDices.Count; j++)
+            {
+                Dice second = boardDices[j];
+                if (!CanForceMergeCandidate(second, center, sqrSearchRadius))
+                    continue;
+
+                if (first.Level != second.Level)
+                    continue;
+
+                Vector3 pairCenter = (first.transform.position + second.transform.position) * 0.5f;
+                Vector3 pairOffset = pairCenter - center;
+                pairOffset.y = 0f;
+                if (pairOffset.sqrMagnitude > sqrMergeRadius)
+                    continue;
+
+                if (TryMerge(first, second))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool CanForceMergeCandidate(Dice dice, Vector3 center, float sqrRadius)
+    {
+        if (dice == null || dice.data == null)
+            return false;
+
+        if (!dice.gameObject.activeInHierarchy)
+            return false;
+
+        if (dice.isMerging || dice.state == DiceState.Merging || dice.state == DiceState.FlyingCombo)
+            return false;
+
+        Vector3 offset = dice.transform.position - center;
+        offset.y = 0f;
+        if (offset.sqrMagnitude > sqrRadius)
+            return false;
+
+        dice.canMerge = true;
+        return true;
+    }
+
     public void ClearBoard()
     {
         foreach (Dice dice in boardDices)
@@ -769,11 +831,14 @@ public class DiceManager : MonoBehaviour
     {
         if (floatingTextPrefab == null)
             return;
-
-        GameObject spawned = Instantiate(floatingTextPrefab, position + floatingTextOffset, Quaternion.identity);
+        Vector3 spawnPosition = position + floatingTextOffset;
+        GameObject spawned = Instantiate(floatingTextPrefab, spawnPosition, Quaternion.identity);
         FloatingText floatingText = spawned.GetComponent<FloatingText>();
         if (floatingText != null)
+        {
+            floatingText.SetWorldPosition(spawnPosition);
             floatingText.SetText(value, color);
+        }
     }
 
     #endregion

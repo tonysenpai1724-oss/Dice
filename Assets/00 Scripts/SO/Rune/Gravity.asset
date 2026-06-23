@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c52947749b5fc2845a84118fd20cc9e7, type: 3}
-  m_Name: Chest
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  m_Script: {fileID: 11500000, guid: 6d02f6caf47b3704fbdab65f4bcc4512, type: 3}
+  m_Name: Gravity
+  m_EditorClassIdentifier: Assembly-CSharp::RuneSkillData
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
@@ -21,12 +21,6 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 30
-  enemyName: Chest
-  damage: 0
-  scale: {x: 1, y: 1, z: 1}
-  type: 2
-  enemyLevel: 0
-  skeletonData: {fileID: 11400000, guid: 4eb51745291ee6d4da979e520ed7bcdf, type: 2}
-  level: 1
-  coinReward: 0
+  TargetType: 4
+  stackApply: 50
+  valueApply: 7

@@ -99,4 +99,5 @@ public enum LevelType
     Jester,
     Upgrade,
     FinalBoss,
+    ChestReward,
 }

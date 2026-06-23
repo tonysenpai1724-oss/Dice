@@ -29,7 +29,7 @@ MonoBehaviour:
     - {fileID: 0}
     enemySpawnPlacements:
     - data: {fileID: 11400000, guid: 00b2ebed55956b4448f8e4d28f527e57, type: 2}
-      position: {x: -88.064, y: 0, z: 0}
+      position: {x: -264.192, y: 0, z: 0}
       useUIPosition: 1
       isBackRow: 0
       gridRow: 1

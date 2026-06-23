@@ -5356,9 +5356,9 @@ MonoBehaviour:
   lockedSlotCount: 2
   slots:
   - locked: 0
-    runeSkill: {fileID: 11400000, guid: 3f3be972fed80a44e845e946e23a4483, type: 2}
+    runeSkill: {fileID: 11400000, guid: c4b39443f4afc644998f9522090ac964, type: 2}
   - locked: 0
-    runeSkill: {fileID: 11400000, guid: e22ee3deee697b0458a5d1f34724c4b7, type: 2}
+    runeSkill: {fileID: 11400000, guid: c4b39443f4afc644998f9522090ac964, type: 2}
   - locked: 1
     runeSkill: {fileID: 0}
   - locked: 1
@@ -5366,6 +5366,7 @@ MonoBehaviour:
   RuneSkillDatas:
   - {fileID: 11400000, guid: e22ee3deee697b0458a5d1f34724c4b7, type: 2}
   - {fileID: 11400000, guid: 3f3be972fed80a44e845e946e23a4483, type: 2}
+  - {fileID: 11400000, guid: c4b39443f4afc644998f9522090ac964, type: 2}
 --- !u!4 &1142323649
 Transform:
   m_ObjectHideFlags: 0
