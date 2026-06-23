@@ -231,6 +231,15 @@ public class UIManager : Singleton<UIManager>
 
         ui.Show();
     }
+    public void ShowUpgradeDicePanel()
+    {
+        UpgradePanel ui = GetUI("Upgrade Dice Panel") as UpgradePanel;
+        if (ui == null)
+            return;
+
+        ui.Show();
+    }
+
 
     #endregion
     public void ShowDialog(string txt)

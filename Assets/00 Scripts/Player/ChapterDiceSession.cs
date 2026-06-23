@@ -192,7 +192,6 @@ public class ChapterDiceSession : MonoBehaviour
 
     void SaveSession()
     {
-        MergeWithSavedRuntimeDice();
 
         ChapterDiceSessionSaveData saveData = new ChapterDiceSessionSaveData
         {
@@ -220,52 +219,6 @@ public class ChapterDiceSession : MonoBehaviour
         CPlayerPrefs.SetString(SaveKey, json);
         DebugLogRuntimeDice("SaveSession");
         Debug.Log($"[ChapterDiceSession] Saved json count={saveData.runtimeDices.Count} json={json}");
-    }
-
-    void MergeWithSavedRuntimeDice()
-    {
-        string json = CPlayerPrefs.GetString(SaveKey);
-        if (string.IsNullOrEmpty(json))
-            return;
-
-        ChapterDiceSessionSaveData saveData = JsonUtility.FromJson<ChapterDiceSessionSaveData>(json);
-        if (saveData == null || saveData.runtimeDices == null || saveData.runtimeDices.Count == 0)
-            return;
-        if (diceDatabase == null)
-            return;
-
-        for (int i = 0; i < saveData.runtimeDices.Count; i++)
-        {
-            ChapterDiceSessionDiceSaveData savedDice = saveData.runtimeDices[i];
-            if (ContainsRuntimeDice(savedDice))
-                continue;
-
-            DiceData data = FindDiceData(diceDatabase, savedDice);
-            if (data != null)
-                runtimeDiceDatas.Insert(0, data);
-        }
-    }
-
-    bool ContainsRuntimeDice(ChapterDiceSessionDiceSaveData savedDice)
-    {
-        if (savedDice == null)
-            return false;
-
-        for (int i = 0; i < runtimeDiceDatas.Count; i++)
-        {
-            DiceData runtimeDice = runtimeDiceDatas[i];
-            if (runtimeDice == null)
-                continue;
-
-            if (runtimeDice.level == savedDice.level &&
-                runtimeDice.type == savedDice.type &&
-                runtimeDice.diceName == savedDice.diceName)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     void LoadSession()
@@ -380,6 +333,91 @@ public class ChapterDiceSession : MonoBehaviour
             runtimeDiceDatas.Insert(i + 1, sourceDiceData);
             initializedFromHero = true;
             DebugLogRuntimeDice($"CloneDiceData before save cloned={sourceDiceData.diceName}");
+            SaveSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    public int GetTotalDiceLevelByType(DiceType type)
+    {
+        int totalLevel = 0;
+
+        for (int i = 0; i < runtimeDiceDatas.Count; i++)
+        {
+            DiceData current = runtimeDiceDatas[i];
+            if (current == null || current.type != type)
+                continue;
+
+            totalLevel += Mathf.Max(0, current.level);
+        }
+
+        return totalLevel;
+    }
+
+    public DiceData GetSummedUpgradeTarget(DiceData sourceDiceData, DiceDatabaseSO sourceDiceDatabase = null)
+    {
+        if (sourceDiceData == null)
+            return null;
+
+        DiceDatabaseSO database = sourceDiceDatabase != null ? sourceDiceDatabase : diceDatabase;
+        if (database == null)
+            return null;
+
+        int totalLevel = GetTotalDiceLevelByType(sourceDiceData.type);
+        if (totalLevel <= sourceDiceData.level)
+            return null;
+
+        return database.GetDiceData(totalLevel, sourceDiceData.type);
+    }
+
+    public bool UpgradeDiceDataByTypeSum(DiceData sourceDiceData, out DiceData upgradedDiceData, DiceDatabaseSO sourceDiceDatabase = null)
+    {
+        upgradedDiceData = GetSummedUpgradeTarget(sourceDiceData, sourceDiceDatabase);
+        if (sourceDiceData == null || upgradedDiceData == null)
+            return false;
+
+        for (int i = 0; i < runtimeDiceDatas.Count; i++)
+        {
+            if (runtimeDiceDatas[i] != sourceDiceData)
+                continue;
+
+            runtimeDiceDatas[i] = upgradedDiceData;
+            DebugLogRuntimeDice($"UpgradeDiceDataByTypeSum before save source={sourceDiceData.diceName} target={upgradedDiceData.diceName}");
+            SaveSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool DowngradeDiceData(DiceData currentDiceData, out DiceData downgradedDiceData, DiceDatabaseSO sourceDiceDatabase = null)
+    {
+        downgradedDiceData = null;
+
+        if (currentDiceData == null)
+            return false;
+
+        int targetLevel = Mathf.Max(1, currentDiceData.level - 1);
+        if (targetLevel == currentDiceData.level)
+            return false;
+
+        DiceDatabaseSO database = sourceDiceDatabase != null ? sourceDiceDatabase : diceDatabase;
+        if (database == null)
+            return false;
+
+        downgradedDiceData = database.GetDiceData(targetLevel, currentDiceData.type);
+        if (downgradedDiceData == null)
+            return false;
+
+        for (int i = 0; i < runtimeDiceDatas.Count; i++)
+        {
+            if (runtimeDiceDatas[i] != currentDiceData)
+                continue;
+
+            runtimeDiceDatas[i] = downgradedDiceData;
+            DebugLogRuntimeDice($"DowngradeDiceData before save source={currentDiceData.diceName} target={downgradedDiceData.diceName}");
             SaveSession();
             return true;
         }
