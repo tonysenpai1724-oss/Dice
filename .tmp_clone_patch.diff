@@ -1,0 +1,139 @@
+*** Begin Patch
+*** Update File: Assets/00 Scripts/Player/ChapterDiceSession.cs
+@@
+     public void AddDiceDatas(List<DiceData> diceDatas)
+     {
+         if (diceDatas == null)
+             return;
+@@
+         }
+     }
++
++    public bool CanCloneAnyDice()
++    {
++        for (int i = 0; i < runtimeDiceDatas.Count; i++)
++        {
++            if (runtimeDiceDatas[i] != null)
++                return true;
++        }
++
++        return false;
++    }
++
++    public List<DiceData> GetCloneableDiceOptions()
++    {
++        List<DiceData> result = new List<DiceData>();
++
++        for (int i = 0; i < runtimeDiceDatas.Count; i++)
++        {
++            DiceData current = runtimeDiceDatas[i];
++            if (current == null)
++                continue;
++
++            result.Add(current);
++        }
++
++        return result;
++    }
++
++    public bool CloneDiceData(DiceData sourceDiceData)
++    {
++        if (sourceDiceData == null)
++            return false;
++
++        for (int i = 0; i < runtimeDiceDatas.Count; i++)
++        {
++            if (runtimeDiceDatas[i] != sourceDiceData)
++                continue;
++
++            runtimeDiceDatas.Insert(i + 1, sourceDiceData);
++            initializedFromHero = true;
++            DebugLogRuntimeDice($"CloneDiceData before save cloned={sourceDiceData.diceName}");
++            SaveSession();
++            return true;
++        }
++
++        return false;
++    }
+ 
+     public bool UpgradeDiceData(DiceData currentDiceData, DiceData upgradedDiceData)
+     {
+         if (currentDiceData == null || upgradedDiceData == null)
+             return false;
+*** Update File: Assets/00 Scripts/Gameplay/ChapterRewardChoiceOption.cs
+@@
+ public enum ChapterRewardChoiceType
+ {
++    CloneDice,
+     UpgradeDice,
+     AddDice,
+     AddRune,
+     Relic
+ }
+*** Update File: Assets/00 Scripts/Gameplay/ChapterRewardChoiceBuilder.cs
+@@
+     ChapterRewardChoiceOption GenerateRandomReward()
+     {
+-        int rand = Random.Range(0, 3);
++        int rand = Random.Range(0, 4);
+         switch (rand)
+         {
+             case 0:
++                return GenerateCloneDiceReward();
++            case 1:
+                 return GenerateUpgradeReward();
+-            case 1:
++            case 2:
+                 return GenerateAddDiceReward();
+-            case 2:
++            case 3:
+                 return GenerateRuneReward();
+         }
+         return null;
+     }
++    ChapterRewardChoiceOption GenerateCloneDiceReward()
++    {
++        if (diceSession == null)
++            return null;
++
++        List<DiceData> cloneable = diceSession.GetCloneableDiceOptions();
++        if (cloneable.Count == 0)
++            return null;
++
++        DiceData source = cloneable[Random.Range(0, cloneable.Count)];
++        if (source == null)
++            return null;
++
++        return new ChapterRewardChoiceOption
++        {
++            type = ChapterRewardChoiceType.CloneDice,
++            title = $"Clone {source.diceName}",
++            description = $"Gain 1 extra Lv{source.level} {source.type} dice",
++            sourceDice = source,
++            targetDice = source
++        };
++    }
+@@
+             switch (candidate.type)
+             {
++                case ChapterRewardChoiceType.CloneDice:
++                    if (current.sourceDice == candidate.sourceDice)
++                        return true;
++                    break;
+                 case ChapterRewardChoiceType.UpgradeDice:
+                     if (current.sourceDice == candidate.sourceDice && current.targetDice == candidate.targetDice)
+                         return true;
+                     break;
+*** Update File: Assets/00 Scripts/Gameplay/GameplayManager.cs
+@@
+         switch (option.type)
+         {
++            case ChapterRewardChoiceType.CloneDice:
++                if (option.sourceDice != null)
++                    diceSession.CloneDiceData(option.sourceDice);
++                break;
+             case ChapterRewardChoiceType.UpgradeDice:
+                 if (option.sourceDice != null && option.targetDice != null)
+                     diceSession.UpgradeDiceData(option.sourceDice, option.targetDice);
+                 break;
+*** End Patch

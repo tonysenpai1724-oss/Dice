@@ -223,6 +223,15 @@ public class UIManager : Singleton<UIManager>
     {
         lstPendingUI.Add(action);
     }
+    public void ShowClonePanel()
+    {
+        ClonePanel ui = GetUI("Clone Panel") as ClonePanel;
+        if (ui == null)
+            return;
+
+        ui.Show();
+    }
+
     #endregion
     public void ShowDialog(string txt)
     {

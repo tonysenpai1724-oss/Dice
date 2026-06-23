@@ -340,6 +340,53 @@ public class ChapterDiceSession : MonoBehaviour
         }
     }
 
+    public bool CanCloneAnyDice()
+    {
+        for (int i = 0; i < runtimeDiceDatas.Count; i++)
+        {
+            if (runtimeDiceDatas[i] != null)
+                return true;
+        }
+
+        return false;
+    }
+
+    public List<DiceData> GetCloneableDiceOptions()
+    {
+        List<DiceData> result = new List<DiceData>();
+
+        for (int i = 0; i < runtimeDiceDatas.Count; i++)
+        {
+            DiceData current = runtimeDiceDatas[i];
+            if (current == null)
+                continue;
+
+            result.Add(current);
+        }
+
+        return result;
+    }
+
+    public bool CloneDiceData(DiceData sourceDiceData)
+    {
+        if (sourceDiceData == null)
+            return false;
+
+        for (int i = 0; i < runtimeDiceDatas.Count; i++)
+        {
+            if (runtimeDiceDatas[i] != sourceDiceData)
+                continue;
+
+            runtimeDiceDatas.Insert(i + 1, sourceDiceData);
+            initializedFromHero = true;
+            DebugLogRuntimeDice($"CloneDiceData before save cloned={sourceDiceData.diceName}");
+            SaveSession();
+            return true;
+        }
+
+        return false;
+    }
+
     public bool UpgradeDiceData(DiceData currentDiceData, DiceData upgradedDiceData)
     {
         if (currentDiceData == null || upgradedDiceData == null)

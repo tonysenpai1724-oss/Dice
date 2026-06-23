@@ -28,6 +28,12 @@ public class LevelManager : Singleton<LevelManager>
 
         currentLevel = level;
 
+        if (level.leveltype == LevelType.MagicAltar)
+        {
+            UIManager.Instance?.ShowClonePanel();
+            return;
+        }
+
         if (EnemyManager.Instance != null)
             EnemyManager.Instance.StartLevel(level);
     }
