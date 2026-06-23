@@ -21,11 +21,11 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  hp: 20
-  enemyName: Golblin
-  damage: 1
+  hp: 500
+  enemyName: Chest
+  damage: 0
   scale: {x: 1, y: 1, z: 1}
-  type: 0
+  type: 2
   enemyLevel: 0
   skeletonData: {fileID: 11400000, guid: 4eb51745291ee6d4da979e520ed7bcdf, type: 2}
   level: 1

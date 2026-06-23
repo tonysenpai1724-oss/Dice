@@ -279,15 +279,24 @@ public class DiceQueue : MonoBehaviour
             );
 
         float timer = 0f;
+        int itemCount = items.Count;
         Vector3[] starts =
-            new Vector3[items.Count];
+            new Vector3[itemCount];
         Vector3[] targets =
-            new Vector3[items.Count];
+            new Vector3[itemCount];
+        DiceQueueItem[] snapshotItems =
+            new DiceQueueItem[itemCount];
 
-        for (int i = 0; i < items.Count; i++)
+        for (int i = 0; i < itemCount; i++)
         {
+            DiceQueueItem item = items[i];
+            snapshotItems[i] = item;
+
+            if (item == null)
+                continue;
+
             starts[i] =
-                items[i].transform.position;
+                item.transform.position;
 
             targets[i] =
                 GetPosition(i);
@@ -302,12 +311,13 @@ public class DiceQueue : MonoBehaviour
                     timer / duration
                 );
 
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < itemCount; i++)
             {
-                if (items[i] == null)
+                DiceQueueItem item = snapshotItems[i];
+                if (item == null)
                     continue;
 
-                items[i].transform.position =
+                item.transform.position =
                     Vector3.Lerp(
                         starts[i],
                         targets[i],

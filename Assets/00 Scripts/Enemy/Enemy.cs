@@ -72,8 +72,11 @@ public class Enemy : GameUnit
     {
         if (!IsAlive())
             return;
+        if (type != EnemyType.Chest)
+            gridColumn -= amount;
+        else
+            gridColumn += amount;
 
-        gridColumn -= amount;
 
         //   distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
     }

@@ -42,6 +42,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     Level currentLevel;
     int currentWaveIndex;
+    int chestTurnsRemaining;
     [Header("Projectile")]
     public RectTransform projectilePrefab;
     public Transform projectileRoot;
@@ -61,6 +62,7 @@ public class EnemyManager : Singleton<EnemyManager>
     {
         currentLevel = level;
         currentWaveIndex = 0;
+        chestTurnsRemaining = IsChestLevel(level) ? 5 : 0;
         SpawnCurrentWave(true);
     }
 
@@ -151,7 +153,10 @@ public class EnemyManager : Singleton<EnemyManager>
                 ),
                 false
             );
-            SetEnemyGrid(enemy, 1, Mathf.Max(meleeAttackColumn + 1, gridColumns - 2));
+            if (IsChestEnemy(data) || IsChestLevel(currentLevel))
+                SetEnemyGrid(enemy, GetChestSpawnRow(), GetChestSpawnColumn());
+            else
+                SetEnemyGrid(enemy, 1, Mathf.Max(meleeAttackColumn + 1, gridColumns - 2));
             SnapEnemyToGridPosition(enemy);
         }
     }
@@ -422,6 +427,9 @@ public class EnemyManager : Singleton<EnemyManager>
         if (!HasAliveEnemies())
             yield break;
 
+        if (TryHandleChestTurn())
+            yield break;
+
         EnemyTurnSkipEffect turnSkipEffect = effectManager?.GetEffect<EnemyTurnSkipEffect>();
         if (turnSkipEffect != null && turnSkipEffect.ConsumeTurnSkip())
         {
@@ -488,6 +496,64 @@ public class EnemyManager : Singleton<EnemyManager>
             return;
 
         GameplayManager.Instance.EndGame(true);
+    }
+
+    bool IsChestLevel(Level level)
+    {
+        return level != null && level.leveltype == LevelType.Chest;
+    }
+
+    bool IsChestEnemy(EnemyData data)
+    {
+        return data != null && data.type == EnemyType.Chest;
+    }
+
+    int GetChestSpawnRow()
+    {
+        return Mathf.Clamp(1, 0, Mathf.Max(0, gridRows - 1));
+    }
+
+    int GetChestSpawnColumn()
+    {
+        return Mathf.Clamp(2, playerColumn + 1, Mathf.Max(playerColumn + 1, gridColumns - 1));
+    }
+
+    Enemy GetAliveChestEnemy()
+    {
+        CleanupEnemies();
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy != null && enemy.IsAlive() && enemy.type == EnemyType.Chest)
+                return enemy;
+        }
+
+        return null;
+    }
+
+    bool TryHandleChestTurn()
+    {
+        if (!IsChestLevel(currentLevel))
+            return false;
+
+        Enemy chestEnemy = GetAliveChestEnemy();
+        if (chestEnemy == null)
+            return false;
+
+        chestTurnsRemaining = Mathf.Max(0, chestTurnsRemaining - 1);
+
+        int nextColumn = Mathf.Min(Mathf.Max(playerColumn + 1, gridColumns - 1), chestEnemy.gridColumn + 1);
+        SetEnemyGrid(chestEnemy, chestEnemy.gridRow, nextColumn);
+        SnapEnemyToGridPosition(chestEnemy);
+
+        if (chestTurnsRemaining <= 0)
+        {
+            GameplayManager.Instance?.EndGame(false);
+            return true;
+        }
+
+        return true;
     }
 
     public bool HasAliveEnemies()

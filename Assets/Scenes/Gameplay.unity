@@ -11158,7 +11158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyLevelPositionGenerator
   spawnArea: {fileID: 2021714174}
-  previewLevel: {fileID: 11400000, guid: 0c6e7f9cff0f09d4da6f739593d0b8a9, type: 2}
+  previewLevel: {fileID: 11400000, guid: c07216f2ee96ce346ab56a70eeaaa974, type: 2}
   levelsToGenerate:
   - {fileID: 11400000, guid: 0c6e7f9cff0f09d4da6f739593d0b8a9, type: 2}
   - {fileID: 11400000, guid: 5e202cdf37a59cf419e03be89647efed, type: 2}
@@ -11257,42 +11257,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b81f2d89528aaeb499d0b04e9a5afec3, type: 2}
   - {fileID: 11400000, guid: 29acd0dde6becda4b8ce8e9b3ebc6a8d, type: 2}
   previewPlacements:
-  - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
-    position: {x: 264.19202, y: 0, z: 0}
-    useUIPosition: 1
-    isBackRow: 0
-    gridRow: 1
-    gridColumn: 4
-  - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
+  - data: {fileID: 11400000, guid: 00b2ebed55956b4448f8e4d28f527e57, type: 2}
     position: {x: 264.19202, y: 119.175, z: 0}
     useUIPosition: 1
     isBackRow: 0
-    gridRow: 0
-    gridColumn: 4
-  - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-    position: {x: 264.19202, y: -119.175, z: 0}
-    useUIPosition: 1
-    isBackRow: 0
     gridRow: 2
-    gridColumn: 4
-  - data: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
-    position: {x: 440.32, y: 0, z: 0}
-    useUIPosition: 1
-    isBackRow: 1
-    gridRow: 1
-    gridColumn: 5
-  - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
-    position: {x: 440.32, y: 119.175, z: 0}
-    useUIPosition: 1
-    isBackRow: 1
-    gridRow: 0
-    gridColumn: 5
-  - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
-    position: {x: 440.32, y: -119.175, z: 0}
-    useUIPosition: 1
-    isBackRow: 1
-    gridRow: 2
-    gridColumn: 5
+    gridColumn: 1
   gridRows: 3
   gridColumns: 6
   playerColumn: 0
