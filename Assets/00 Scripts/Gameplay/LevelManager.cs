@@ -30,7 +30,7 @@ public class LevelManager : Singleton<LevelManager>
 
         if (level.leveltype == LevelType.MagicAltar)
         {
-            UIManager.Instance?.ShowClonePanel();
+            UIManager.Instance?.ShowPopupClonePanel();
             return;
         }
 

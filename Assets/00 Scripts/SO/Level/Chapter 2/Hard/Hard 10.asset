@@ -21,7 +21,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  levelNumber: 1
+  levelNumber: 10
   enemyDatas:
   - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
   - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}

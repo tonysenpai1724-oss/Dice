@@ -223,17 +223,25 @@ public class UIManager : Singleton<UIManager>
     {
         lstPendingUI.Add(action);
     }
-    public void ShowClonePanel()
+    public void ShowPopupClonePanel()
     {
-        ClonePanel ui = GetUI("Clone Panel") as ClonePanel;
+        ClonePanel ui = GetUI("Popup Clone Panel") as ClonePanel;
         if (ui == null)
             return;
 
         ui.Show();
     }
-    public void ShowUpgradeDicePanel()
+    public void ShowPopupUpgradeDice()
     {
-        UpgradePanel ui = GetUI("Upgrade Dice Panel") as UpgradePanel;
+        UpgradePanel ui = GetUI("Popup Upgrade Dice") as UpgradePanel;
+        if (ui == null)
+            return;
+
+        ui.Show();
+    }
+    public void ShowPopupShop()
+    {
+        ShopDiceRunePanel ui = GetUI("Popup Shop") as ShopDiceRunePanel;
         if (ui == null)
             return;
 
@@ -242,6 +250,14 @@ public class UIManager : Singleton<UIManager>
 
 
     #endregion
+    public void ShowUpgradePanel()
+    {
+        UpgradePanel ui = GetUI("Upgrade Panel") as UpgradePanel;
+        if (ui == null)
+            return;
+
+        ui.Show();
+    }
     public void ShowDialog(string txt)
     {
         uIDialog.ShowDialog(txt);

@@ -21,7 +21,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  levelNumber: 1
+  levelNumber: 3
   enemyDatas:
   - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
   - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
@@ -121,7 +121,7 @@ MonoBehaviour:
       isBackRow: 1
       gridRow: 2
       gridColumn: 5
-  leveltype: 0
+  leveltype: 3
   enemySpawnPlacements:
   - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
     position: {x: 264.19202, y: 0, z: 0}

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShopDiceRunePanel : MonoBehaviour
+public class ShopDiceRunePanel : UIBase
 {
     public ShopDiceItemUI diceItemPrefab;
     public ShopRuneItemUI runeItemPrefab;

@@ -145,11 +145,30 @@ public class GameManager : Singleton<GameManager>
     {
         if (GameState == EGameState.Loading)
             return;
+
         PackageResource packCost = new PackageResource();
         packCost.AddResource(new CommonResource(ECommonResource.Energy, -1));
         packCost.ReceiveResource(EResourceFrom.SpendIngame, false, () =>
         {
             GameType = gameType;
+
+            Level currentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : null;
+            if (currentLevel != null)
+            {
+                switch (currentLevel.leveltype)
+                {
+                    case LevelType.MagicAltar:
+                        UIManager.Instance?.ShowPopupClonePanel();
+                        return;
+                    case LevelType.Upgrade:
+                        UIManager.Instance?.ShowPopupUpgradeDice();
+                        return;
+                    case LevelType.Shop:
+                        UIManager.Instance?.ShowPopupShop();
+                        return;
+                }
+            }
+
             GoSceneGameplay();
         });
     }

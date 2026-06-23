@@ -103,6 +103,7 @@ public enum EnemyType
     // Normal,
     Range,
     Melee,
+    Chest,
 }
 public enum EnemyLevel
 {
