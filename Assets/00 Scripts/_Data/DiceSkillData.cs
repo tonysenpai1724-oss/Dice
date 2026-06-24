@@ -75,6 +75,9 @@ public class DiceSkillData : SerializedScriptableObject
             case DiceType.MultiAttack:
                 MultiAttackDiceSkillData.Execute(stackApply, valueApply);
                 break;
+            case DiceType.BonusAtk:
+                BonusAtkDiceSkillData.Execute(stackApply, valueApply);
+                break;
         }
     }
 }
@@ -221,11 +224,32 @@ public static class MultiAttackDiceSkillData
     }
 }
 
+public static class BonusAtkDiceSkillData
+{
+    public static void Execute(int stackApply, int valueApply)
+    {
+        GameplayManager gameplay = GameplayManager.Instance;
+        if (gameplay == null)
+            return;
+
+        int percentPerDie = Mathf.Max(0, valueApply);
+
+        int dieNumber = Mathf.Max(1, gameplay.skillDiceData != null ? gameplay.skillDiceData.level : 1);
+        int bonusPercent = percentPerDie * dieNumber;
+        int currentDamage = Mathf.Max(0, gameplay.skillDamage);
+        int bonusDamage = Mathf.RoundToInt(currentDamage * (bonusPercent / 100f));
+        if (bonusDamage <= 0)
+            return;
+        gameplay.AddDamage(bonusDamage);
+    }
+}
 public static class EnemyDiceSKillData
 {
     public static void Execute(int stackApply, int valueApply)
     {
+
     }
+
 }
 
 public static class DiceSkillFactory
@@ -303,13 +327,15 @@ public static class DiceEvoSkillRuntime
         if (gameplay?.skillPlayer == null)
             return false;
 
-        int basePlayerDamage = Mathf.Max(0, gameplay.skillPlayer.RuntimeDamage);
+        int currentDamage = Mathf.Max(0, gameplay.skillDamage);
         int percentPerDie = Mathf.Max(0, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 10);
-        int bonusDamage = Mathf.RoundToInt(basePlayerDamage * (percentPerDie / 100f) * Mathf.Max(1, sourceDiceData.level));
-        if (bonusDamage <= 0)
+        int dieNumber = Mathf.Max(1, sourceDiceData.level);
+        int baseBonusDamage = Mathf.RoundToInt(currentDamage * ((percentPerDie * dieNumber) / 100f));
+        int doubledBonusDamage = baseBonusDamage * 2;
+        if (doubledBonusDamage <= 0)
             return false;
 
-        gameplay.AddDamage(bonusDamage);
+        gameplay.AddDamage(doubledBonusDamage);
         return true;
     }
 
@@ -344,6 +370,7 @@ public static class DiceEvoSkillRuntime
 
         gameplay.CancelAttack();
         player.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
+        player.effectManager?.RemoveEffectsByType(EffectType.Debuff);
         return true;
     }
 
@@ -368,3 +395,10 @@ public static class DiceEvoSkillRuntime
         return true;
     }
 }
+
+
+
+
+
+
+

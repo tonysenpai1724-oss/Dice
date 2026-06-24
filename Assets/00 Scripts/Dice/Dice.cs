@@ -25,7 +25,8 @@ public enum DiceType
     Stun,
     Bomb,
     Enemy,
-    MultiAttack
+    MultiAttack,
+    BonusAtk,
 
 
 }
@@ -339,8 +340,8 @@ public class Dice : PoolingObject
         Quaternion uprightRotation =
             GetUprightRotation();
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+        //  rb.linearVelocity = Vector3.zero;
+        //rb.angularVelocity = Vector3.zero;
         transform.SetPositionAndRotation(
             position,
             uprightRotation

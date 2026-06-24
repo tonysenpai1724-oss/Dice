@@ -1,5 +1,6 @@
-﻿public class HealEffect : GameEffect
+public class HealEffect : GameEffect
 {
+    public override EffectType EffectType => EffectType.Neutral;
     GameUnit unit;
 
     protected override void Awake()
@@ -13,3 +14,4 @@
             unit.OnHeal(amount);
     }
 }
+

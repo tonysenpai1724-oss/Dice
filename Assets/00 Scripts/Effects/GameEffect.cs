@@ -1,11 +1,19 @@
-﻿using System;
+using System;
 using UnityEngine;
+
+public enum EffectType
+{
+    Neutral,
+    Buff,
+    Debuff
+}
 
 public abstract class GameEffect : MonoBehaviour
 {
     public EffectManager EffectManager { get; private set; }
     public GameUnit Unit { get; private set; }
     public int Stacks;
+    public virtual EffectType EffectType => EffectType.Neutral;
 
     public event Action<GameEffect, int> StacksChanged;
 
@@ -30,7 +38,6 @@ public abstract class GameEffect : MonoBehaviour
             return;
 
         Stacks += amount;
-        Debug.Log("Stacks: " + Stacks);
         NotifyStacksChanged();
     }
 
@@ -40,7 +47,6 @@ public abstract class GameEffect : MonoBehaviour
             return false;
 
         Stacks--;
-        Debug.Log("Stacks: " + Stacks);
         NotifyStacksChanged();
 
         if (Stacks <= 0)

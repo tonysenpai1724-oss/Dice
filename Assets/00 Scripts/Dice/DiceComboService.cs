@@ -129,9 +129,10 @@ public class DiceComboService
 
         dice.state = DiceState.FlyingCombo;
         dice.canMerge = true;
+        //  dice.SetCollisionEnabled(false);
         dice.rb.isKinematic = true;
-        dice.rb.linearVelocity = Vector3.zero;
-        dice.rb.angularVelocity = Vector3.zero;
+        //  dice.rb.linearVelocity = Vector3.zero;
+        //  dice.rb.angularVelocity = Vector3.zero;
 
         Vector3 start = dice.transform.position;
         Vector3 finalDestination = targetPos;
@@ -219,6 +220,11 @@ public class DiceComboService
         comboChainMap.Remove(dice);
         if (target != null)
             comboChainMap.Remove(target);
+
+        finalDestination = boardService.FindClearPosition(
+            finalDestination,
+            dice,
+            config.diceSpacingRadius);
 
         Quaternion targetRot = Quaternion.Euler(0f, dice.transform.eulerAngles.y, 0f);
         Quaternion startRot = dice.transform.rotation;

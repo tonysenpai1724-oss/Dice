@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class PoisonEffect : GameEffect
 {
+    public override EffectType EffectType => EffectType.Debuff;
+
     public int turnsRemaining;
     public int damagePerTurn;
 
@@ -10,6 +12,7 @@ public class PoisonEffect : GameEffect
 
     protected override void Awake()
     {
+        base.Awake();
         unit = GetComponent<GameUnit>();
 
         if (unit != null)

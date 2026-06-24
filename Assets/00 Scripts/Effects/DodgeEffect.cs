@@ -1,5 +1,9 @@
-﻿public class DodgeEffect : GameEffect
+public class DodgeEffect : GameEffect
+
+
 {
+    public override EffectType EffectType => EffectType.Buff;
+
     protected override void Awake()
     {
         base.Awake();
@@ -25,3 +29,4 @@
             damageEvent.Cancel();
     }
 }
+

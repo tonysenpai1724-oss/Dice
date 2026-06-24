@@ -1,5 +1,7 @@
-﻿public class ShieldEffect : GameEffect
+public class ShieldEffect : GameEffect
 {
+    public override EffectType EffectType => EffectType.Buff;
+
     protected override void Awake()
     {
         base.Awake();
@@ -29,3 +31,4 @@
             damageEvent.Cancel();
     }
 }
+

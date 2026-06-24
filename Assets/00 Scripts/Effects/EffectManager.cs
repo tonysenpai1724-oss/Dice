@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EffectManager : MonoBehaviour
@@ -50,12 +50,28 @@ public class EffectManager : MonoBehaviour
         effect.Initialize(this);
     }
 
+    public void RemoveEffect<T>() where T : GameEffect
+    {
+        T effect = GetEffect<T>();
+        if (effect != null)
+            Destroy(effect);
+    }
+
+    public void RemoveEffectsByType(EffectType effectType)
+    {
+        for (int i = currentEffects.Count - 1; i >= 0; i--)
+        {
+            GameEffect effect = currentEffects[i];
+            if (effect != null && effect.EffectType == effectType)
+                Destroy(effect);
+        }
+    }
+
     public void UnregisterEffect(GameEffect effect)
     {
         if (effect == null)
             return;
 
-        Debug.Log("UnregisterEffect" + effect);
         currentEffects.Remove(effect);
     }
 

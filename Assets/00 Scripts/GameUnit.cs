@@ -16,6 +16,8 @@ public abstract class GameUnit : MonoBehaviour
     public string attackAnim = "Attack";
     public string dieAnim = "Die";
     public string hurtAnim = "Hurt";
+    [Header("Combat")]
+    public float aimAttackSpeed = 1f;
 
     public event Action<GameUnit, int, int> OnHpChanged;
     public event Action<GameUnitDamageEvent> OnBeforeDamage;
@@ -229,3 +231,4 @@ public sealed class GameUnitDamageEvent
         Amount = 0;
     }
 }
+
