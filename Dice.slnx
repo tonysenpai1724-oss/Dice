@@ -15,6 +15,7 @@
   <Project Path="Unity.Burst.csproj" />
   <Project Path="Unity.Services.Core.Environments.Editor.csproj" />
   <Project Path="spine-unity-examples.csproj" />
+  <Project Path="Unity.FilmInternalUtilities.Editor.csproj" />
   <Project Path="Cinemachine.csproj" />
   <Project Path="Unity.Recorder.Editor.csproj" />
   <Project Path="Unity.2D.SpriteShape.Editor.csproj" />
@@ -33,8 +34,10 @@
   <Project Path="spine-csharp.csproj" />
   <Project Path="Unity.Services.Core.csproj" />
   <Project Path="Unity.PerformanceTesting.csproj" />
+  <Project Path="Unity.FilmInternalUtilities.csproj" />
   <Project Path="Unity.2D.Tilemap.Extras.Editor.csproj" />
   <Project Path="spine-unity.csproj" />
+  <Project Path="Unity.Toonshader.csproj" />
   <Project Path="UnityEditor.Purchasing.csproj" />
   <Project Path="PsdPlugin.csproj" />
   <Project Path="Unity.2D.IK.Editor.csproj" />
@@ -48,6 +51,7 @@
   <Project Path="Unity.2D.Tooling.Editor.csproj" />
   <Project Path="Unity.InternalAPIEditorBridge.001.csproj" />
   <Project Path="UnityEngine.Purchasing.AppleMacosStub.csproj" />
+  <Project Path="Unity.Toonshader.Editor.csproj" />
   <Project Path="UnityEngine.Purchasing.Codeless.csproj" />
   <Project Path="Unity.2D.PixelPerfect.Editor.csproj" />
   <Project Path="Unity.Recorder.csproj" />

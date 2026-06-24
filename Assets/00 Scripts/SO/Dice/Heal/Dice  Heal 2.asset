@@ -29,7 +29,7 @@ MonoBehaviour:
   useVisualPreset: 1
   visualPresetDatabase: {fileID: 11400000, guid: a5f0de09df959bb47aef66d11740ef0c, type: 2}
   allowManualOverride: 1
-  diceMaterial: {fileID: 2100000, guid: 32b5765d7ebf39143bff10f34d9935d8, type: 2}
+  diceMaterial: {fileID: 2100000, guid: d45a989185590a947a3de218f880e4e8, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 14359cbf863ce244aa4af995140877bc, type: 2}
   - {fileID: 2100000, guid: 9c17275b6541d9148b9f64bb8a61853d, type: 2}
@@ -40,4 +40,3 @@ MonoBehaviour:
   type: 3
   evol: 5
   skillData: {fileID: 11400000, guid: 2215d8b6ce8fc3846b734d8f4fc61c75, type: 2}
-
