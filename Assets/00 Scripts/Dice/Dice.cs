@@ -56,13 +56,18 @@ public class Dice : PoolingObject
 
     [Header("Physics")]
     public float rbMass = 1.2f;
-    public float rbDrag = 0.15f;
-    public float rbAngularDrag = 0.4f;
-    public float rbMaxAngularVelocity = 35f;
+    public float rbDrag = 0.22f;
+    public float rbAngularDrag = 0.7f;
+    public float rbMaxAngularVelocity = 45f;
     public PhysicsMaterial dicePhysicMaterial;
-    public float driftStopVelocity = 0.08f;
-    public float driftStopAngularVelocity = 0.08f;
-    public float driftStopDelay = 0.15f;
+    public float driftStopVelocity = 0.18f;
+    public float driftStopAngularVelocity = 0.22f;
+    public float driftStopDelay = 0.08f;
+    public float headOnImpactAssist = 0.75f;
+    public float headOnImpactDotThreshold = 0.9f;
+    public float shotSpinForwardTorque = 7f;
+    public float shotSpinYawTorque = 2f;
+    public float shotSpinRandomTorque = 1f;
 
 
     [Header("State")]
@@ -72,6 +77,7 @@ public class Dice : PoolingObject
     Material outlineMaterial;
     bool isHovered;
     float slowMoveTimer;
+    float shotStopGraceTimer;
     readonly RigidbodyConstraints groundedConstraints =
         RigidbodyConstraints.FreezePositionY |
         RigidbodyConstraints.FreezeRotationX |
@@ -143,6 +149,7 @@ public class Dice : PoolingObject
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = false;
+        shotStopGraceTimer = 0f;
         ApplyPhysicsSettings();
         ApplyGroundedConstraints();
 
@@ -156,6 +163,7 @@ public class Dice : PoolingObject
     {
         state = DiceState.Shot;
         slowMoveTimer = 0f;
+        shotStopGraceTimer = 0.18f;
 
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -196,8 +204,8 @@ public class Dice : PoolingObject
     {
         if (rb != null)
         {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            // rb.linearVelocity = Vector3.zero;
+            // rb.angularVelocity = Vector3.zero;
             rb.isKinematic = false;
         }
 
@@ -250,6 +258,13 @@ public class Dice : PoolingObject
         if (state == DiceState.Merging ||
             state == DiceState.FlyingCombo)
         {
+            slowMoveTimer = 0f;
+            return;
+        }
+
+        if (shotStopGraceTimer > 0f)
+        {
+            shotStopGraceTimer -= Time.fixedDeltaTime;
             slowMoveTimer = 0f;
             return;
         }
@@ -411,6 +426,7 @@ public class Dice : PoolingObject
 
     void OnCollisionEnter(Collision col)
     {
+        ApplyHeadOnImpactAssist(col);
         TryMergeCollision(col);
     }
 
@@ -419,6 +435,50 @@ public class Dice : PoolingObject
         TryMergeCollision(col);
     }
 
+    void ApplyHeadOnImpactAssist(Collision col)
+    {
+        if (state != DiceState.Shot || rb == null)
+            return;
+
+        Dice other =
+            col.collider.GetComponentInParent<Dice>();
+
+        if (other == null || other == this || other.rb == null)
+            return;
+
+        Vector3 planarVelocity = rb.linearVelocity;
+        planarVelocity.y = 0f;
+
+        if (planarVelocity.sqrMagnitude <= 0.01f)
+            return;
+
+        Vector3 hitDirection =
+            other.transform.position - transform.position;
+        hitDirection.y = 0f;
+
+        if (hitDirection.sqrMagnitude <= 0.0001f)
+            return;
+
+        Vector3 moveDirection = planarVelocity.normalized;
+        Vector3 impactDirection = hitDirection.normalized;
+        float headOnDot = Vector3.Dot(
+            moveDirection,
+            impactDirection
+        );
+
+        if (headOnDot < headOnImpactDotThreshold)
+            return;
+
+        Vector3 assistImpulse =
+            impactDirection *
+            planarVelocity.magnitude *
+            headOnImpactAssist;
+
+        other.rb.AddForce(
+            assistImpulse,
+            ForceMode.Impulse
+        );
+    }
     void TryMergeCollision(Collision col)
     {
         if (state == DiceState.Merging)
@@ -452,6 +512,20 @@ public class Dice : PoolingObject
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

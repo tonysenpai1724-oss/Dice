@@ -33,11 +33,10 @@ MonoBehaviour:
   decalMaterial:
   - {fileID: 2100000, guid: 07432b989592a174abbac7134ea9fd19, type: 2}
   - {fileID: 2100000, guid: f781f403c8fab0642be8bc35749136cc, type: 2}
-  baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  baseOutlineColor: {r: 0.1882353, g: 0.09803922, b: 0.09803922, a: 1}
   targetColor: {r: 1, g: 1, b: 1, a: 1}
   diceColor: {r: 0.96862745, g: 0.36862746, b: 0.78039217, a: 1}
   hitEffectPrefab: {fileID: 4859746839628731135, guid: fa5cadda581724947b2860ab128b921f, type: 3}
   type: 9
   evol: 0
   skillData: {fileID: 11400000, guid: 654e0ce68e12acc4bb502d6f7610569a, type: 2}
-
