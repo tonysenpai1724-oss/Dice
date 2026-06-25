@@ -38,4 +38,4 @@ MonoBehaviour:
   hitEffectPrefab: {fileID: 4859746839628731135, guid: fa5cadda581724947b2860ab128b921f, type: 3}
   type: 5
   evol: 3
-  skillData: {fileID: 11400000, guid: b1a22222222222222222222222222222, type: 2}
+  skillData: {fileID: 11400000, guid: 05626516115cc944488447653650e26c, type: 2}

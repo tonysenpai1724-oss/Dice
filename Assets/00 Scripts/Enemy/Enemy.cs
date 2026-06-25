@@ -1,11 +1,13 @@
 using UnityEngine;
 using System;
-
-
+using DG.Tweening;
 
 public class Enemy : GameUnit
 {
     public event Action<Enemy> DeathCompleted;
+
+    [Header("Death Fade")]
+    public float deathFadeDuration = 0.3f;
 
     public EnemyType type;
     public EnemyLevel enemyLevel;
@@ -16,6 +18,8 @@ public class Enemy : GameUnit
     public int gridRow;
     public int gridColumn;
 
+    Tween deathFadeTween;
+
     [Header("anim")]
     public string moveAnim = "Move";
 
@@ -23,13 +27,14 @@ public class Enemy : GameUnit
     {
         base.Awake();
 
+        ResetVisualAlpha();
+
         if (idleAnim == "Idle")
             idleAnim = "IDLE";
 
         if (dieAnim == "Die")
             dieAnim = "DIE";
     }
-
 
     public virtual void Setup(EnemyData newData)
     {
@@ -40,17 +45,18 @@ public class Enemy : GameUnit
         // attackRange = Mathf.Max(1, data.attackRange);
 
         transform.localScale = data.scale;
+        ResetDeathFade();
 
         if (skeletonGraphic != null)
         {
             skeletonGraphic.skeletonDataAsset = data.skeletonData;
             skeletonGraphic.Initialize(true);
+            ResetVisualAlpha();
             PlayAnimation(idleAnim, true);
-
-
         }
         NotifyHpChanged();
     }
+
     public virtual void SetHp(int hp, int damage)
     {
         this.damage = damage;
@@ -77,7 +83,6 @@ public class Enemy : GameUnit
         else
             gridColumn += amount;
 
-
         //   distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
     }
 
@@ -92,14 +97,58 @@ public class Enemy : GameUnit
 
         if (currentTrack == null)
         {
+            BeginDeathFade();
+            return;
+        }
+
+        currentTrack.Complete += HandleDeathAnimationComplete;
+    }
+
+    protected override void OnDestroy()
+    {
+        deathFadeTween?.Kill();
+        base.OnDestroy();
+    }
+
+    void HandleDeathAnimationComplete(Spine.TrackEntry trackEntry)
+    {
+        if (currentTrack != null)
+            currentTrack.Complete -= HandleDeathAnimationComplete;
+
+        BeginDeathFade();
+    }
+
+    void BeginDeathFade()
+    {
+        if (skeletonGraphic == null)
+        {
             DeathCompleted?.Invoke(this);
             return;
         }
 
-        currentTrack.Complete += _ => DeathCompleted?.Invoke(this);
+        deathFadeTween?.Kill();
+        deathFadeTween = skeletonGraphic
+            .DOFade(0f, deathFadeDuration)
+            .SetEase(Ease.Linear)
+            .OnComplete(() => DeathCompleted?.Invoke(this));
+    }
+
+    void ResetDeathFade()
+    {
+        deathFadeTween?.Kill();
+        ResetVisualAlpha();
+    }
+
+    void ResetVisualAlpha()
+    {
+        if (skeletonGraphic == null)
+            return;
+
+        Color color = skeletonGraphic.color;
+        color.a = 1f;
+        skeletonGraphic.color = color;
     }
 }
-
 
 public enum EnemyType
 {

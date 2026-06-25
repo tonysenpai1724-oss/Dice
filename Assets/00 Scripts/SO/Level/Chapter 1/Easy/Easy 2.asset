@@ -39,6 +39,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
     - {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
     - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
+    - {fileID: 11400000, guid: c1efc31e126da504188d6ab555d306d1, type: 2}
     enemySpawnPlacements:
     - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
       position: {x: 264.19202, y: 0, z: 0}
@@ -58,6 +59,12 @@ MonoBehaviour:
       isBackRow: 0
       gridRow: 2
       gridColumn: 4
+    - data: {fileID: 11400000, guid: c1efc31e126da504188d6ab555d306d1, type: 2}
+      position: {x: 88.064026, y: -119.175, z: 0}
+      useUIPosition: 1
+      isBackRow: 0
+      gridRow: 2
+      gridColumn: 3
     - data: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
       position: {x: 440.32, y: 0, z: 0}
       useUIPosition: 1
@@ -84,6 +91,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
     - {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
     - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
+    - {fileID: 11400000, guid: c1efc31e126da504188d6ab555d306d1, type: 2}
     enemySpawnPlacements:
     - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
       position: {x: 264.19202, y: 0, z: 0}
@@ -103,6 +111,12 @@ MonoBehaviour:
       isBackRow: 0
       gridRow: 2
       gridColumn: 4
+    - data: {fileID: 11400000, guid: c1efc31e126da504188d6ab555d306d1, type: 2}
+      position: {x: 88.064026, y: -119.175, z: 0}
+      useUIPosition: 1
+      isBackRow: 0
+      gridRow: 2
+      gridColumn: 3
     - data: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
       position: {x: 440.32, y: 0, z: 0}
       useUIPosition: 1

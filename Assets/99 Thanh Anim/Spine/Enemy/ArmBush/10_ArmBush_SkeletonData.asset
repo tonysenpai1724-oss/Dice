@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1b3b4b945939a54ea0b23d3396115fb, type: 3}
-  m_Name: 4_goblin_king_SkeletonData
+  m_Name: 10_ArmBush_SkeletonData
   m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonDataAsset
   atlasAssets:
-  - {fileID: 11400000, guid: 80d483f5c51016747b5f88432a121e30, type: 2}
-  scale: 0.006
-  skeletonJSON: {fileID: 4900000, guid: 712b7a09bce7e684badb2a8fb0c04823, type: 3}
+  - {fileID: 11400000, guid: 8cc72614b0c9ade4685c884f28a721e6, type: 2}
+  scale: 0.005
+  skeletonJSON: {fileID: 4900000, guid: 51ac7a8cd3c1e4743b2a0d5a17d62fe2, type: 3}
   isUpgradingBlendModeMaterials: 0
   blendModeMaterials:
     requiresBlendModeMaterials: 0

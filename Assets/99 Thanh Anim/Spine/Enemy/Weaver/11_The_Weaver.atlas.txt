@@ -1,72 +1,71 @@
 11_The_Weaver.png
-	size: 1024, 256
-	filter: Linear, Linear
-	pma: true
+size:1024,256
+filter:Linear,Linear
 0
-	bounds: 547, 151, 34, 18
-	offsets: 1, 1, 36, 20
-	rotate: 90
+bounds:547,151,34,18
+offsets:1,1,36,20
+rotate:90
 1
-	bounds: 568, 196, 56, 124
-	offsets: 1, 1, 58, 126
-	rotate: 90
+bounds:568,196,56,124
+offsets:1,1,58,126
+rotate:90
 11
-	bounds: 417, 61, 53, 52
-	offsets: 1, 1, 55, 54
-	rotate: 90
+bounds:417,61,53,52
+offsets:1,1,55,54
+rotate:90
 2
-	bounds: 808, 189, 63, 86
-	offsets: 2, 1, 67, 89
-	rotate: 90
+bounds:808,189,63,86
+offsets:2,1,67,89
+rotate:90
 22
-	bounds: 2, 53, 243, 199
+bounds:2,53,243,199
 3
-	bounds: 694, 196, 56, 112
-	offsets: 2, 2, 59, 115
-	rotate: 90
+bounds:694,196,56,112
+offsets:2,2,59,115
+rotate:90
 33
-	bounds: 2, 2, 49, 58
-	offsets: 2, 1, 52, 61
-	rotate: 90
+bounds:2,2,49,58
+offsets:2,1,52,61
+rotate:90
 4
-	bounds: 896, 191, 61, 80
-	offsets: 1, 1, 63, 82
-	rotate: 90
+bounds:896,191,61,80
+offsets:1,1,63,82
+rotate:90
 44
-	bounds: 247, 93, 95, 92
-	offsets: 1, 1, 97, 94
+bounds:247,93,95,92
+offsets:1,1,97,94
 5
-	bounds: 344, 116, 69, 106
-	offsets: 2, 1, 73, 108
-	rotate: 90
+bounds:344,116,69,106
+offsets:2,1,73,108
+rotate:90
 55
-	bounds: 452, 125, 60, 93
-	offsets: 1, 1, 63, 95
-	rotate: 90
+bounds:452,125,60,93
+offsets:1,1,63,95
+rotate:90
 6
-	bounds: 247, 23, 77, 68
-	offsets: 1, 2, 79, 71
+bounds:247,23,77,68
+offsets:1,2,79,71
 66
-	bounds: 344, 61, 53, 71
-	offsets: 2, 1, 56, 73
-	rotate: 90
+bounds:344,61,53,71
+offsets:2,1,56,73
+rotate:90
 7
-	bounds: 62, 13, 36, 38
-	offsets: 1, 1, 38, 40
+bounds:62,13,36,38
+offsets:1,1,38,40
 77
-	bounds: 247, 187, 319, 65
-	offsets: 5, 1, 329, 73
+bounds:247,187,319,65
+offsets:5,1,329,73
 8
-	bounds: 100, 13, 36, 38
-	offsets: 1, 1, 38, 40
+bounds:100,13,36,38
+offsets:1,1,38,40
 9
-	bounds: 978, 194, 58, 21
-	offsets: 1, 1, 60, 23
-	rotate: 90
+bounds:978,194,58,21
+offsets:1,1,60,23
+rotate:90
 phai
-	bounds: 138, 16, 28, 35
-	offsets: 1, 1, 30, 38
+bounds:138,16,28,35
+offsets:1,1,30,38
 trai
-	bounds: 168, 28, 23, 38
-	offsets: 1, 1, 26, 40
-	rotate: 90
+bounds:168,28,23,38
+offsets:1,1,26,40
+rotate:90

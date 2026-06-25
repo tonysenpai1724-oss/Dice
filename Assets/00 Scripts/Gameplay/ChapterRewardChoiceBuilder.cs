@@ -24,17 +24,46 @@ public class ChapterRewardChoiceBuilder
         }
         return options;
     }
+    public List<ChapterRewardChoiceOption> BuildChestChoices(int maxOptions = 3, int maxAttempts = 30)
+    {
+        List<ChapterRewardChoiceOption> options = new List<ChapterRewardChoiceOption>();
+        while (options.Count < maxOptions && maxAttempts-- > 0)
+        {
+            ChapterRewardChoiceOption option = GenerateRandomChestReward();
+            if (option == null)
+                continue;
+            if (!ContainsSameRewardOption(options, option))
+                options.Add(option);
+        }
+        return options;
+    }
     ChapterRewardChoiceOption GenerateRandomReward()
     {
         int rand = Random.Range(0, 3);
         switch (rand)
         {
             case 0:
+                //    return GenerateRuneReward();
+                return GenerateUpgradeReward();
+            case 1:
+                //    return GenerateRuneReward();
+                return GenerateAddDiceReward();
+            case 2:
                 return GenerateRuneReward();
-            // return GenerateUpgradeReward();
+        }
+        return null;
+    }
+    ChapterRewardChoiceOption GenerateRandomChestReward()
+    {
+        int rand = Random.Range(0, 3);
+        switch (rand)
+        {
+            case 0:
+                return GenerateRuneReward();
+            //return GenerateUpgradeReward();
             case 1:
                 return GenerateRuneReward();
-            // return GenerateAddDiceReward();
+            //return GenerateAddDiceReward();
             case 2:
                 return GenerateRuneReward();
         }

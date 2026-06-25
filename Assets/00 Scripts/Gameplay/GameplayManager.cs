@@ -237,15 +237,18 @@ public class GameplayManager : MonoBehaviour
         TigerForge.EventManager.EmitEvent(Constant.ON_GAME_STATE_CHANGE);
     }
 
-    public List<ChapterRewardChoiceOption> BuildChapterRewardChoices()
+    public List<ChapterRewardChoiceOption> BuildChapterRewardChoices(LevelType levelType)
     {
         ChapterRewardChoiceBuilder builder = new ChapterRewardChoiceBuilder(
             DiceManager.Instance != null ? DiceManager.Instance.diceDatabase : null,
             ChapterDiceSession.GetOrCreate(),
             RuneManager.Instance.RuneSkillDatas
         );
+        if (levelType == LevelType.Chest || levelType == LevelType.ChestReward)
+            return builder.BuildChestChoices();
 
-        return builder.BuildChoices();
+        else
+            return builder.BuildChoices();
     }
 
     public void ApplyChapterRewardChoice(ChapterRewardChoiceOption option)
@@ -300,7 +303,7 @@ public class GameplayManager : MonoBehaviour
             PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, 1));
 
             PackReward.ReceiveResource(EResourceFrom.ReviveIngame);
-            List<ChapterRewardChoiceOption> rewardChoices = BuildChapterRewardChoices();
+            List<ChapterRewardChoiceOption> rewardChoices = BuildChapterRewardChoices(ChapterManager.Instance.GetCurrentLevel().leveltype);
             if (rewardChoices != null && rewardChoices.Count > 0)
                 UIManager.Instance.ShowPopupChoice(rewardChoices);
             else

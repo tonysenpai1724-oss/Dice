@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c52947749b5fc2845a84118fd20cc9e7, type: 3}
+  m_Name: ArmBush
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  hp: 100
+  enemyName: ArmBush
+  damage: 1
+  scale: {x: 1, y: 1, z: 1}
+  type: 1
+  enemyLevel: 0
+  skeletonData: {fileID: 11400000, guid: 7c57c30b8e7c06e4cb5f995b49617f82, type: 2}
+  level: 1
+  coinReward: 0
