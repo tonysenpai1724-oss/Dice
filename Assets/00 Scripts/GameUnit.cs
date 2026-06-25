@@ -9,6 +9,7 @@ public abstract class GameUnit : MonoBehaviour
     public int currentHp;
     public HPBar hpBar;
     public SkeletonGraphic skeletonGraphic;
+    public SkeletonAnimation skeletonAnimation;
     public EffectManager effectManager;
 
     [Header("anim")]
@@ -34,6 +35,12 @@ public abstract class GameUnit : MonoBehaviour
         effectManager = GetComponent<EffectManager>();
         if (effectManager == null)
             effectManager = gameObject.AddComponent<EffectManager>();
+
+        if (skeletonGraphic == null)
+            skeletonGraphic = GetComponentInChildren<SkeletonGraphic>();
+
+        if (skeletonAnimation == null)
+            skeletonAnimation = GetComponentInChildren<SkeletonAnimation>();
 
         OnHpChanged += UpdateHpBar;
     }
@@ -101,21 +108,29 @@ public abstract class GameUnit : MonoBehaviour
 
     public virtual TrackEntry PlayAnimation(string animName, bool loop = false)
     {
-        if (skeletonGraphic == null)
-            return null;
+        if (skeletonGraphic != null && skeletonGraphic.AnimationState != null)
+        {
+            animName = AnimationNameUtility.ResolveAnimationName(
+                skeletonGraphic.Skeleton?.Data?.Animations,
+                animName
+            );
 
-        animName = AnimationNameUtility.ResolveAnimationName(
-            skeletonGraphic.Skeleton?.Data?.Animations,
-            animName
-        );
+            currentTrack = skeletonGraphic.AnimationState.SetAnimation(0, animName, loop);
+            return currentTrack;
+        }
 
-        currentTrack = skeletonGraphic.AnimationState.SetAnimation(
-            0,
-            animName,
-            loop
-        );
+        if (skeletonAnimation != null && skeletonAnimation.AnimationState != null)
+        {
+            animName = AnimationNameUtility.ResolveAnimationName(
+                skeletonAnimation.Skeleton?.Data?.Animations,
+                animName
+            );
 
-        return currentTrack;
+            currentTrack = skeletonAnimation.AnimationState.SetAnimation(0, animName, loop);
+            return currentTrack;
+        }
+
+        return null;
     }
 
     public virtual void OnDie()
@@ -166,18 +181,49 @@ public abstract class GameUnit : MonoBehaviour
 
     protected void QueueIdleAnimation()
     {
-        if (skeletonGraphic == null)
+        if (skeletonGraphic != null && skeletonGraphic.AnimationState != null)
+        {
+            skeletonGraphic.AnimationState.AddAnimation(
+                0,
+                AnimationNameUtility.ResolveAnimationName(
+                    skeletonGraphic.Skeleton?.Data?.Animations,
+                    idleAnim
+                ),
+                true,
+                0
+            );
             return;
+        }
 
-        skeletonGraphic.AnimationState.AddAnimation(
-            0,
-            AnimationNameUtility.ResolveAnimationName(
-                skeletonGraphic.Skeleton?.Data?.Animations,
-                idleAnim
-            ),
-            true,
-            0
-        );
+        if (skeletonAnimation != null && skeletonAnimation.AnimationState != null)
+        {
+            skeletonAnimation.AnimationState.AddAnimation(
+                0,
+                AnimationNameUtility.ResolveAnimationName(
+                    skeletonAnimation.Skeleton?.Data?.Animations,
+                    idleAnim
+                ),
+                true,
+                0
+            );
+        }
+    }
+
+    protected virtual void SetVisualAlpha(float alpha)
+    {
+        if (skeletonGraphic != null)
+        {
+            Color color = skeletonGraphic.color;
+            color.a = alpha;
+            skeletonGraphic.color = color;
+        }
+
+        if (skeletonAnimation != null && skeletonAnimation.Skeleton != null)
+        {
+            Color color = skeletonAnimation.Skeleton.GetColor();
+            color.a = alpha;
+            skeletonAnimation.Skeleton.SetColor(color);
+        }
     }
 
     void UpdateHpBar(GameUnit unit, int current, int max)

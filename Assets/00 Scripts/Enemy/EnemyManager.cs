@@ -16,7 +16,7 @@ public class EnemyManager : Singleton<EnemyManager>
     public PlayerController player;
     public EnemyLevelPositionGenerator spawnPositionGenerator;
     public EnemySpawnArea spawnArea;
-    public RectTransform combatSpaceRoot;
+    public Transform combatSpaceRoot;
     public RectTransform attackPoint;
 
     [Header("Layout")]
@@ -119,7 +119,8 @@ public class EnemyManager : Singleton<EnemyManager>
                 SetEnemyPosition(
                     enemy,
                     placement.position,
-                    placement.useUIPosition
+                    placement.useUIPosition,
+                    placement.useWorldPosition
                 );
 
                 if (placement.gridColumn <= playerColumn)
@@ -794,7 +795,7 @@ public class EnemyManager : Singleton<EnemyManager>
         if (rectTransform == null)
             return true;
 
-        float attackX = GetGridLocalPosition(enemy.gridRow, meleeAttackColumn).x;
+        float attackX = GetGridLocalPosition(enemy, enemy.gridRow, meleeAttackColumn).x;
         return Mathf.Abs(rectTransform.localPosition.x - attackX) <= 1f;
     }
 
@@ -832,7 +833,7 @@ public class EnemyManager : Singleton<EnemyManager>
                 continue;
             }
 
-            Vector3 targetPosition = GetGridLocalPosition(enemy.gridRow, nextColumn);
+            Vector3 targetPosition = GetGridLocalPosition(enemy, enemy.gridRow, nextColumn);
             float fixedY = rectTransform.localPosition.y;
 
             if (Mathf.Abs(targetPosition.x - rectTransform.localPosition.x) <= 0.1f)
@@ -950,7 +951,7 @@ public class EnemyManager : Singleton<EnemyManager>
         {
             for (int column = playerColumn + 1; column < Mathf.Max(2, gridColumns); column++)
             {
-                Vector3 gridPosition = GetGridLocalPosition(row, column);
+                Vector3 gridPosition = GetGridLocalPosition(enemy, row, column);
                 float distance = Vector2.SqrMagnitude(
                     new Vector2(rectTransform.localPosition.x, rectTransform.localPosition.y) - new Vector2(gridPosition.x, gridPosition.y)
                 );
@@ -976,14 +977,22 @@ public class EnemyManager : Singleton<EnemyManager>
         if (rectTransform == null)
             return;
 
-        Vector3 gridPosition = GetGridLocalPosition(enemy.gridRow, enemy.gridColumn);
+        Vector3 gridPosition = GetGridLocalPosition(enemy, enemy.gridRow, enemy.gridColumn);
         rectTransform.localPosition = new Vector3(gridPosition.x, gridPosition.y, rectTransform.localPosition.z);
     }
 
     Vector3 GetGridLocalPosition(int row, int column)
     {
-        if (spawnArea != null && spawnArea.uiArea != null)
-            return SpawnAreaPointToEnemyParentLocal(GetGridAreaLocalPosition(row, column));
+        return GetGridLocalPosition(null, row, column);
+    }
+
+    Vector3 GetGridLocalPosition(Enemy enemy, int row, int column)
+    {
+        if (spawnArea != null && spawnArea.HasValidArea)
+            return SpawnAreaPointToEnemyParentLocal(
+                GetGridAreaLocalPosition(row, column),
+                GetEnemyGridParent(enemy)
+            );
 
         return new Vector3(column * enemySpacing, row * -enemySpacing, 0f);
     }
@@ -998,19 +1007,38 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnArea.GetPoint(x01, y01);
     }
 
-    Vector3 SpawnAreaPointToEnemyParentLocal(Vector3 spawnAreaLocalPosition)
+    Transform GetEnemyGridParent(Enemy enemy)
     {
-        Transform targetParent = combatSpaceRoot != null
+        if (enemy != null && enemy.transform != null)
+            return enemy.transform.parent;
+
+        return combatSpaceRoot != null
             ? combatSpaceRoot
             : (enemyRoot != null ? enemyRoot : transform);
+    }
 
-        if (spawnArea == null || spawnArea.uiArea == null || targetParent == null)
+    Vector3 SpawnAreaPointToEnemyParentLocal(Vector3 spawnAreaLocalPosition, Transform targetParent = null)
+    {
+        if (targetParent == null)
+        {
+            targetParent = combatSpaceRoot != null
+                ? combatSpaceRoot
+                : (enemyRoot != null ? enemyRoot : transform);
+        }
+
+        if (spawnArea == null || targetParent == null)
             return spawnAreaLocalPosition;
 
-        if (spawnArea.uiArea == targetParent)
-            return spawnAreaLocalPosition;
+        if (spawnArea.spawnSpace == EnemySpawnSpace.UI)
+        {
+            if (spawnArea.uiArea == null || spawnArea.uiArea == targetParent)
+                return spawnAreaLocalPosition;
 
-        Vector3 worldPoint = spawnArea.uiArea.TransformPoint(spawnAreaLocalPosition);
+            Vector3 uiWorldPoint = spawnArea.uiArea.TransformPoint(spawnAreaLocalPosition);
+            return targetParent.InverseTransformPoint(uiWorldPoint);
+        }
+
+        Vector3 worldPoint = spawnAreaLocalPosition;
         return targetParent.InverseTransformPoint(worldPoint);
     }
 
@@ -1041,9 +1069,17 @@ public class EnemyManager : Singleton<EnemyManager>
         return row;
     }
 
-    void SetEnemyPosition(Enemy enemy, Vector3 position, bool useUIPosition)
+    void SetEnemyPosition(Enemy enemy, Vector3 position, bool useUIPosition, bool useWorldPosition = false)
     {
         RectTransform rectTransform = enemy.transform as RectTransform;
+        if (useWorldPosition)
+        {
+            Transform parent = enemyRoot != null ? enemyRoot : transform;
+            enemy.transform.SetParent(parent, true);
+            enemy.transform.position = position;
+            return;
+        }
+
         if (useUIPosition && rectTransform != null)
         {
             rectTransform.SetParent(
@@ -1053,7 +1089,7 @@ public class EnemyManager : Singleton<EnemyManager>
                 false
             );
 
-            Vector3 localPosition = SpawnAreaPointToEnemyParentLocal(position);
+            Vector3 localPosition = SpawnAreaPointToEnemyParentLocal(position, rectTransform.parent);
 
             rectTransform.localPosition =
                 new Vector3(localPosition.x, localPosition.y, 0f);
@@ -1118,7 +1154,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     void DrawCombatGridGizmos()
     {
-        if (spawnArea == null || spawnArea.uiArea == null)
+        if (spawnArea == null || !spawnArea.HasValidArea)
             return;
 
         int rows = Mathf.Max(1, gridRows);
@@ -1162,13 +1198,6 @@ public class EnemyManager : Singleton<EnemyManager>
     Vector3 GetGridWorldPosition(int row, int column)
     {
         Vector3 areaPoint = GetGridAreaLocalPosition(row, column);
-        return spawnArea.uiArea.TransformPoint(areaPoint);
+        return spawnArea.spawnSpace == EnemySpawnSpace.World ? areaPoint : spawnArea.uiArea.TransformPoint(areaPoint);
     }
 }
-
-
-
-
-
-
-

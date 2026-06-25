@@ -18,6 +18,7 @@ public class DiceThrowController : MonoBehaviour
     public float shootForce = 12f;
     [Range(0f, 89f)]
     public float minLaunchAngle = 15f;
+    public float maxClickShootHoldTime = 0.2f;
 
     [Header("Board Stable")]
     public float stableTimeRequired = 0.35f;
@@ -32,6 +33,7 @@ public class DiceThrowController : MonoBehaviour
 
     bool dragging;
     bool waitingForBoard;
+    float mouseDownTime;
 
     [Header("Highlight")]
     public Transform diceHighlight;
@@ -78,9 +80,7 @@ public class DiceThrowController : MonoBehaviour
 
         RotateCurrentDiceToMouse();
 
-        if (
-            Mouse.current.leftButton.wasPressedThisFrame
-        )
+        if (WasPointerPressedThisFrame())
         {
             if (!IsPointerOverBoardMesh())
             {
@@ -89,16 +89,17 @@ public class DiceThrowController : MonoBehaviour
             }
 
             dragging = true;
+            mouseDownTime = Time.time;
         }
 
-        if (
-            Mouse.current.leftButton.wasReleasedThisFrame &&
-            dragging
-        )
+        if (WasPointerReleasedThisFrame() && dragging)
         {
             dragging = false;
 
             if (!IsPointerOverBoardMesh())
+                return;
+
+            if (Time.time - mouseDownTime > maxClickShootHoldTime)
                 return;
 
             Shoot();
@@ -267,6 +268,54 @@ public class DiceThrowController : MonoBehaviour
         return GameplayManager.Instance != null &&
             GameplayManager.Instance.IsGameEnded;
     }
+
+    bool IsAndroid()
+    {
+        return Application.platform == RuntimePlatform.Android;
+    }
+
+    bool WasPointerPressedThisFrame()
+    {
+        if (IsAndroid())
+            return Touchscreen.current != null &&
+                Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
+
+        return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+    }
+
+    bool WasPointerReleasedThisFrame()
+    {
+        if (IsAndroid())
+            return Touchscreen.current != null &&
+                Touchscreen.current.primaryTouch.press.wasReleasedThisFrame;
+
+        return Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame;
+    }
+
+    bool TryGetPointerScreenPosition(out Vector2 screenPosition)
+    {
+        if (IsAndroid())
+        {
+            if (Touchscreen.current == null)
+            {
+                screenPosition = Vector2.zero;
+                return false;
+            }
+
+            screenPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+            return true;
+        }
+
+        if (Mouse.current == null)
+        {
+            screenPosition = Vector2.zero;
+            return false;
+        }
+
+        screenPosition = Mouse.current.position.ReadValue();
+        return true;
+    }
+
     public void Clear()
     {
         if (currentDice != null)
@@ -276,14 +325,14 @@ public class DiceThrowController : MonoBehaviour
     }
     bool IsPointerOverBoardMesh()
     {
-        if (Camera.main == null || Mouse.current == null)
+        if (Camera.main == null || !TryGetPointerScreenPosition(out Vector2 screenPosition))
             return false;
 
         if (DiceManager.Instance == null || DiceManager.Instance.boardCollider == null)
             return false;
 
         Collider boardCollider = DiceManager.Instance.boardCollider;
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit[] hits = Physics.RaycastAll(
             ray,
             Mathf.Infinity,
@@ -315,19 +364,19 @@ public class DiceThrowController : MonoBehaviour
         hand.Prepare();
     }
 
-    Vector3 GetMouseWorldPosition()
+    Vector3 GetPointerWorldPosition()
     {
+        if (!TryGetPointerScreenPosition(out Vector2 screenPosition))
+            return Vector3.zero;
+
         float boardY =
             DiceManager.Instance != null
                 ? DiceManager.Instance.GetBoardService().GetBoardSurfaceY()
                 : 0f;
 
-        Vector2 mousePos =
-            Mouse.current.position.ReadValue();
-
         Ray ray =
             Camera.main.ScreenPointToRay(
-                mousePos
+                screenPosition
             );
 
         Plane plane =
@@ -354,7 +403,7 @@ public class DiceThrowController : MonoBehaviour
         if (currentDice == null)
             return Vector3.forward;
 
-        Vector3 target = GetMouseWorldPosition();
+        Vector3 target = GetPointerWorldPosition();
 
         Vector3 flatDir = target - currentDice.transform.position;
         flatDir.y = 0f;
@@ -384,7 +433,7 @@ public class DiceThrowController : MonoBehaviour
             return Vector3.forward;
 
         Vector3 target =
-            GetMouseWorldPosition();
+            GetPointerWorldPosition();
 
         Vector3 flatDir =
             target - currentDice.transform.position;

@@ -2281,7 +2281,7 @@ RectTransform:
   m_GameObject: {fileID: 470231341}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 196783843}
@@ -2374,6 +2374,7 @@ MonoBehaviour:
   currentHp: 50
   hpBar: {fileID: 300497465}
   skeletonGraphic: {fileID: 470231343}
+  skeletonAnimation: {fileID: 0}
   effectManager: {fileID: 0}
   idleAnim: Idle
   attackAnim: Attack
@@ -11309,6 +11310,7 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: 00b2ebed55956b4448f8e4d28f527e57, type: 2}
     position: {x: 264.19202, y: 119.175, z: 0}
     useUIPosition: 1
+    useWorldPosition: 0
     isBackRow: 0
     gridRow: 2
     gridColumn: 1
@@ -12197,10 +12199,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcf0d7f131f46ca4a86685920227e234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnArea
+  spawnSpace: 0
   uiArea: {fileID: 2021714175}
+  worldAreaCenter: {fileID: 0}
+  worldAreaSize: {x: 6, y: 3}
   frontRowPercent: 0.25
   backRowPercent: 0.75
   padding: {x: 40, y: 40}
+  worldPadding: {x: 0.25, y: 0.25}
 --- !u!224 &2021714175
 RectTransform:
   m_ObjectHideFlags: 0
