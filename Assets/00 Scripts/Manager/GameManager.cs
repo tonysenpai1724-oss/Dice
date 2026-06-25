@@ -177,8 +177,26 @@ public class GameManager : Singleton<GameManager>
         SetState(EGameState.Loading);
         StartCoroutine(SceneHelper.Instance.IEReturnHome());
     }
+
+    public void ReplayGame()
+    {
+        // if (GameState == EGameState.Loading)
+        //     return;
+
+        PlayerStats.Shared.ClearTemporaryStats();
+        SetState(EGameState.Loading);
+        StartCoroutine(IEReplayGame());
+    }
+
+    IEnumerator IEReplayGame()
+    {
+        yield return null;
+        yield return StartCoroutine(SceneHelper.Instance.IEGoGameplay());
+    }
+
     void GoSceneGameplay()
     {
+        PlayerStats.Shared.ClearTemporaryStats();
         SetState(EGameState.Loading);
         StartCoroutine(SceneHelper.Instance.IEGoGameplay());
     }

@@ -206,6 +206,7 @@ public class PlayerStats
         new Dictionary<HeroStatType, CompositeStats>();
 
     bool isInitialized;
+    int temporaryStatApplyIndex;
 
     public void InitStats()
     {
@@ -345,11 +346,23 @@ public class PlayerStats
     public void ClearTemporaryStats()
     {
         ClearStats(TemporaryKey);
+        temporaryStatApplyIndex = 0;
     }
 
     public void ApplyTemporaryStat(HeroStatType statType, float value, string keyLocal, bool isFlatValue)
     {
         ApplyStats(statType, value, TemporaryKey, keyLocal, isFlatValue);
+    }
+
+    public void AddTemporaryStat(HeroStatType statType, float value, string keyLocal, bool isFlatValue)
+    {
+        temporaryStatApplyIndex++;
+        ApplyTemporaryStat(
+            statType,
+            value,
+            keyLocal + "_" + temporaryStatApplyIndex,
+            isFlatValue
+        );
     }
 
     public HeroStatSnapshot ToHeroStatSnapshot(HeroData heroData = null)

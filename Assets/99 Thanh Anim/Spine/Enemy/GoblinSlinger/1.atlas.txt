@@ -1,0 +1,86 @@
+1.png
+	size: 2048, 256
+	filter: Linear, Linear
+	pma: true
+1
+	bounds: 686, 26, 111, 148
+	offsets: 1, 1, 113, 150
+10
+	bounds: 533, 43, 131, 151
+	rotate: 90
+11
+	bounds: 297, 28, 234, 224
+12
+	bounds: 2, 34, 293, 218
+13
+	bounds: 1544, 210, 119, 42
+	offsets: 1, 1, 121, 44
+14
+	bounds: 2, 2, 120, 30
+	offsets: 1, 1, 122, 32
+15
+	bounds: 1924, 153, 52, 48
+	offsets: 2, 1, 55, 50
+16
+	bounds: 1901, 204, 48, 56
+	offsets: 1, 1, 50, 58
+	rotate: 90
+17
+	bounds: 1745, 147, 61, 59
+	offsets: 1, 1, 63, 61
+	rotate: 90
+18
+	bounds: 1312, 156, 96, 115
+	rotate: 90
+19
+	bounds: 1192, 182, 118, 70
+2
+	bounds: 840, 212, 211, 40
+20
+	bounds: 1867, 155, 47, 55
+	offsets: 1, 1, 49, 57
+	rotate: 90
+21
+	bounds: 1959, 203, 56, 49
+	offsets: 1, 1, 58, 51
+22
+	bounds: 1806, 152, 59, 61
+	offsets: 1, 1, 61, 63
+23
+	bounds: 1805, 215, 46, 37
+	offsets: 1, 1, 48, 39
+24
+	bounds: 1665, 210, 42, 68
+	rotate: 90
+25
+	bounds: 1853, 215, 46, 37
+	offsets: 1, 1, 48, 39
+26
+	bounds: 1735, 210, 42, 68
+	rotate: 90
+27
+	bounds: 533, 219, 305, 33
+	offsets: 4, 1, 313, 38
+3
+	bounds: 1616, 143, 66, 65
+4
+	bounds: 533, 176, 271, 41
+6
+	bounds: 806, 197, 20, 20
+	offsets: 1, 1, 23, 22
+7
+	bounds: 1429, 145, 107, 113
+	offsets: 1, 4, 109, 118
+	rotate: 90
+7_die
+	bounds: 1544, 143, 65, 70
+	rotate: 90
+7_hust
+	bounds: 1684, 146, 59, 62
+8
+	bounds: 1053, 180, 137, 72
+	offsets: 1, 1, 139, 74
+Layer 674 copy
+	bounds: 2017, 213, 39, 29
+	offsets: 1, 0, 40, 30
+	rotate: 90

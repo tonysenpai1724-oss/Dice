@@ -88,6 +88,11 @@ public class UIManager : Singleton<UIManager>
     }
     public void Close(UIBase uI)
     {
+        lstOpenningUI.RemoveAll(ui => ui == null);
+
+        if (uI == null)
+            return;
+
         DebugCustom.LogColor("Close popup", uI.name);
         if (lstOpenningUI.Contains(uI))
         {
@@ -161,7 +166,14 @@ public class UIManager : Singleton<UIManager>
     public virtual UIBase GetUI(string name)
     {
         if (dicUsedUI.ContainsKey(name))
-            return dicUsedUI[name];
+        {
+            UIBase cachedUI = dicUsedUI[name];
+            if (cachedUI != null)
+                return cachedUI;
+
+            dicUsedUI.Remove(name);
+        }
+
         UIBase _uiBase = null;
 
         _uiBase = Instantiate(GetUIByPath(name), uISafeZone.transform);
@@ -402,6 +414,11 @@ public class UIManager : Singleton<UIManager>
     public void ShowPopupSetting()
     {
         UIBase ui = GetUI("Popup Setting");
+        ui.Show();
+    }
+    public void ShowPopupGameplaySetting()
+    {
+        UIBase ui = GetUI("Popup Gameplay Setting");
         ui.Show();
     }
     public void ShowPopupIAPHistory()

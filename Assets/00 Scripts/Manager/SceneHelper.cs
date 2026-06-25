@@ -52,6 +52,7 @@ public class SceneHelper : Singleton<SceneHelper>
     }
     public IEnumerator IEGoGameplay()
     {
+
         yield return StartCoroutine(LoadingPanel.Instance.IEStartTransiton());
         yield return StartCoroutine(IEChangeSceneLoading());
         yield return StartCoroutine(IEChangeSceneGameplay());

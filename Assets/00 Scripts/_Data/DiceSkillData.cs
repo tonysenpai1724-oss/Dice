@@ -240,6 +240,14 @@ public static class BonusAtkDiceSkillData
         int bonusDamage = Mathf.RoundToInt(currentDamage * (bonusPercent / 100f));
         if (bonusDamage <= 0)
             return;
+
+        PlayerStats.Shared.AddTemporaryStat(
+            HeroStatType.Damage,
+            bonusDamage,
+            "BonusAtk",
+            true
+        );
+
         gameplay.AddDamage(bonusDamage);
     }
 }
@@ -334,6 +342,13 @@ public static class DiceEvoSkillRuntime
         int doubledBonusDamage = baseBonusDamage * 2;
         if (doubledBonusDamage <= 0)
             return false;
+
+        PlayerStats.Shared.AddTemporaryStat(
+            HeroStatType.Damage,
+            doubledBonusDamage,
+            "X2BonusAtk",
+            true
+        );
 
         gameplay.AddDamage(doubledBonusDamage);
         return true;

@@ -187,8 +187,10 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         for (int i = 0; i < enemiesToPlace.Count; i++)
         {
             EnemyData data = enemiesToPlace[i];
-            int row = i % rows;
-            int column = Mathf.Max(minEnemyColumn, startColumn - (i / rows));
+            int row = IsBossEnemy(data) ? GetBossSpawnRow(rows) : i % rows;
+            int column = IsBossEnemy(data)
+                ? GetBossSpawnColumn(columns, minEnemyColumn)
+                : Mathf.Max(minEnemyColumn, startColumn - (i / rows));
             placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(row, column), isBackRow, row, column));
         }
     }
@@ -212,6 +214,17 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         for (int i = 0; i < validDatas.Count; i++)
         {
             EnemyData data = validDatas[i];
+            if (IsBossEnemy(data))
+            {
+                int rows = Mathf.Max(1, gridRows);
+                int columns = Mathf.Max(2, gridColumns);
+                int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
+                int row = GetBossSpawnRow(rows);
+                int column = GetBossSpawnColumn(columns, minEnemyColumn);
+                placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(row, column), false, row, column));
+                continue;
+            }
+
             bool isMelee = data != null && data.type != EnemyType.Range;
             placements.Add(CreatePlacement(data, GetBottomRowFallback(i, validDatas.Count, isMelee), false));
         }
@@ -253,6 +266,21 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         return spawnArea.GetPoint(x01, Mathf.Clamp01(bottomRowPercent));
     }
 
+    bool IsBossEnemy(EnemyData data)
+    {
+        return data != null && data.enemyLevel == EnemyLevel.Boss;
+    }
+
+    int GetBossSpawnRow(int rows)
+    {
+        return Mathf.Clamp(rows / 2, 0, Mathf.Max(0, rows - 1));
+    }
+
+    int GetBossSpawnColumn(int columns, int minEnemyColumn)
+    {
+        return Mathf.Clamp(columns / 2, minEnemyColumn, Mathf.Max(minEnemyColumn, columns - 1));
+    }
+
     List<EnemySpawnPlacement> BuildFallbackPlacements(List<EnemyData> enemyDatas)
     {
         List<EnemySpawnPlacement> placements = new();
@@ -262,7 +290,11 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             if (data == null)
                 continue;
 
-            placements.Add(CreatePlacement(data, new Vector3(Random.Range(-fallbackSpacing, fallbackSpacing), 0f, 0f), false));
+            Vector3 position = IsBossEnemy(data)
+                ? Vector3.zero
+                : new Vector3(Random.Range(-fallbackSpacing, fallbackSpacing), 0f, 0f);
+
+            placements.Add(CreatePlacement(data, position, false));
         }
 
         return placements;
@@ -287,6 +319,12 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             EnemyData data = enemyDatas[i];
             if (data == null)
                 continue;
+
+            if (IsBossEnemy(data))
+            {
+                placements.Add(CreatePlacement(data, Vector3.zero, false));
+                continue;
+            }
 
             float x01 = validCount <= 1 ? 0.5f : (float)index / (validCount - 1);
             index++;

@@ -69,8 +69,11 @@ public class DiceThrowController : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale < 1)
+            return;
         if (IsGameEnded())
             return;
+
 
         if (currentDice == null)
             return;

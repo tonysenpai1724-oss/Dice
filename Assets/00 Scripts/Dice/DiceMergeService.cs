@@ -113,7 +113,7 @@ public class DiceMergeService
         {
             Vector3 fxPos = merged.transform.position;
             if (merged.cachedCollider != null)
-                fxPos.y = 11.5f;
+                fxPos.y = 1.5f;
 
             GameObject fx = UnityEngine.Object.Instantiate(merged.data.hitEffectPrefab, fxPos, Quaternion.identity);
             UnityEngine.Object.Destroy(fx, 1f);
