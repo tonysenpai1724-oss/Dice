@@ -29,7 +29,7 @@ MonoBehaviour:
   useVisualPreset: 1
   visualPresetDatabase: {fileID: 11400000, guid: a5f0de09df959bb47aef66d11740ef0c, type: 2}
   allowManualOverride: 1
-  diceMaterial: {fileID: 2100000, guid: 6b8b8b455889f2c46a84b14e2effacaa, type: 2}
+  diceMaterial: {fileID: 2100000, guid: 676d4ee3c2e3a6540b18268e7b2d3935, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 14359cbf863ce244aa4af995140877bc, type: 2}
   - {fileID: 2100000, guid: 6b8b8b455889f2c46a84b14e2effacaa, type: 2}
