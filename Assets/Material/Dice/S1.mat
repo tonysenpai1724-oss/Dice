@@ -51,12 +51,12 @@ Material:
     - _Min: 0.7
     - _QueueControl: 0
     - _QueueOffset: -50
-    - _RimLightPower: 3
+    - _RimLightPower: 3.06
     - _Shades: 0.66
     m_Colors:
     - _Color: {r: 0.990566, g: 0.990566, b: 0.990566, a: 1}
     - _RimLightColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+    - _Tint: {r: 1, g: 0.9858491, b: 0.9858491, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &2557533516263085253

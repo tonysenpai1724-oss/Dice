@@ -21,7 +21,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  diceName: Attack Bonus Dice 9
+  diceName: Backstab
   level: 9
   damage: 9
   attackCount: 1
@@ -32,10 +32,11 @@ MonoBehaviour:
   diceMaterial: {fileID: 2100000, guid: 676d4ee3c2e3a6540b18268e7b2d3935, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 6b8b8b455889f2c46a84b14e2effacaa, type: 2}
+  - {fileID: 2100000, guid: 8ccc7c16be16a444e94139e57864c461, type: 2}
   baseOutlineColor: {r: 0.1882353, g: 0.09803922, b: 0.09803922, a: 1}
   targetColor: {r: 1, g: 1, b: 1, a: 1}
   diceColor: {r: 1, g: 1, b: 1, a: 1}
   hitEffectPrefab: {fileID: 4859746839628731135, guid: fa5cadda581724947b2860ab128b921f, type: 3}
   type: 5
-  evol: 3
+  evol: 0
   skillData: {fileID: 11400000, guid: 05626516115cc944488447653650e26c, type: 2}

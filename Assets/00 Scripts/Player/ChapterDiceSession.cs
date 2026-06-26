@@ -279,6 +279,7 @@ public class ChapterDiceSession : MonoBehaviour
         runtimeDiceDatas.Add(diceData);
         initializedFromHero = true;
         DebugLogRuntimeDice($"AddDiceData before save added={diceData.diceName}");
+        TigerForge.EventManager.EmitEvent(Constant.ON_EQUIMENT_DICE_CHANGED);
         SaveSession();
     }
 

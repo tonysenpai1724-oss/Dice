@@ -252,7 +252,7 @@ public class DiceQueue : Singleton<DiceQueue>
                 );
 
             t.localScale =
-                Vector3.one * 100f;
+                Vector3.one;
 
             items.Add(item);
 
