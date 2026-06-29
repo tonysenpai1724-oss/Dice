@@ -185,7 +185,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopDiceRunePanel
   allowBackKey: 0
   animatorUI: {fileID: 0}
-  buttonClose: {fileID: 0}
+  buttonClose: {fileID: 2261485435984768840}
   blockPanel: {fileID: 0}
   hackObj: {fileID: 0}
   diceItemPrefab: {fileID: 7637484231340690622, guid: 0a503fadbafc61746b41202068a95124, type: 3}
@@ -822,7 +822,7 @@ GameObject:
   - component: {fileID: 980243923937858066}
   - component: {fileID: 2261485435984768840}
   m_Layer: 5
-  m_Name: Button
+  m_Name: CloseBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -928,19 +928,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 980243923937858066}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1595128702202723591}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8103070294075159315
 GameObject:
   m_ObjectHideFlags: 0

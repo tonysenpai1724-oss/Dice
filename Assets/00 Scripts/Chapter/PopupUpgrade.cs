@@ -26,6 +26,8 @@ public class PopupUpgrade : UIBase
     public Button buttonUse;
     public Button buttonExit;
 
+    public bool completeLevelOnClose;
+
     readonly List<DiceData> currentDiceDatas = new();
 
     DiceData selectedDiceData;
@@ -46,36 +48,26 @@ public class PopupUpgrade : UIBase
         }
         if (inventoryUIController != null)
             inventoryUIController.ItemSelected += OnInventoryItemSelected;
+
+
         //gameObject.SetActive(false);
     }
     void Start()
     {
-        Show();
-    }
-
-    void OnEnable()
-    {
-        RefreshView();
-
-    }
-
-
-    public void Show()
-    {
-        gameObject.SetActive(true);
         RefreshView();
     }
-
-    public void Hide()
+    public override void AfterHideAction()
     {
-        gameObject.SetActive(false);
+        GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Upgrade);
     }
+
+
 
     void RefreshView()
     {
         ClearResult();
         BuildDiceList();
-        SelectDefaultDice();
+        // SelectDefaultDice();
         RefreshSelectedView();
     }
 
@@ -123,40 +115,33 @@ public class PopupUpgrade : UIBase
 
     void RefreshSelectedView()
     {
-        ChapterDiceSession session = ChapterDiceSession.GetOrCreate();
-        DiceData targetDice = session != null ? session.GetSummedUpgradeTarget(selectedDiceData) : null;
-        int totalLevel = selectedDiceData != null && session != null ? session.GetTotalDiceLevelByType(selectedDiceData.type) : 0;
+        var session = ChapterDiceSession.GetOrCreate();
 
-        if (txtSelectedDice != null)
-            txtSelectedDice.text = selectedDiceData != null
-                ? $"{selectedDiceData.diceName} Lv{selectedDiceData.level}"
-                : "";
-
-        if (txtDescription != null)
+        if (selectedDiceData == null)
         {
-            if (selectedDiceData == null)
-            {
-                txtDescription.text = "";
-            }
-            else if (targetDice == null)
-            {
-                txtDescription.text = $"Total same-type level = {totalLevel}. No valid upgrade target found.";
-            }
-            else
-            {
-                txtDescription.text = $"Total same-type level = {totalLevel}. Use to upgrade selected dice to Lv{targetDice.level}. Other dice stay unchanged.";
-            }
+            txtSelectedDice.text = "";
+            txtDescription.text = "";
+            txtChance.text = "";
+            RefreshSelectedDiceImage();
+            buttonUse.interactable = false;
+            return;
         }
 
-        if (txtChance != null)
-            txtChance.text = $"Upgrade Chance: {Mathf.RoundToInt(GetSuccessChance01() * 100f)}%";
+        var targetDice = session?.GetSummedUpgradeTarget(selectedDiceData);
+        int totalLevel = session?.GetTotalDiceLevelByType(selectedDiceData.type) ?? 0;
 
-        if (buttonUse != null)
-            buttonUse.interactable = selectedDiceData != null && targetDice != null;
+        txtSelectedDice?.SetText($"{selectedDiceData.diceName} Lv{selectedDiceData.level}");
+
+        txtDescription.text = targetDice == null
+            ? $"Total same-type level = {totalLevel}. No valid upgrade target found."
+            : $"Total same-type level = {totalLevel}. Use to upgrade selected dice to Lv{targetDice.level}. Other dice stay unchanged.";
+
+        txtChance.text = $"Upgrade Chance: {Mathf.RoundToInt(GetSuccessChance01() * 100f)}%";
+
+        buttonUse.interactable = targetDice != null;
 
         RefreshSelectedDiceImage();
     }
-
     void RefreshSelectedDiceImage()
     {
         if (diceImg == null)

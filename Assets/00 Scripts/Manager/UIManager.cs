@@ -86,6 +86,13 @@ public class UIManager : Singleton<UIManager>
     public void HomeInit()
     {
     }
+
+    public void RefreshHomeUI()
+    {
+        if (uIHome != null)
+            uIHome.RefreshHomePanels();
+    }
+
     public void Close(UIBase uI)
     {
         lstOpenningUI.RemoveAll(ui => ui == null);
@@ -249,6 +256,7 @@ public class UIManager : Singleton<UIManager>
         if (ui == null)
             return;
 
+        ui.completeLevelOnClose = true;
         ui.Show();
     }
     public void ShowPopupShop()
@@ -268,6 +276,7 @@ public class UIManager : Singleton<UIManager>
         if (ui == null)
             return;
 
+        ui.completeLevelOnClose = false;
         ui.Show();
     }
     public void ShowDialog(string txt)

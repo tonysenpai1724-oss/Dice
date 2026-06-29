@@ -18,6 +18,11 @@ public class UiHome : MonoBehaviour
     public void InitHome()
     {
         homeToggleButtons[1].OnClick();
+        RefreshHomePanels();
+    }
+
+    public void RefreshHomePanels()
+    {
         foreach (var item in homePanels)
         {
             item.InitFirstTime();

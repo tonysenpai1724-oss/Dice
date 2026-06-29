@@ -80,6 +80,7 @@ public class UIBase : MonoBehaviour
     }
     public virtual void AfterHideAction()
     {
+
     }
     #endregion
 }

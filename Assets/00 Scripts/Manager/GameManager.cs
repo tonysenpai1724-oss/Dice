@@ -172,6 +172,23 @@ public class GameManager : Singleton<GameManager>
             GoSceneGameplay();
         });
     }
+
+    public void CompleteCurrentSpecialLevel(LevelType expectedLevelType)
+    {
+        if (ChapterManager.Instance == null)
+            return;
+
+        Level currentLevel = ChapterManager.Instance.GetCurrentLevel();
+        if (currentLevel == null || currentLevel.leveltype != expectedLevelType)
+            return;
+
+        if (ChapterManager.Instance.IsAtFinalPlayableLevel())
+            return;
+
+        ChapterManager.Instance.AdvanceAfterWin();
+        UIManager.Instance?.RefreshHomeUI();
+    }
+
     public void GoSceneHome()
     {
         SetState(EGameState.Loading);

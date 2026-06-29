@@ -19,6 +19,12 @@ public class PopupShop : UIBase
     {
         RefreshShop();
     }
+    public override void AfterHideAction()
+    {
+        GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Shop);
+    }
+
+
 
     public void RefreshShop()
     {
