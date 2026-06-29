@@ -1,83 +1,63 @@
-﻿Shader "Custom/URP_CustomCubeLighting"
+﻿Shader "Custom/ToonShader"
 {
     Properties
     {
-        _MainColor ("Base Color", Color) = (1, 1, 1, 1)
+        _Color ("Color", Color) = (1, 1, 1, 1)
+        _MainTex ("Texture", 2D) = "white" {}
+        _ShadowThreshold ("Shadow Threshold", Range(0, 1)) = 0.5
     }
+
     SubShader
     {
-        Tags
-        {
-            "RenderType" = "Opaque"
-            "RenderPipeline" = "UniversalPipeline"
-            "Queue" = "Geometry"
-        }
-        LOD 100
+        Tags { "RenderType" = "Opaque" }
 
         Pass
         {
-            Name "ForwardLit"
-            Tags { "LightMode" = "UniversalForward" }
-
-            HLSLPROGRAM
+            CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #include "UnityCG.cginc"
 
-            // Core thư viện của URP thay cho UnityCG.cginc
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
-            struct Attributes
+            struct appdata
             {
-                float4 positionOS : POSITION;
-                float3 normalOS : NORMAL;
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+                float2 uv : TEXCOORD0;
             };
 
-            struct Varyings
+            struct v2f
             {
-                float4 positionCS : SV_POSITION;
-                float3 normalWS : TEXCOORD0;
+                float2 uv : TEXCOORD0;
+                float4 vertex : SV_POSITION;
+                float3 normal : TEXCOORD1;
             };
 
-            float4 _MainColor;
+            sampler2D _MainTex;
+            float4 _Color;
+            float _ShadowThreshold;
 
-            Varyings vert (Attributes input)
+            v2f vert (appdata v)
             {
-                Varyings output;
-
-                // Chuyển đổi vị trí đỉnh từ Object sang Clip Space
-                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
-                output.positionCS = vertexInput.positionCS;
-
-                // Chuyển đổi Normal từ Object sang World Space
-                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS);
-                output.normalWS = normalInput.normalWS;
-
-                return output;
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.uv = v.uv;
+                o.normal = UnityObjectToWorldNormal(v.normal);
+                return o;
             }
 
-            half4 frag (Varyings input) : SV_Target
+            fixed4 frag (v2f i) : SV_Target
             {
-                // 1. Chuẩn hóa Vector pháp tuyến của Cube
-                float3 N = normalize(input.normalWS);
+                float3 lightDir = normalize(_WorldSpaceLightPos0.xyz);
+                float NdotL = dot(normalize(i.normal), lightDir);
 
-                // 2. Lấy dữ liệu ánh sáng chính (Main Light) từ URP
-                Light mainLight = GetMainLight();
-                float3 L = normalize(mainLight.direction);
-                half3 lightColor = mainLight.color;
+                float light = NdotL > _ShadowThreshold ? 1.0 : 0.4;
 
-                // 3. Tính toán cường độ sáng Diffuse (Lambert)
-                float lightIntensity = max(0.0, dot(N, L));
+                fixed4 col = tex2D(_MainTex, i.uv) * _Color;
+                col.rgb *= light;
 
-                // 4. Cộng thêm một chút ánh sáng môi trường (Ambient) của URP
-                half3 ambient = SampleSH(N) * 0.15;
-
-                // 5. Kết hợp tất cả lại thành màu cuối cùng
-                half3 finalColor = _MainColor.rgb * (lightColor * lightIntensity + ambient);
-
-                return half4(finalColor, _MainColor.a);
+                return col;
             }
-            ENDHLSL
+            ENDCG
         }
     }
 }

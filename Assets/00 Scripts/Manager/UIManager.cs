@@ -245,7 +245,7 @@ public class UIManager : Singleton<UIManager>
     }
     public void ShowPopupUpgradeDice()
     {
-        UpgradePanel ui = GetUI("Popup Upgrade Dice") as UpgradePanel;
+        PopupUpgrade ui = GetUI("Popup Upgrade Dice") as PopupUpgrade;
         if (ui == null)
             return;
 
@@ -264,7 +264,7 @@ public class UIManager : Singleton<UIManager>
     #endregion
     public void ShowUpgradePanel()
     {
-        UpgradePanel ui = GetUI("Upgrade Panel") as UpgradePanel;
+        PopupUpgrade ui = GetUI("Upgrade Panel") as PopupUpgrade;
         if (ui == null)
             return;
 

@@ -26,7 +26,7 @@ public abstract class ShopItemBase : MonoBehaviour
 
     public abstract void SetupItem();
 
-    protected void SetupCommon(string itemName, string itemDesc, int itemPrice, Sprite itemIcon = null)
+    protected virtual void SetupCommon(string itemName, string itemDesc, int itemPrice, Sprite itemIcon = null)
     {
         price = Mathf.Max(0, itemPrice);
 
@@ -39,10 +39,24 @@ public abstract class ShopItemBase : MonoBehaviour
         if (txtPrice != null)
             txtPrice.text = price.ToString();
 
-        if (icon != null)
-            icon.sprite = itemIcon;
+        SetIcon(itemIcon);
 
         RefreshButtonState();
+    }
+
+
+    protected virtual void SetIcon(Sprite itemIcon)
+    {
+        if (icon == null)
+            return;
+
+        icon.sprite = itemIcon;
+        icon.enabled = itemIcon != null;
+        icon.preserveAspect = true;
+
+        Color color = icon.color;
+        color.a = itemIcon != null ? 1f : color.a;
+        icon.color = color;
     }
 
     protected virtual void RefreshButtonState()

@@ -11,7 +11,8 @@ public class ShopRuneItemUI : ShopItemBase
             return;
 
         enumItemType = EnumItemType.Rune;
-        SetupCommon(runeData.name, runeData.TargetType.ToString(), coinPrice);
+        SetupCommon(runeData.name, runeData.TargetType.ToString(), coinPrice, RuneViewManager.Instance.GetRuneSprite(runeData));
+
     }
 
     public void Setup(RuneSkillData data, int itemPrice)

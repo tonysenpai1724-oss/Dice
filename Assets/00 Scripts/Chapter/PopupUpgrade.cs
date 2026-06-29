@@ -3,9 +3,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UpgradePanel : UIBase
+public class PopupUpgrade : UIBase
 {
-    public static UpgradePanel Instance;
+    public static PopupUpgrade Instance;
 
     [Header("Chance")]
     [Range(0f, 1f)] public float upgradeSuccessChance = 0.8f;
@@ -13,18 +13,19 @@ public class UpgradePanel : UIBase
     [Header("List")]
     public ClonePanelDiceItem itemPrefab;
     public Transform itemParent;
+    public InventoryUIController inventoryUIController;
 
     [Header("Info")]
     public TextMeshProUGUI txtSelectedDice;
     public TextMeshProUGUI txtDescription;
     public TextMeshProUGUI txtChance;
     public TextMeshProUGUI txtResult;
+    public Image diceImg;
 
     [Header("Actions")]
     public Button buttonUse;
     public Button buttonExit;
 
-    readonly List<ClonePanelDiceItem> spawnedItems = new();
     readonly List<DiceData> currentDiceDatas = new();
 
     DiceData selectedDiceData;
@@ -43,6 +44,8 @@ public class UpgradePanel : UIBase
             buttonExit.onClick.RemoveListener(Hide);
             buttonExit.onClick.AddListener(Hide);
         }
+        if (inventoryUIController != null)
+            inventoryUIController.ItemSelected += OnInventoryItemSelected;
         //gameObject.SetActive(false);
     }
     void Start()
@@ -73,7 +76,6 @@ public class UpgradePanel : UIBase
         ClearResult();
         BuildDiceList();
         SelectDefaultDice();
-        RebuildItems();
         RefreshSelectedView();
     }
 
@@ -92,36 +94,7 @@ public class UpgradePanel : UIBase
         currentDiceDatas.AddRange(diceDatas);
     }
 
-    void RebuildItems()
-    {
-        ClearItems();
 
-        if (itemPrefab == null || itemParent == null)
-            return;
-
-        for (int i = 0; i < currentDiceDatas.Count; i++)
-        {
-            DiceData diceData = currentDiceDatas[i];
-            if (diceData == null)
-                continue;
-
-            ClonePanelDiceItem item = Instantiate(itemPrefab, itemParent);
-            item.Setup(diceData, OnSelectDice);
-            item.SetSelected(diceData == selectedDiceData);
-            spawnedItems.Add(item);
-        }
-    }
-
-    void ClearItems()
-    {
-        for (int i = 0; i < spawnedItems.Count; i++)
-        {
-            if (spawnedItems[i] != null)
-                Destroy(spawnedItems[i].gameObject);
-        }
-
-        spawnedItems.Clear();
-    }
 
     void SelectDefaultDice()
     {
@@ -136,7 +109,16 @@ public class UpgradePanel : UIBase
         selectedDiceData = diceData;
         ClearResult();
         RefreshSelectedView();
-        RefreshItemSelection();
+        RefreshSelectedDiceImage();
+    }
+
+    void OnInventoryItemSelected(ItemToggle itemToggle)
+    {
+        if (itemToggle == null)
+            return;
+
+        OnSelectDice(itemToggle.data);
+        SetDiceImage(itemToggle.PreviewSprite);
     }
 
     void RefreshSelectedView()
@@ -147,14 +129,14 @@ public class UpgradePanel : UIBase
 
         if (txtSelectedDice != null)
             txtSelectedDice.text = selectedDiceData != null
-                ? $"Selected: {selectedDiceData.diceName} Lv{selectedDiceData.level}"
-                : "Selected: None";
+                ? $"{selectedDiceData.diceName} Lv{selectedDiceData.level}"
+                : "";
 
         if (txtDescription != null)
         {
             if (selectedDiceData == null)
             {
-                txtDescription.text = "No dice available to upgrade.";
+                txtDescription.text = "";
             }
             else if (targetDice == null)
             {
@@ -171,18 +153,30 @@ public class UpgradePanel : UIBase
 
         if (buttonUse != null)
             buttonUse.interactable = selectedDiceData != null && targetDice != null;
+
+        RefreshSelectedDiceImage();
     }
 
-    void RefreshItemSelection()
+    void RefreshSelectedDiceImage()
     {
-        for (int i = 0; i < spawnedItems.Count; i++)
-        {
-            ClonePanelDiceItem item = spawnedItems[i];
-            if (item == null)
-                continue;
+        if (diceImg == null)
+            return;
 
-            item.SetSelected(item.DiceData == selectedDiceData);
-        }
+        ItemToggle selectedToggle = inventoryUIController != null
+            ? inventoryUIController.GetToggle(selectedDiceData)
+            : null;
+
+        SetDiceImage(selectedToggle != null ? selectedToggle.PreviewSprite : null);
+    }
+
+    void SetDiceImage(Sprite sprite)
+    {
+        if (diceImg == null)
+            return;
+
+        diceImg.sprite = sprite;
+        diceImg.enabled = sprite != null;
+        diceImg.preserveAspect = true;
     }
 
     float GetSuccessChance01()

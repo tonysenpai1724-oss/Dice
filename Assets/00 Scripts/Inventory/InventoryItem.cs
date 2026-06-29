@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 public class InventoryItem : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class InventoryItem : MonoBehaviour
     public MeshRenderer meshRenderer;
     public List<DecalProjector> decals = new();
     public List<DecalProjector> decals2 = new();
+    public Image itemPreview;
+
+    Texture2D previewTexture;
+    Sprite previewSprite;
 
     public void Setup(DiceData diceData)
     {
@@ -26,6 +31,54 @@ public class InventoryItem : MonoBehaviour
             meshRenderer.material = dice.diceMaterial;
 
         ApplyDecalMaterials();
+    }
+
+    public void Setup(DiceData diceData, Texture2D texture)
+    {
+        Setup(diceData);
+        SetPreview(texture);
+    }
+
+    public void SetPreview(Texture2D texture)
+    {
+        ReleasePreview();
+        previewTexture = texture;
+
+        if (itemPreview == null)
+            return;
+
+        if (previewTexture == null)
+        {
+            itemPreview.sprite = null;
+            itemPreview.enabled = false;
+            return;
+        }
+
+        previewSprite = Sprite.Create(
+            previewTexture,
+            new Rect(0f, 0f, previewTexture.width, previewTexture.height),
+            new Vector2(0.5f, 0.5f)
+        );
+        itemPreview.sprite = previewSprite;
+        itemPreview.preserveAspect = true;
+        itemPreview.enabled = true;
+    }
+
+    void ReleasePreview()
+    {
+        if (previewSprite != null)
+            Destroy(previewSprite);
+
+        if (previewTexture != null)
+            Destroy(previewTexture);
+
+        previewSprite = null;
+        previewTexture = null;
+    }
+
+    void OnDestroy()
+    {
+        ReleasePreview();
     }
 
     void ApplyDecalMaterials()

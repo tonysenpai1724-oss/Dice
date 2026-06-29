@@ -8,6 +8,10 @@ public class ShopDiceRunePanel : UIBase
     public Transform contentRoot;
     public ShopDatabaseSO shopDatabase;
 
+    [Header("Dice Preview")]
+    public InventoryUIController inventoryUIController;
+    public InventoryItem itemPrefab;
+    public ItemPreviewGenerator previewGenerator;
 
     readonly List<GameObject> spawnedItems = new List<GameObject>();
 
@@ -18,6 +22,7 @@ public class ShopDiceRunePanel : UIBase
 
     public void RefreshShop()
     {
+        CachePreviewRefs();
         ClearSpawnedItems();
         SpawnDiceItems();
         SpawnRuneItems();
@@ -36,9 +41,78 @@ public class ShopDiceRunePanel : UIBase
                 continue;
 
             ShopDiceItemUI item = Instantiate(diceItemPrefab, contentRoot);
-            item.Setup(entry.diceData, entry.price);
+            SetupDiceItem(item, entry.diceData, entry.price);
             spawnedItems.Add(item.gameObject);
         }
+    }
+
+    void SetupDiceItem(ShopDiceItemUI item, DiceData diceData, int price)
+    {
+        if (item == null)
+            return;
+
+        Sprite existingIcon = GetExistingDiceIcon(diceData);
+        if (existingIcon != null)
+        {
+            item.Setup(diceData, price, existingIcon);
+            return;
+        }
+
+        Texture2D previewTexture = CaptureDiceIcon(diceData);
+        if (previewTexture != null)
+        {
+            item.Setup(diceData, price, previewTexture);
+            return;
+        }
+
+        item.Setup(diceData, price);
+    }
+
+    Sprite GetExistingDiceIcon(DiceData diceData)
+    {
+        if (inventoryUIController == null || diceData == null)
+            return null;
+
+        ItemToggle itemToggle = inventoryUIController.GetToggle(diceData);
+        return itemToggle != null ? itemToggle.PreviewSprite : null;
+    }
+
+    Texture2D CaptureDiceIcon(DiceData diceData)
+    {
+        if (diceData == null)
+            return null;
+
+        CachePreviewRefs();
+
+        if (previewGenerator == null || itemPrefab == null)
+        {
+            Debug.LogWarning($"ShopDiceRunePanel cannot capture dice icon for {diceData.diceName}: missing previewGenerator or itemPrefab.");
+            return null;
+        }
+
+        Texture2D texture = previewGenerator.Capture(itemPrefab, diceData);
+        if (texture == null)
+            Debug.LogWarning($"ShopDiceRunePanel failed to capture dice icon for {diceData.diceName}. Check preview camera/render texture.");
+
+        return texture;
+    }
+
+    void CachePreviewRefs()
+    {
+        if (inventoryUIController == null)
+            inventoryUIController = FindFirstObjectByType<InventoryUIController>();
+
+        if (inventoryUIController != null)
+        {
+            if (itemPrefab == null)
+                itemPrefab = inventoryUIController.itemPrefab;
+
+            if (previewGenerator == null)
+                previewGenerator = inventoryUIController.previewGenerator;
+        }
+
+        if (previewGenerator == null)
+            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>();
     }
 
     void SpawnRuneItems()
