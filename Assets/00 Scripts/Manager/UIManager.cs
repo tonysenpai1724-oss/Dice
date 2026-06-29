@@ -253,7 +253,7 @@ public class UIManager : Singleton<UIManager>
     }
     public void ShowPopupShop()
     {
-        ShopDiceRunePanel ui = GetUI("Popup Shop") as ShopDiceRunePanel;
+        PopupShop ui = GetUI("Popup Shop") as PopupShop;
         if (ui == null)
             return;
 

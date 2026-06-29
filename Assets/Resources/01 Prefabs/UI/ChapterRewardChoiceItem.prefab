@@ -307,6 +307,7 @@ MonoBehaviour:
   txtTitle: {fileID: 7376696210055082415}
   txtDescription: {fileID: 5981426876919439325}
   button: {fileID: 1145650727219706002}
+  icon: {fileID: 5746095754529735415}
 --- !u!114 &1145650727219706002
 MonoBehaviour:
   m_ObjectHideFlags: 0
