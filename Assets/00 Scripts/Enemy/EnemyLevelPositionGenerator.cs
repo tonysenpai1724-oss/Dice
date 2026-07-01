@@ -77,28 +77,19 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             return;
         }
 
-        if (level.WaveCount <= 1)
-        {
-            level.ClearEnemySpawnPlacements();
-            previewPlacements = BuildPlacements(level.GetWaveEnemyDatas(0));
-            level.enemySpawnPlacements = new List<EnemySpawnPlacement>(previewPlacements);
-#if UNITY_EDITOR
-            EditorUtility.SetDirty(level);
-#endif
-            return;
-        }
-
         previewPlacements.Clear();
+
         for (int waveIndex = 0; waveIndex < level.WaveCount; waveIndex++)
         {
             LevelWaveData wave = level.waves[waveIndex];
             if (wave == null)
                 continue;
 
+            wave.enemySpawnPlacements.Clear();
             List<EnemySpawnPlacement> generatedPlacements = BuildPlacements(level.GetWaveEnemyDatas(waveIndex));
             wave.enemySpawnPlacements = new List<EnemySpawnPlacement>(generatedPlacements);
 
-            if (waveIndex == 0)
+            if (previewPlacements.Count == 0)
                 previewPlacements = new List<EnemySpawnPlacement>(generatedPlacements);
         }
 
@@ -115,28 +106,19 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             return;
         }
 
-        if (level.WaveCount <= 1)
-        {
-            level.ClearEnemySpawnPlacements();
-            previewPlacements = BuildBottomRowPlacements(level.GetWaveEnemyDatas(0));
-            level.enemySpawnPlacements = new List<EnemySpawnPlacement>(previewPlacements);
-#if UNITY_EDITOR
-            EditorUtility.SetDirty(level);
-#endif
-            return;
-        }
-
         previewPlacements.Clear();
+
         for (int waveIndex = 0; waveIndex < level.WaveCount; waveIndex++)
         {
             LevelWaveData wave = level.waves[waveIndex];
             if (wave == null)
                 continue;
 
+            wave.enemySpawnPlacements.Clear();
             List<EnemySpawnPlacement> generatedPlacements = BuildBottomRowPlacements(level.GetWaveEnemyDatas(waveIndex));
             wave.enemySpawnPlacements = new List<EnemySpawnPlacement>(generatedPlacements);
 
-            if (waveIndex == 0)
+            if (previewPlacements.Count == 0)
                 previewPlacements = new List<EnemySpawnPlacement>(generatedPlacements);
         }
 
@@ -169,30 +151,107 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
                 meleeEnemies.Add(data);
         }
 
-        AddGridPlacements(placements, meleeEnemies, Mathf.Clamp(meleeStartColumn, playerColumn + 1, gridColumns - 1), false);
-        AddGridPlacements(placements, rangeEnemies, Mathf.Clamp(rangeStartColumn, playerColumn + 1, gridColumns - 1), true);
+        int rows = Mathf.Max(1, gridRows);
+        int columns = Mathf.Max(2, gridColumns);
+        int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
+        int rangedStartColumn = Mathf.Clamp(5, minEnemyColumn, columns - 1);
+        int nextMeleeColumn = AddGridPlacements(placements, rangeEnemies, rangedStartColumn, minEnemyColumn, true, rows, -1);
+
+        if (meleeEnemies.Count > 0)
+        {
+            int meleeStartColumn = Mathf.Clamp(nextMeleeColumn, minEnemyColumn, columns - 1);
+            AddGridPlacements(placements, meleeEnemies, meleeStartColumn, minEnemyColumn, false, rows, -1);
+        }
 
         return placements.Count > 0 ? placements : BuildFallbackPlacements(enemyDatas);
     }
 
-    void AddGridPlacements(List<EnemySpawnPlacement> placements, List<EnemyData> enemiesToPlace, int startColumn, bool isBackRow)
+    int AddGridPlacements(List<EnemySpawnPlacement> placements, List<EnemyData> enemiesToPlace, int startColumn, int minColumn, bool isBackRow, int rows, int reservedFirstColumnRow)
     {
         if (enemiesToPlace == null || enemiesToPlace.Count == 0)
-            return;
+            return startColumn - 1;
 
-        int rows = Mathf.Max(1, gridRows);
-        int columns = Mathf.Max(2, gridColumns);
-        int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
+        int column = startColumn;
+        int slotIndex = 0;
+        bool bossPlaced = false;
+        int bossRow = GetBossSpawnRow(rows);
 
         for (int i = 0; i < enemiesToPlace.Count; i++)
         {
             EnemyData data = enemiesToPlace[i];
-            int row = IsBossEnemy(data) ? GetBossSpawnRow(rows) : i % rows;
-            int column = IsBossEnemy(data)
-                ? GetBossSpawnColumn(columns, minEnemyColumn)
-                : Mathf.Max(minEnemyColumn, startColumn - (i / rows));
+
+            if (column < minColumn)
+                break;
+
+            if (IsBossEnemy(data) && !bossPlaced)
+            {
+                placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(bossRow, column), isBackRow, bossRow, column));
+                bossPlaced = true;
+
+                if (rows == 1)
+                {
+                    column--;
+                    slotIndex = 0;
+                }
+
+                continue;
+            }
+
+            int reservedRow = reservedFirstColumnRow;
+            if (bossPlaced && column == startColumn)
+                reservedRow = bossRow;
+
+            int row = GetNextAvailableRow(rows, reservedRow, slotIndex);
+
+            if (row < 0)
+            {
+                column--;
+                slotIndex = 0;
+
+                if (column < minColumn)
+                    break;
+
+                reservedRow = -1;
+                row = GetNextAvailableRow(rows, reservedRow, slotIndex);
+            }
+
             placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(row, column), isBackRow, row, column));
+            slotIndex++;
+
+            int capacity = GetColumnCapacity(rows, reservedRow);
+            if (slotIndex >= capacity)
+            {
+                column--;
+                slotIndex = 0;
+            }
         }
+
+        return column;
+    }
+
+    int GetNextAvailableRow(int rows, int reservedRow, int slotIndex)
+    {
+        for (int row = 0; row < rows; row++)
+        {
+            if (row == reservedRow)
+                continue;
+
+            if (slotIndex == 0)
+                return row;
+
+            slotIndex--;
+        }
+
+        return -1;
+    }
+
+    int GetColumnCapacity(int rows, int reservedRow)
+    {
+        int capacity = rows;
+        if (reservedRow >= 0 && reservedRow < rows)
+            capacity--;
+
+        return Mathf.Max(0, capacity);
     }
 
     public List<EnemySpawnPlacement> BuildBottomRowPlacements(List<EnemyData> enemyDatas)
@@ -334,3 +393,6 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         return placements;
     }
 }
+
+
+

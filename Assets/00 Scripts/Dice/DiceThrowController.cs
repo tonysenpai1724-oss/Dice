@@ -102,6 +102,9 @@ public class DiceThrowController : MonoBehaviour
             if (!IsPointerOverBoardMesh())
                 return;
 
+            if (IsAndroid() && IsPointerOverBoardDice())
+                return;
+
             if (Time.time - mouseDownTime > maxClickShootHoldTime)
                 return;
 
@@ -345,6 +348,29 @@ public class DiceThrowController : MonoBehaviour
         for (int i = 0; i < hits.Length; i++)
         {
             if (hits[i].collider == boardCollider)
+                return true;
+        }
+
+        return false;
+    }
+
+    bool IsPointerOverBoardDice()
+    {
+        if (Camera.main == null || !TryGetPointerScreenPosition(out Vector2 screenPosition))
+            return false;
+
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+        RaycastHit[] hits = Physics.RaycastAll(
+            ray,
+            Mathf.Infinity,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Collide
+        );
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Dice dice = hits[i].collider.GetComponentInParent<Dice>();
+            if (dice != null && dice != currentDice)
                 return true;
         }
 

@@ -74,6 +74,9 @@ public class DiceManager : MonoBehaviour
 
     void Start()
     {
+        if (boardCollider != null)
+            SetBoardCollider(boardCollider);
+
         SpawnStartBoard();
         TigerForge.EventManager.StartListening(Constant.ON_END_GAME, ClearBoard);
     }
@@ -844,5 +847,6 @@ public class DiceManager : MonoBehaviour
     #endregion
 
 }
+
 
 

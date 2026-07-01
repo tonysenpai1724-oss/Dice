@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -7,20 +6,14 @@ using Sirenix.OdinInspector;
 public class Level : SerializedScriptableObject
 {
     public int levelNumber;
-    public List<EnemyData> enemyDatas;
     public List<LevelWaveData> waves = new();
     public LevelType leveltype;
-    [Header("Enemy Spawn")]
-    public List<EnemySpawnPlacement> enemySpawnPlacements = new();
 
     public int WaveCount
     {
         get
         {
-            if (waves != null && waves.Count > 0)
-                return waves.Count;
-
-            return HasLegacyWaveData() ? 1 : 0;
+            return waves != null ? waves.Count : 0;
         }
     }
 
@@ -34,9 +27,6 @@ public class Level : SerializedScriptableObject
         if (waves != null && waveIndex >= 0 && waveIndex < waves.Count)
             return waves[waveIndex] != null ? waves[waveIndex].enemyDatas : null;
 
-        if (waveIndex == 0)
-            return enemyDatas;
-
         return null;
     }
 
@@ -44,9 +34,6 @@ public class Level : SerializedScriptableObject
     {
         if (waves != null && waveIndex >= 0 && waveIndex < waves.Count)
             return waves[waveIndex] != null ? waves[waveIndex].enemySpawnPlacements : null;
-
-        if (waveIndex == 0)
-            return enemySpawnPlacements;
 
         return null;
     }
@@ -65,18 +52,6 @@ public class Level : SerializedScriptableObject
         }
 
         return count;
-    }
-
-    bool HasLegacyWaveData()
-    {
-        return (enemyDatas != null && enemyDatas.Count > 0) ||
-               (enemySpawnPlacements != null && enemySpawnPlacements.Count > 0);
-    }
-
-    [Button]
-    public void ClearEnemySpawnPlacements()
-    {
-        enemySpawnPlacements.Clear();
     }
 }
 

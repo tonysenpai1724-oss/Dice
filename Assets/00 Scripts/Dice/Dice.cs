@@ -54,6 +54,8 @@ public class Dice : PoolingObject
     public MeshRenderer meshRenderer;
     public List<DecalProjector> decals = new();
     public List<DecalProjector> decals2 = new();
+    public List<MeshRenderer> decalMeshes = new();
+    public List<MeshRenderer> decalMeshes2 = new();
 
     [Header("Physics")]
     public float rbMass = 1.2f;
@@ -127,23 +129,57 @@ public class Dice : PoolingObject
         ApplyOutlineColor(data.baseOutlineColor);
         this.type = data.type;
 
+        Material primaryDecalMaterial = data.decalMaterial.Count > 0
+            ? data.decalMaterial[0]
+            : null;
+        Material secondaryDecalMaterial = data.decalMaterial.Count > 1
+            ? data.decalMaterial[1]
+            : null;
+
         foreach (var d in decals)
         {
-            d.material = data.decalMaterial[0];
+            if (d != null)
+                d.material = primaryDecalMaterial;
         }
-        if (data.decalMaterial.Count > 1)
+
+        foreach (var d in decalMeshes)
+        {
+            if (d != null)
+                d.sharedMaterial = primaryDecalMaterial;
+        }
+
+        if (secondaryDecalMaterial != null)
         {
             foreach (var d in decals2)
             {
+                if (d == null)
+                    continue;
+
                 d.gameObject.SetActive(true);
-                d.material = data.decalMaterial[1];
+                d.material = secondaryDecalMaterial;
+            }
+
+            foreach (var d in decalMeshes2)
+            {
+                if (d == null)
+                    continue;
+
+                d.gameObject.SetActive(true);
+                d.sharedMaterial = secondaryDecalMaterial;
             }
         }
         else
         {
             foreach (var d in decals2)
             {
-                d.gameObject.SetActive(false);
+                if (d != null)
+                    d.gameObject.SetActive(false);
+            }
+
+            foreach (var d in decalMeshes2)
+            {
+                if (d != null)
+                    d.gameObject.SetActive(false);
             }
         }
 

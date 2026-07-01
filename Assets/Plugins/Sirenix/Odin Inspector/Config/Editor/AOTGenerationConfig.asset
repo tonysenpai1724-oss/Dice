@@ -16,7 +16,7 @@ MonoBehaviour:
   deleteDllAfterBuilds: 1
   AutomateForAllAOTPlatforms: 1
   automateForPlatforms: 0900000014000000
-  lastScan: 639165102423892517
+  lastScan: 639184951228605193
   supportSerializedTypes:
   - TypeName: UnityEngine.AudioClip, UnityEngine.AudioModule
     IsCustom: 0
@@ -33,14 +33,10 @@ MonoBehaviour:
   - TypeName: DailyQuestConfig, Assembly-CSharp
     IsCustom: 0
     Emit: 1
-  - TypeName: DiceType, Assembly-CSharp
+  - TypeName: DiceData, Assembly-CSharp
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[System.Boolean, mscorlib],[UnityEngine.Sprite,
-      UnityEngine.CoreModule]], mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.Dictionary`2[[DiceType, Assembly-CSharp],[UnityEngine.Sprite,
       UnityEngine.CoreModule]], mscorlib
     IsCustom: 0
     Emit: 1
@@ -129,8 +125,16 @@ MonoBehaviour:
       Assembly-CSharp]], mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[System.Collections.Generic.List`1[[DiceData,
+      Assembly-CSharp]], mscorlib]], mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[System.String,
       mscorlib]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[RuneType, Assembly-CSharp],[UnityEngine.Sprite,
+      UnityEngine.CoreModule]], mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[EIAPPackType,
@@ -167,10 +171,6 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: EIAPPackType, Assembly-CSharp
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[DiceType, Assembly-CSharp]],
-      mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EAnimationEffectType,
@@ -225,6 +225,10 @@ MonoBehaviour:
       Assembly-CSharp]], mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[RuneType, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: ERarity, Assembly-CSharp
     IsCustom: 0
     Emit: 1
@@ -265,10 +269,6 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.IEqualityComparer`1[[System.Boolean, mscorlib]],
-      mscorlib
-    IsCustom: 0
-    Emit: 1
-  - TypeName: System.Collections.Generic.IEqualityComparer`1[[DiceType, Assembly-CSharp]],
       mscorlib
     IsCustom: 0
     Emit: 1
@@ -328,6 +328,10 @@ MonoBehaviour:
       mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[RuneType, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.IEqualityComparer`1[[System.String, mscorlib]],
       mscorlib
     IsCustom: 0
@@ -342,6 +346,9 @@ MonoBehaviour:
       mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.List`1[[DiceData, Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.List`1[[PartnerReferalConfig, Assembly-CSharp]],
       mscorlib
     IsCustom: 0
@@ -353,6 +360,9 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: PartnerReferalConfig, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
+  - TypeName: RuneType, Assembly-CSharp
     IsCustom: 0
     Emit: 1
   - TypeName: UnityEngine.Sprite, UnityEngine.CoreModule
