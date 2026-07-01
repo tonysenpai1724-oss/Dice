@@ -37,6 +37,7 @@ public class DiceManager : MonoBehaviour
     List<Dice> boardDices = new List<Dice>();
 
     public DiceQueue diceQueue;
+    public DiceQueueUI diceQueueUI;
 
     Dictionary<Dice, int> bindTurnsMap = new Dictionary<Dice, int>();
 
@@ -62,6 +63,7 @@ public class DiceManager : MonoBehaviour
             boardService,
             mergeConfig,
             diceQueue,
+            () => diceQueueUI != null ? diceQueueUI : DiceQueueUI.Instance,
             () => GetBoardDices(),
             (level, type) => GetDiceData(level, type),
             (data, position) => SpawnDice(data, position),

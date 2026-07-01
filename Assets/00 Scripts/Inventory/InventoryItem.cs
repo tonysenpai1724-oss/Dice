@@ -10,6 +10,8 @@ public class InventoryItem : MonoBehaviour
     public MeshRenderer meshRenderer;
     public List<DecalProjector> decals = new();
     public List<DecalProjector> decals2 = new();
+    public List<MeshRenderer> decalMeshes = new();
+    public List<MeshRenderer> decalMeshes2 = new();
     public Image itemPreview;
 
     Texture2D previewTexture;
@@ -86,6 +88,7 @@ public class InventoryItem : MonoBehaviour
         Material firstDecal = dice.decalMaterial != null && dice.decalMaterial.Count > 0
             ? dice.decalMaterial[0]
             : null;
+        Debug.Log($"Applying first decal: {firstDecal?.name ?? "null"}");
 
         for (int i = 0; i < decals.Count; i++)
         {
@@ -94,8 +97,21 @@ public class InventoryItem : MonoBehaviour
                 continue;
 
             decal.gameObject.SetActive(firstDecal != null);
+            decal.enabled = firstDecal != null;
             if (firstDecal != null)
                 decal.material = firstDecal;
+        }
+
+        for (int i = 0; i < decalMeshes.Count; i++)
+        {
+            MeshRenderer decalMesh = decalMeshes[i];
+            if (decalMesh == null)
+                continue;
+
+            decalMesh.gameObject.SetActive(firstDecal != null);
+            decalMesh.enabled = firstDecal != null;
+            if (firstDecal != null)
+                decalMesh.sharedMaterial = firstDecal;
         }
 
         Material secondDecal = dice.decalMaterial != null && dice.decalMaterial.Count > 1
@@ -109,8 +125,21 @@ public class InventoryItem : MonoBehaviour
                 continue;
 
             decal.gameObject.SetActive(secondDecal != null);
+            decal.enabled = secondDecal != null;
             if (secondDecal != null)
                 decal.material = secondDecal;
+        }
+
+        for (int i = 0; i < decalMeshes2.Count; i++)
+        {
+            MeshRenderer decalMesh = decalMeshes2[i];
+            if (decalMesh == null)
+                continue;
+
+            decalMesh.gameObject.SetActive(secondDecal != null);
+            decalMesh.enabled = secondDecal != null;
+            if (secondDecal != null)
+                decalMesh.sharedMaterial = secondDecal;
         }
     }
 }

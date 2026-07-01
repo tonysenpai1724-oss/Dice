@@ -29,7 +29,7 @@ public class ItemPreviewGenerator : MonoBehaviour
         Texture2D texture = Capture();
 
         item.gameObject.SetActive(false);
-        Destroy(item.gameObject);
+        // Destroy(item.gameObject);
 
         return texture;
     }

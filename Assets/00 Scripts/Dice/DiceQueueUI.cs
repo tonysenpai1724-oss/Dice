@@ -10,12 +10,17 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     [Header("Root")]
     public RectTransform contentRoot;
     public RectTransform consumePoint;
+    public Canvas canvas;
+    public Camera worldCamera;
 
     [Header("Preview")]
     public InventoryItem itemPreviewPrefab;
     public ItemPreviewGenerator previewGenerator;
 
     [Header("Layout")]
+    public RectTransform startPoint;
+    public RectTransform nextPoint;
+    public Vector2 itemSize = new Vector2(100f, 100f);
     public bool useHorizontalLayout = true;
     public Vector2 horizontalOffset = new Vector2(140f, 0f);
     public Vector2 verticalOffset = new Vector2(0f, -140f);
@@ -66,6 +71,11 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     public void AddDice(DiceData data, Vector2 spawnPosition)
     {
         AddDice(data, spawnPosition, true);
+    }
+
+    public void AddDice(DiceData data, Vector3 worldSpawnPosition)
+    {
+        AddDice(data, WorldToQueuePosition(worldSpawnPosition), true);
     }
 
     void AddDice(DiceData data, Vector2 spawnPosition, bool hasSpawnPosition)
@@ -153,7 +163,14 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
             }
         }
 
+        if (EnemyManager.Instance != null && EnemyManager.Instance.HasAliveEnemies())
+            yield return EnemyManager.Instance.EnemyTurn();
+
         processing = false;
+
+        if (EnemyManager.Instance != null)
+            EnemyManager.Instance.CheckWinGame();
+
         fastFlushRequested = false;
     }
 
@@ -161,6 +178,12 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     {
         while (pendingItems.Count > 0)
         {
+            yield return new WaitUntil(
+                () =>
+                    TurnManager.Instance == null ||
+                    !TurnManager.Instance.IsResettingBoard
+            );
+
             PendingQueueItem pendingItem = pendingItems[0];
             pendingItems.RemoveAt(0);
 
@@ -174,6 +197,7 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
 
             if (rectTransform != null)
             {
+                PrepareItemRect(rectTransform);
                 rectTransform.anchoredPosition = shouldFlyFromSpawn ? pendingItem.spawnPosition : targetPosition;
                 rectTransform.localScale = Vector3.one;
             }
@@ -204,6 +228,79 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     {
         if (previewGenerator == null)
             previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>();
+    }
+
+    Vector2 WorldToQueuePosition(Vector3 worldPosition)
+    {
+        CacheCanvasRefs();
+
+        RectTransform targetRoot = contentRoot != null
+            ? contentRoot
+            : transform as RectTransform;
+
+        if (targetRoot == null)
+            return startAnchoredPosition;
+
+        Camera camera = worldCamera != null
+            ? worldCamera
+            : Camera.main;
+
+        Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(camera, worldPosition);
+        Camera uiCamera = GetUICamera();
+
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                targetRoot,
+                screenPosition,
+                uiCamera,
+                out Vector2 localPoint))
+        {
+            return localPoint;
+        }
+
+        return startAnchoredPosition;
+    }
+
+    void PrepareItemRect(RectTransform rect)
+    {
+        if (rect == null)
+            return;
+
+        RectTransform root = contentRoot != null
+            ? contentRoot
+            : transform as RectTransform;
+
+        Vector2 anchor = root != null
+            ? root.pivot
+            : new Vector2(0.5f, 0.5f);
+
+        rect.anchorMin = anchor;
+        rect.anchorMax = anchor;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+
+        if (itemSize.x > 0f)
+            rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, itemSize.x);
+
+        if (itemSize.y > 0f)
+            rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, itemSize.y);
+
+        rect.localRotation = Quaternion.identity;
+        rect.localScale = Vector3.one;
+    }
+
+    void CacheCanvasRefs()
+    {
+        if (canvas == null)
+            canvas = GetComponentInParent<Canvas>();
+    }
+
+    Camera GetUICamera()
+    {
+        if (canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+            return null;
+
+        return canvas.worldCamera != null
+            ? canvas.worldCamera
+            : Camera.main;
     }
 
     IEnumerator ShiftItems()
@@ -298,24 +395,61 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
 
     Vector2 GetPosition(int index)
     {
-        Vector2 offset = useHorizontalLayout
+        Vector2 startPosition = GetStartPosition();
+        Vector2 offset = GetQueueOffset();
+
+        return startPosition + offset * index;
+    }
+
+    Vector2 GetStartPosition()
+    {
+        return GetRectPositionInRoot(startPoint, startAnchoredPosition);
+    }
+
+    Vector2 GetQueueOffset()
+    {
+        if (startPoint != null && nextPoint != null)
+            return GetRectPositionInRoot(nextPoint, startAnchoredPosition) - GetStartPosition();
+
+        return useHorizontalLayout
             ? horizontalOffset
             : stackOffset != Vector2.zero
                 ? stackOffset
                 : verticalOffset;
+    }
 
-        return startAnchoredPosition + offset * index;
+    Vector2 GetRectPositionInRoot(RectTransform rect, Vector2 fallback)
+    {
+        RectTransform root = contentRoot != null
+            ? contentRoot
+            : transform as RectTransform;
+
+        if (rect == null || root == null)
+            return fallback;
+
+        CacheCanvasRefs();
+
+        Camera uiCamera = GetUICamera();
+        Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(uiCamera, rect.position);
+
+        return RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            root,
+            screenPosition,
+            uiCamera,
+            out Vector2 localPoint)
+                ? localPoint
+                : fallback;
     }
 
     Vector2 GetConsumeTargetPosition()
     {
         if (consumePoint != null)
-            return consumePoint.anchoredPosition;
+            return GetRectPositionInRoot(consumePoint, GetStartPosition());
 
         if (contentRoot != null)
-            return contentRoot.anchoredPosition;
+            return Vector2.zero;
 
-        return startAnchoredPosition;
+        return GetStartPosition();
     }
 
     float GetItemMoveDuration()
@@ -337,6 +471,9 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     {
         return fastFlushRequested ? fastFlushDestroyDelay : delayDestroyTime;
     }
+
+
+
 }
 
 

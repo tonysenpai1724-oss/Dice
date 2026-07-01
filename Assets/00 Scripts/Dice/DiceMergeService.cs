@@ -17,6 +17,7 @@ public class DiceMergeService
     readonly BoardService boardService;
     readonly DiceMergeConfig config;
     readonly DiceQueue diceQueue;
+    readonly Func<DiceQueueUI> getDiceQueueUI;
     readonly Func<List<Dice>> getBoardDices;
     readonly Func<int, DiceType, DiceData> getDiceData;
     readonly Func<DiceData, Vector3, Dice> spawnDice;
@@ -30,6 +31,7 @@ public class DiceMergeService
         BoardService boardService,
         DiceMergeConfig config,
         DiceQueue diceQueue,
+        Func<DiceQueueUI> getDiceQueueUI,
         Func<List<Dice>> getBoardDices,
         Func<int, DiceType, DiceData> getDiceData,
         Func<DiceData, Vector3, Dice> spawnDice,
@@ -42,6 +44,7 @@ public class DiceMergeService
         this.boardService = boardService;
         this.config = config;
         this.diceQueue = diceQueue;
+        this.getDiceQueueUI = getDiceQueueUI;
         this.getBoardDices = getBoardDices;
         this.getDiceData = getDiceData;
         this.spawnDice = spawnDice;
@@ -83,8 +86,8 @@ public class DiceMergeService
         Vector3 mergePos = (a.transform.position + b.transform.position) * 0.5f;
         mergePos.y = boardService.GetBoardSurfaceY();
 
-        diceQueue.AddDice(a.data, mergePos);
-        diceQueue.AddDice(b.data, mergePos);
+        EnqueueDice(a.data, mergePos);
+        EnqueueDice(b.data, mergePos);
 
         int chain = comboChainMap.TryGetValue(a, out int chainValue) ? chainValue : 1;
 
@@ -133,6 +136,18 @@ public class DiceMergeService
             return second;
 
         return null;
+    }
+
+    void EnqueueDice(DiceData data, Vector3 mergePosition)
+    {
+        DiceQueueUI diceQueueUI = getDiceQueueUI?.Invoke();
+        if (diceQueueUI != null)
+        {
+            diceQueueUI.AddDice(data, mergePosition);
+            return;
+        }
+
+        diceQueue?.AddDice(data, mergePosition);
     }
 
     void ExplodeBoardDice(Vector3 position, DiceData sourceData)

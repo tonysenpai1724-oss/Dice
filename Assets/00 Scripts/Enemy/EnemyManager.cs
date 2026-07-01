@@ -489,7 +489,16 @@ public class EnemyManager : Singleton<EnemyManager>
         if (enemies.Count != 0 || GameplayManager.Instance == null || GameplayManager.Instance.IsGameEnded)
             return;
 
-        DiceQueueUI queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueueUI : null;
+        DiceQueueUI queueUI = DiceManager.Instance != null && DiceManager.Instance.diceQueueUI != null
+            ? DiceManager.Instance.diceQueueUI
+            : DiceQueueUI.Instance;
+        if (queueUI != null && queueUI.IsBusy)
+        {
+            queueUI.RequestFastFlush();
+            return;
+        }
+
+        DiceQueue queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueue : null;
         if (queue != null && queue.IsBusy)
         {
             queue.RequestFastFlush();
@@ -1230,6 +1239,5 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnArea.spawnSpace == EnemySpawnSpace.World ? areaPoint : spawnArea.uiArea.TransformPoint(areaPoint);
     }
 }
-
 
 

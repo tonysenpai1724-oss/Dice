@@ -75,13 +75,22 @@ public static class BombRuneSkillData
     public static void Execute()
     {
         DiceManager diceManager = DiceManager.Instance;
+        DiceQueueUI diceQueueUI = diceManager != null && diceManager.diceQueueUI != null
+            ? diceManager.diceQueueUI
+            : DiceQueueUI.Instance;
         DiceQueue diceQueue = diceManager != null ? diceManager.diceQueue : null;
         DiceData bombDiceData = diceManager != null ? diceManager.GetDiceData(5, DiceType.Bomb) : null;
 
-        if (diceQueue == null || bombDiceData == null)
+        if (bombDiceData == null)
             return;
 
-        diceQueue.AddDice(bombDiceData);
+        if (diceQueueUI != null)
+        {
+            diceQueueUI.AddDice(bombDiceData);
+            return;
+        }
+
+        diceQueue?.AddDice(bombDiceData);
     }
 }
 

@@ -28,6 +28,7 @@ public class DiceThrowController : MonoBehaviour
 
     [Header("Queue")]
     public DiceQueue diceQueue;
+    public DiceQueueUI diceQueueUI;
 
     Dice currentDice;
 
@@ -244,16 +245,36 @@ public class DiceThrowController : MonoBehaviour
             yield return null;
         }
 
-        DiceQueue queue =
-            diceQueue != null
-            ? diceQueue
-            : DiceManager.Instance.diceQueue;
+        DiceQueueUI queueUI =
+            diceQueueUI != null
+            ? diceQueueUI
+            : DiceManager.Instance != null
+                ? DiceManager.Instance.diceQueueUI != null
+                    ? DiceManager.Instance.diceQueueUI
+                    : DiceQueueUI.Instance
+                : DiceQueueUI.Instance;
 
-        if (queue != null)
+        if (queueUI != null)
         {
             yield return StartCoroutine(
-                queue.ProcessQueue()
+                queueUI.ProcessQueue()
             );
+        }
+        else
+        {
+            DiceQueue queue =
+                diceQueue != null
+                ? diceQueue
+                : DiceManager.Instance != null
+                    ? DiceManager.Instance.diceQueue
+                    : null;
+
+            if (queue != null)
+            {
+                yield return StartCoroutine(
+                    queue.ProcessQueue()
+                );
+            }
         }
 
         if (TurnManager.Instance != null &&
