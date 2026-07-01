@@ -89,6 +89,9 @@ public class EnemyManager : Singleton<EnemyManager>
         if (currentLevel == null || enemyPrefab == null)
             return;
 
+        SnapPlayerToConfiguredGrid();
+
+
         List<EnemyData> waveEnemyDatas = currentLevel.GetWaveEnemyDatas(currentWaveIndex);
         List<EnemySpawnPlacement> wavePlacements = currentLevel.GetWaveSpawnPlacements(currentWaveIndex);
 
@@ -486,7 +489,7 @@ public class EnemyManager : Singleton<EnemyManager>
         if (enemies.Count != 0 || GameplayManager.Instance == null || GameplayManager.Instance.IsGameEnded)
             return;
 
-        DiceQueue queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueue : null;
+        DiceQueueUI queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueueUI : null;
         if (queue != null && queue.IsBusy)
         {
             queue.RequestFastFlush();
@@ -981,6 +984,32 @@ public class EnemyManager : Singleton<EnemyManager>
         rectTransform.localPosition = new Vector3(gridPosition.x, gridPosition.y, rectTransform.localPosition.z);
     }
 
+    void SnapPlayerToConfiguredGrid()
+    {
+        if (player == null || spawnPositionGenerator == null)
+            return;
+
+        int row = spawnPositionGenerator.GetPlayerSpawnRow();
+        int column = spawnPositionGenerator.GetPlayerSpawnColumn();
+        Vector3 position = GetGridLocalPosition(row, column);
+
+        RectTransform playerRect = player.GetComponent<RectTransform>();
+        if (playerRect != null)
+        {
+            Transform targetParent = combatSpaceRoot != null
+                ? combatSpaceRoot
+                : (enemyRoot != null ? enemyRoot : transform);
+
+            if (targetParent != null && playerRect.parent != targetParent)
+                playerRect.SetParent(targetParent, false);
+
+            playerRect.localPosition = position;
+            return;
+        }
+
+        player.transform.localPosition = position;
+    }
+
     Vector3 GetGridLocalPosition(int row, int column)
     {
         return GetGridLocalPosition(null, row, column);
@@ -1201,3 +1230,6 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnArea.spawnSpace == EnemySpawnSpace.World ? areaPoint : spawnArea.uiArea.TransformPoint(areaPoint);
     }
 }
+
+
+

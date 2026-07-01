@@ -32,6 +32,7 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
     public int gridRows = 3;
     public int gridColumns = 6;
     public int playerColumn = 0;
+    public int playerRow = 1;
     public int meleeStartColumn = 4;
     public int rangeStartColumn = 5;
     public float fallbackSpacing = 120f;
@@ -335,6 +336,16 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         return Mathf.Clamp(rows / 2, 0, Mathf.Max(0, rows - 1));
     }
 
+    public int GetPlayerSpawnRow()
+    {
+        return Mathf.Clamp(playerRow, 0, Mathf.Max(0, gridRows - 1));
+    }
+
+    public int GetPlayerSpawnColumn()
+    {
+        return Mathf.Clamp(playerColumn, 0, Mathf.Max(0, gridColumns - 1));
+    }
+
     int GetBossSpawnColumn(int columns, int minEnemyColumn)
     {
         return Mathf.Clamp(columns / 2, minEnemyColumn, Mathf.Max(minEnemyColumn, columns - 1));
@@ -393,6 +404,8 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         return placements;
     }
 }
+
+
 
 
 

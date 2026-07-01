@@ -36,8 +36,8 @@ public class BoardPlaneScaler : MonoBehaviour
 
     void Update()
     {
-        // if (!Application.isPlaying)
-        ApplyScale();
+        if (!Application.isPlaying)
+            ApplyScale();
     }
 
     [ContextMenu("Apply Board Scale")]
@@ -54,7 +54,7 @@ public class BoardPlaneScaler : MonoBehaviour
 
         Vector3 nextScale = initialScale;
         if (scaleWidthOnly)
-            nextScale.x = 4f * initialScale.x * aspectRatio;
+            nextScale.x = 3f * initialScale.x * aspectRatio;
         else
             nextScale = new Vector3(3 * initialScale.x * aspectRatio, 4.5f * initialScale.y * aspectRatio, 4.5f * initialScale.z * aspectRatio);
 
