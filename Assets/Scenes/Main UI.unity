@@ -9090,8 +9090,92 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentInventoryManager
   equipmentDatabase: {fileID: 11400000, guid: 677041f7bdf74ba43b75c299a67e3e24, type: 2}
-  ownedEquipments: []
-  baseEquiments: []
+  ownedEquipments:
+  - entryId: 666e0d9148094662905ec41bce335a1d
+    equipmentId: bn1
+    quantity: 1
+  - entryId: a192729c8247450faf229e04e763f8e3
+    equipmentId: bn1
+    quantity: 1
+  - entryId: 1d0bf86518744085aad7ea3280d72186
+    equipmentId: bn2
+    quantity: 1
+  - entryId: 9531e9bbf2ee41ffb1398f3ae31255dd
+    equipmentId: bn2
+    quantity: 1
+  - entryId: 5ace387778e9487ba3c9f7ae82a5e847
+    equipmentId: bn3
+    quantity: 1
+  - entryId: d3442c6ce9c64f03832960fca4660998
+    equipmentId: bn3
+    quantity: 1
+  - entryId: 1c5936630d8b4c9f8c893303e5ef1147
+    equipmentId: bn4
+    quantity: 1
+  - entryId: 02cf897450f14b478087a213ec10130b
+    equipmentId: bn4
+    quantity: 1
+  - entryId: fc49b96a4b734e47a50a30464e9dac97
+    equipmentId: bn5
+    quantity: 1
+  - entryId: dfe3065482db411381a9311a4f8c78ff
+    equipmentId: bn5
+    quantity: 1
+  - entryId: 6538ed4caafd4d54b7a8daafdb5a4b4d
+    equipmentId: bn6
+    quantity: 1
+  - entryId: c62e45952cea4927acd1dc353645c95d
+    equipmentId: bn6
+    quantity: 1
+  - entryId: a81ec0dea08b4422a709ba7f7a71a94a
+    equipmentId: rof1
+    quantity: 1
+  - entryId: 6f0ab19375cf4301bb1a37a6b5eef40b
+    equipmentId: rof1
+    quantity: 1
+  - entryId: d02c7cd7866e4db894a2842570c4b6f6
+    equipmentId: rof2
+    quantity: 1
+  - entryId: 996aa0c97cc0419db1a9b299dd1149e1
+    equipmentId: rof2
+    quantity: 1
+  - entryId: 7cac25715d7a49d7b0f42fecc01642dc
+    equipmentId: rof3
+    quantity: 1
+  - entryId: a88d6777ad5c4ab183da8600fffcec5e
+    equipmentId: rof3
+    quantity: 1
+  - entryId: 8873436453f3411abb67ab04f222352d
+    equipmentId: rof4
+    quantity: 1
+  - entryId: c25394b028354444a0283e3a859b1c48
+    equipmentId: rof4
+    quantity: 1
+  - entryId: 84eab6cde4b645cd8e4c7c05036913ae
+    equipmentId: rof5
+    quantity: 1
+  - entryId: 078f4bb5fbe643488d12a4bef2ad49ab
+    equipmentId: rof5
+    quantity: 1
+  - entryId: c8d9f31551054e2d841c8ae0b404bed6
+    equipmentId: rof6
+    quantity: 1
+  - entryId: 5d3f4991c75c4fcb9e65dfd1c7eae85a
+    equipmentId: rof6
+    quantity: 1
+  baseEquiments:
+  - {fileID: 11400000, guid: dc8046d2733d8b14bba037b2b48a907d, type: 2}
+  - {fileID: 11400000, guid: 724fc4b374035a649aaacd1f6eab6037, type: 2}
+  - {fileID: 11400000, guid: 459ead5e6753c4d4286dcc9a132db987, type: 2}
+  - {fileID: 11400000, guid: abf653e20749b5744aa70e51ae458230, type: 2}
+  - {fileID: 11400000, guid: efafeffb1b7858a4b89c78dff42513b6, type: 2}
+  - {fileID: 11400000, guid: 22145713cf63df64590f48c77257a723, type: 2}
+  - {fileID: 11400000, guid: 2c2477fa8cf11024b8e0083a16017c25, type: 2}
+  - {fileID: 11400000, guid: b15464a30b22b0140b41853e130b9332, type: 2}
+  - {fileID: 11400000, guid: 97cd90518cb4b7f449708fbb3a9bb358, type: 2}
+  - {fileID: 11400000, guid: 57d0a3b8611e9df4e94b0d8fb095f417, type: 2}
+  - {fileID: 11400000, guid: 4b7d6b411a02beb41afe28db9c37f8f1, type: 2}
+  - {fileID: 11400000, guid: fd3e0cf6f0e10624cb3b6915c8d27903, type: 2}
 --- !u!4 &1764901871
 Transform:
   m_ObjectHideFlags: 0

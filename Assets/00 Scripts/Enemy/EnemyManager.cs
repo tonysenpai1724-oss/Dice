@@ -8,6 +8,7 @@ using UnityEditor;
 
 public class EnemyManager : Singleton<EnemyManager>
 {
+    Coroutine pendingWinCheckCoroutine;
     public EffectManager effectManager;
 
     [Header("Refs")]
@@ -519,6 +520,22 @@ public class EnemyManager : Singleton<EnemyManager>
         GameplayManager.Instance.EndGame(true);
     }
 
+
+    void RequestDeferredWinCheck()
+    {
+        if (pendingWinCheckCoroutine != null)
+            return;
+
+        pendingWinCheckCoroutine = StartCoroutine(DeferredWinCheckRoutine());
+    }
+
+    IEnumerator DeferredWinCheckRoutine()
+    {
+        yield return null;
+        yield return null;
+        pendingWinCheckCoroutine = null;
+        CheckWinGame();
+    }
     bool IsChestLevel(Level level)
     {
         return level != null && level.leveltype == LevelType.Chest;
@@ -596,7 +613,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
         bool attackCompleted = false;
         Spine.TrackEntry attackTrack = enemy.PlayAnimation(enemy.attackAnim, false);
-        
+
         if (attackTrack == null)
             yield break;
 
@@ -1253,5 +1270,8 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnArea.spawnSpace == EnemySpawnSpace.World ? areaPoint : spawnArea.uiArea.TransformPoint(areaPoint);
     }
 }
+
+
+
 
 

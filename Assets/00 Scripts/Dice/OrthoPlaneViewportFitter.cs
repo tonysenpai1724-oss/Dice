@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+[DefaultExecutionOrder(-1000)]
 [ExecuteAlways]
 public class OrthoPlaneViewportFitter : MonoBehaviour
 {
@@ -22,6 +23,11 @@ public class OrthoPlaneViewportFitter : MonoBehaviour
     Vector2Int lastScreenSize;
     float lastOrthoSize;
     float lastAspect;
+
+    void Awake()
+    {
+        ApplyReferenceFit();
+    }
 
     void OnEnable()
     {
@@ -106,3 +112,5 @@ public class OrthoPlaneViewportFitter : MonoBehaviour
                !Mathf.Approximately(lastAspect, cam.aspect);
     }
 }
+
+

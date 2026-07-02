@@ -1,4 +1,3 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,6 +55,7 @@ public class Dice : PoolingObject
     public List<DecalProjector> decals2 = new();
     public List<MeshRenderer> decalMeshes = new();
     public List<MeshRenderer> decalMeshes2 = new();
+    public List<MeshRenderer> decalMeshes3 = new();
     public bool preferMeshDecals = true;
 
     [Header("Physics")]
@@ -136,6 +136,7 @@ public class Dice : PoolingObject
         Material secondaryDecalMaterial = data.decalMaterial.Count > 1
             ? data.decalMaterial[1]
             : null;
+        int decalCount = data.decalMaterial.Count;
 
         bool useProjectorPrimary = !preferMeshDecals || decalMeshes.Count == 0;
         foreach (var d in decals)
@@ -155,7 +156,7 @@ public class Dice : PoolingObject
             if (d == null)
                 continue;
 
-            bool enabled = !useProjectorPrimary && primaryDecalMaterial != null;
+            bool enabled = !useProjectorPrimary && primaryDecalMaterial != null && decalCount == 1;
             d.gameObject.SetActive(enabled);
             d.enabled = enabled;
             if (primaryDecalMaterial != null)
@@ -168,7 +169,7 @@ public class Dice : PoolingObject
             if (d == null)
                 continue;
 
-            bool enabled = useProjectorSecondary && secondaryDecalMaterial != null;
+            bool enabled = useProjectorSecondary && secondaryDecalMaterial != null && decalCount == 2;
             d.gameObject.SetActive(enabled);
             d.enabled = enabled;
             if (secondaryDecalMaterial != null)
@@ -180,12 +181,26 @@ public class Dice : PoolingObject
             if (d == null)
                 continue;
 
-            bool enabled = !useProjectorSecondary && secondaryDecalMaterial != null;
+            bool enabled = !useProjectorSecondary && secondaryDecalMaterial != null && decalCount == 2;
             d.gameObject.SetActive(enabled);
             d.enabled = enabled;
             if (secondaryDecalMaterial != null)
                 d.sharedMaterial = secondaryDecalMaterial;
         }
+        foreach (var d in decalMeshes3)
+        {
+            if (d == null)
+                continue;
+
+            bool enabled = !useProjectorSecondary && primaryDecalMaterial != null && decalCount == 2;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (primaryDecalMaterial != null)
+                d.sharedMaterial = primaryDecalMaterial;
+        }
+
+
+
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = false;
@@ -244,8 +259,6 @@ public class Dice : PoolingObject
     {
         if (rb != null)
         {
-            // rb.linearVelocity = Vector3.zero;
-            // rb.angularVelocity = Vector3.zero;
             rb.isKinematic = false;
         }
 
@@ -379,8 +392,6 @@ public class Dice : PoolingObject
         Quaternion uprightRotation =
             GetUprightRotation();
 
-        //  rb.linearVelocity = Vector3.zero;
-        //rb.angularVelocity = Vector3.zero;
         transform.SetPositionAndRotation(
             position,
             uprightRotation
@@ -440,16 +451,6 @@ public class Dice : PoolingObject
                 ? data.targetColor
                 : data.baseOutlineColor
         );
-    }
-
-    void OnMouseEnter()
-    {
-        // SetHoverState(true);
-    }
-
-    void OnMouseExit()
-    {
-        //SetHoverState(false);
     }
 
     public Quaternion GetUprightRotation()
@@ -519,6 +520,7 @@ public class Dice : PoolingObject
             ForceMode.Impulse
         );
     }
+
     void TryMergeCollision(Collision col)
     {
         if (state == DiceState.Merging)
@@ -550,24 +552,4 @@ public class Dice : PoolingObject
 
         DiceManager.Instance.TryMerge(this, other);
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

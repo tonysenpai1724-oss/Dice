@@ -92,3 +92,5 @@ MonoBehaviour:
     price: 15
   - runeData: {fileID: 11400000, guid: 3f3be972fed80a44e845e946e23a4483, type: 2}
     price: 15
+  - runeData: {fileID: 11400000, guid: c4b39443f4afc644998f9522090ac964, type: 2}
+    price: 15

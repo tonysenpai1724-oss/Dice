@@ -270,12 +270,13 @@ public class DiceComboService
         dice.transform.rotation = targetRot;
         dice.rb.position = finalDestination;
         dice.rb.rotation = targetRot;
-        Physics.SyncTransforms();
-        dice.rb.isKinematic = false;
+        dice.SetCollisionEnabled(true);
+        dice.ApplyGroundedConstraints();
         dice.rb.linearVelocity = Vector3.zero;
         dice.rb.angularVelocity = Vector3.zero;
+        Physics.SyncTransforms();
+        dice.rb.isKinematic = false;
         dice.rb.Sleep();
-        dice.SetCollisionEnabled(true);
         dice.state = DiceState.Idle;
 
         runCoroutine?.Invoke(RecoverUprightRoutine(dice));
@@ -306,3 +307,7 @@ public class DiceComboService
         rigidbody.angularVelocity = Vector3.zero;
     }
 }
+
+
+
+

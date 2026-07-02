@@ -25,15 +25,15 @@ public class ItemPreviewGenerator : MonoBehaviour
         item.transform.localScale = previewLocalScale;
         item.transform.localRotation = Quaternion.Euler(previewLocalEulerAngles);
         item.Setup(diceData);
-        foreach (Transform t in item.GetComponentsInChildren<Transform>(true))
-        {
-            Debug.Log($"{t.name} | Layer = {LayerMask.LayerToName(t.gameObject.layer)}");
-        }
+        // foreach (Transform t in item.GetComponentsInChildren<Transform>(true))
+        // {
+        //     Debug.Log($"{t.name} | Layer = {LayerMask.LayerToName(t.gameObject.layer)}");
+        // }
 
         Texture2D texture = Capture();
 
         item.gameObject.SetActive(false);
-        // Destroy(item.gameObject);
+        Destroy(item.gameObject);
 
         return texture;
     }

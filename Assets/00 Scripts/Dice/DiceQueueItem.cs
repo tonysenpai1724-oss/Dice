@@ -12,6 +12,7 @@ public class DiceQueueItem : PoolingObject
     public List<DecalProjector> decals2 = new();
     public List<MeshRenderer> decalMeshes = new();
     public List<MeshRenderer> decalMeshes2 = new();
+    public List<MeshRenderer> decalMeshes3 = new();
     public bool preferMeshDecals = true;
     public DiceData data;
 
@@ -42,63 +43,80 @@ public class DiceQueueItem : PoolingObject
                 meshRenderer.material = data.diceMaterial;
         }
 
-        Material firstDecal = visible && data.decalMaterial != null && data.decalMaterial.Count > 0
-            ? data.decalMaterial[0]
-            : null;
-
-        for (int i = 0; i < decals.Count; i++)
-        {
-            DecalProjector decal = decals[i];
-            if (decal == null)
-                continue;
-
-            decal.gameObject.SetActive(firstDecal != null && decalMeshes.Count == 0);
-            decal.enabled = firstDecal != null && decalMeshes.Count == 0;
-            if (firstDecal != null)
-                decal.material = firstDecal;
-        }
-
-        for (int i = 0; i < decalMeshes.Count; i++)
-        {
-            MeshRenderer decalMesh = decalMeshes[i];
-            if (decalMesh == null)
-                continue;
-
-            decalMesh.gameObject.SetActive(firstDecal != null);
-            decalMesh.enabled = firstDecal != null;
-            if (firstDecal != null)
-                decalMesh.sharedMaterial = firstDecal;
-        }
-
-        Material secondDecal = visible && data.decalMaterial != null && data.decalMaterial.Count > 1
+        Material primaryDecalMaterial = data.decalMaterial.Count > 0
+         ? data.decalMaterial[0]
+         : null;
+        Material secondaryDecalMaterial = data.decalMaterial.Count > 1
             ? data.decalMaterial[1]
             : null;
-        bool useProjectorSecond = !preferMeshDecals || decalMeshes2.Count == 0;
+        int decalCount = data.decalMaterial.Count;
 
-        for (int i = 0; i < decals2.Count; i++)
+        bool useProjectorPrimary = !preferMeshDecals || decalMeshes.Count == 0;
+        foreach (var d in decals)
         {
-            DecalProjector decal = decals2[i];
-            if (decal == null)
+            if (d == null)
                 continue;
 
-            decal.gameObject.SetActive(secondDecal != null && useProjectorSecond);
-            decal.enabled = secondDecal != null && useProjectorSecond;
-            if (secondDecal != null)
-                decal.material = secondDecal;
+            bool enabled = useProjectorPrimary && primaryDecalMaterial != null;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (primaryDecalMaterial != null)
+                d.material = primaryDecalMaterial;
         }
 
-        for (int i = 0; i < decalMeshes2.Count; i++)
+        foreach (var d in decalMeshes)
         {
-            MeshRenderer decalMesh = decalMeshes2[i];
-            if (decalMesh == null)
+            if (d == null)
                 continue;
 
-            decalMesh.gameObject.SetActive(secondDecal != null);
-            decalMesh.enabled = secondDecal != null;
-            if (secondDecal != null)
-                decalMesh.sharedMaterial = secondDecal;
+            bool enabled = !useProjectorPrimary && primaryDecalMaterial != null && decalCount == 1;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (primaryDecalMaterial != null)
+                d.sharedMaterial = primaryDecalMaterial;
         }
+
+        bool useProjectorSecondary = !preferMeshDecals || decalMeshes2.Count == 0;
+        foreach (var d in decals2)
+        {
+            if (d == null)
+                continue;
+
+            bool enabled = useProjectorSecondary && secondaryDecalMaterial != null && decalCount == 2;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (secondaryDecalMaterial != null)
+                d.material = secondaryDecalMaterial;
+        }
+
+        foreach (var d in decalMeshes2)
+        {
+            if (d == null)
+                continue;
+
+            bool enabled = !useProjectorSecondary && primaryDecalMaterial != null && decalCount == 2;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (primaryDecalMaterial != null)
+                d.sharedMaterial = primaryDecalMaterial;
+        }
+        foreach (var d in decalMeshes3)
+        {
+            if (d == null)
+                continue;
+
+            bool enabled = !useProjectorSecondary && secondaryDecalMaterial != null && decalCount == 2;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (secondaryDecalMaterial != null)
+                d.sharedMaterial = secondaryDecalMaterial;
+        }
+
+
     }
+
+
+
 
     void ApplyPreview(Texture2D previewTexture)
     {
@@ -149,6 +167,5 @@ public class DiceQueueItem : PoolingObject
         }
     }
 }
-
 
 
