@@ -617,9 +617,10 @@ public class EnemyManager : Singleton<EnemyManager>
         if (attackTrack == null)
             yield break;
 
+        attackTrack.TimeScale = Mathf.Max(0.1f, enemy.enemyAttackAnimSpeed);
         attackTrack.Complete += _ => attackCompleted = true;
 
-        float duration = attackTrack.Animation.Duration;
+        float duration = attackTrack.Animation.Duration / attackTrack.TimeScale;
         float halfTime = duration * 0.5f;
         float timer = 0f;
 
@@ -1270,6 +1271,7 @@ public class EnemyManager : Singleton<EnemyManager>
         return spawnArea.spawnSpace == EnemySpawnSpace.World ? areaPoint : spawnArea.uiArea.TransformPoint(areaPoint);
     }
 }
+
 
 
 

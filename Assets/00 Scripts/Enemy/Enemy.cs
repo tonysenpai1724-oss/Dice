@@ -22,6 +22,7 @@ public class Enemy : GameUnit
 
     [Header("anim")]
     public string moveAnim = "Move";
+    [Min(0.1f)] public float enemyAttackAnimSpeed = 1f;
 
     protected override void Awake()
     {
@@ -45,6 +46,7 @@ public class Enemy : GameUnit
         // attackRange = Mathf.Max(1, data.attackRange);
 
         transform.localScale = data.scale;
+        enemyAttackAnimSpeed = Mathf.Max(0.1f, data.attackAnimSpeed);
         ResetDeathFade();
 
         if (skeletonGraphic != null)
@@ -163,3 +165,4 @@ public enum EnemyLevel
     MiniBoss,
     Boss,
 }
+

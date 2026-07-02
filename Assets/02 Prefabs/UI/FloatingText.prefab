@@ -287,6 +287,6 @@ MonoBehaviour:
   moveSpeed: 1
   duration: 1
   blinkDuration: 0.7
-  blinkSpeed: 18
+  blinkSpeed: 6
   colorTransitionDuration: 0.2
   text: {fileID: 1474785772136917653}

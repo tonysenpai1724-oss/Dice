@@ -16,6 +16,7 @@ public class EnemyData : SerializedScriptableObject
     public EnemyType type;
     public EnemyLevel enemyLevel;
     public SkeletonDataAsset skeletonData;
+    [Min(0.1f)] public float attackAnimSpeed = 1f;
     // public int startDistance = 3;
     // public int attackRange = 1;
     public int level = 1;
@@ -23,3 +24,4 @@ public class EnemyData : SerializedScriptableObject
 
 
 }
+

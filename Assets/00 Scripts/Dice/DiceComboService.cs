@@ -122,6 +122,45 @@ public class DiceComboService
         return nearest;
     }
 
+    bool ShouldSwitchToPhysics(Dice dice, Vector3 currentPosition, Vector3 nextPosition, float radius = 0.55f)
+    {
+        if (dice == null)
+            return false;
+
+        Vector3 direction = nextPosition - currentPosition;
+        float distance = direction.magnitude;
+        if (distance <= 0.001f)
+            return false;
+
+        direction /= distance;
+        RaycastHit[] hits = Physics.SphereCastAll(
+            currentPosition + Vector3.up * 0.05f,
+            radius,
+            direction,
+            distance,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Collide
+        );
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Collider hitCollider = hits[i].collider;
+            if (hitCollider == null)
+                continue;
+
+            Dice other = hitCollider.GetComponentInParent<Dice>();
+            if (other == null || other == dice)
+                continue;
+
+            if (!other.gameObject.activeInHierarchy)
+                continue;
+
+            return true;
+        }
+
+        return false;
+    }
+
     public IEnumerator ComboJumpRoutine(Dice dice, Dice target, Vector3 targetPos, Vector3 dir, bool shouldFullBounce)
     {
         if (dice == null)
@@ -129,10 +168,11 @@ public class DiceComboService
 
         dice.state = DiceState.FlyingCombo;
         dice.canMerge = true;
-        //  dice.SetCollisionEnabled(false);
-        dice.rb.isKinematic = true;
-        //  dice.rb.linearVelocity = Vector3.zero;
-        //  dice.rb.angularVelocity = Vector3.zero;
+        dice.SetCollisionEnabled(true);
+        dice.rb.isKinematic = false;
+        dice.ApplyFlyingConstraints();
+        dice.rb.linearVelocity = Vector3.zero;
+        dice.rb.angularVelocity = Vector3.zero;
 
         Vector3 start = dice.transform.position;
         Vector3 finalDestination = targetPos;
@@ -148,74 +188,87 @@ public class DiceComboService
             finalDestination = boardService.FindClearPosition(finalDestination, dice);
 
         Vector3 jumpDir = dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward;
+        float comboCount = comboChainMap.TryGetValue(dice, out int currentChain)
+            ? currentChain + 1
+            : 1;
+
+        comboChainMap[dice] = (int)comboCount;
+        comboLastTime[dice] = Time.time;
+
+        float dynamicDuration = Mathf.Min(
+            config.comboDuration + comboCount * config.comboDurationPerChain,
+            config.maxComboDuration);
+
+        float dynamicArcHeight = Mathf.Min(
+            config.comboArcHeight + comboCount * config.comboArcPerChain,
+            config.maxComboArcHeight);
+
         float originalDist = Vector3.Distance(start, finalDestination);
-        float actualBounceDistance = Mathf.Min(2.8f, originalDist * 0.55f);
+        float actualBounceDistance = shouldFullBounce
+            ? Mathf.Min(2.8f, originalDist * 0.55f)
+            : 0f;
 
         Vector3 mainJumpEnd = finalDestination - jumpDir * actualBounceDistance;
         mainJumpEnd.y = boardService.GetBoardSurfaceY();
 
-        int comboCount = comboChainMap.TryGetValue(dice, out int currentChain)
-            ? currentChain + 1
-            : 1;
-
-        comboChainMap[dice] = comboCount;
-        comboLastTime[dice] = Time.time;
-
         Vector3 sideOffset = Vector3.Cross(
             Vector3.up,
-            dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward) *
-            UnityEngine.Random.Range(-config.comboSideScatter, config.comboSideScatter);
+            jumpDir) * UnityEngine.Random.Range(-config.comboSideScatter, config.comboSideScatter);
 
-        Vector3 angularSpin = new Vector3(
+        Vector3 spinVelocity = new Vector3(
             UnityEngine.Random.Range(config.comboSpinTurnsX.x, config.comboSpinTurnsX.y),
             UnityEngine.Random.Range(config.comboSpinTurnsY.x, config.comboSpinTurnsY.y),
             UnityEngine.Random.Range(config.comboSpinTurnsZ.x, config.comboSpinTurnsZ.y));
 
         if (UnityEngine.Random.value < 0.2f)
-            angularSpin *= 1.8f;
+            spinVelocity *= 1.8f;
 
         float t = 0f;
-        float dynamicDuration = Mathf.Min(
-            config.comboDuration + comboCount * config.comboDurationPerChain,
-            config.maxComboDuration);
+        bool merged = false;
+        float mergeDistance = Mathf.Max(1.2f, config.diceSpacingRadius * 1.25f);
+        Vector3 previousPosition = start;
 
         while (t < 1f)
         {
             if (dice == null)
                 yield break;
 
-            if (target != null && !target.gameObject.activeInHierarchy)
-                break;
+            t += Time.deltaTime / Mathf.Max(0.01f, dynamicDuration);
+            float clampedT = Mathf.Clamp01(t);
+            float easedT = 1f - Mathf.Pow(1f - clampedT, 2f);
 
-            t += Time.deltaTime / dynamicDuration;
+            Vector3 pos = Vector3.Lerp(start, mainJumpEnd, easedT);
+            float arc = Mathf.Pow(Mathf.Clamp01(Mathf.Sin(clampedT * Mathf.PI)), 0.7f);
+            pos.y = boardService.GetBoardSurfaceY() + arc * dynamicArcHeight;
+            pos += sideOffset * Mathf.Sin(clampedT * Mathf.PI);
 
-            Vector3 pos = Vector3.Lerp(start, mainJumpEnd, t);
-            float dynamicArcHeight = Mathf.Min(
-                config.comboArcHeight + comboCount * config.comboArcPerChain,
-                config.maxComboArcHeight);
+            Vector3 frameVelocity = (pos - previousPosition) / Mathf.Max(Time.deltaTime, 0.0001f);
+            dice.rb.linearVelocity = frameVelocity;
 
-            float arc = Mathf.Pow(Mathf.Clamp01(Mathf.Sin(t * Mathf.PI)), 0.7f);
-            pos.y += arc * dynamicArcHeight;
-            pos += sideOffset * Mathf.Sin(t * Mathf.PI);
-            dice.transform.position = pos;
+            Vector3 rotationStep = spinVelocity * (1f - Mathf.Pow(clampedT, 1.8f)) * Time.deltaTime;
+            dice.rb.MoveRotation(dice.rb.rotation * Quaternion.Euler(rotationStep));
+            dice.rb.MovePosition(pos);
+            previousPosition = pos;
 
-            float spinDamping = 1f - Mathf.Pow(t, 1.8f);
-            dice.transform.Rotate(angularSpin * spinDamping * Time.deltaTime, Space.Self);
+            if (target != null && target.gameObject.activeInHierarchy)
+            {
+                float distToTarget = Vector3.Distance(dice.transform.position, target.transform.position);
+                if (distToTarget <= mergeDistance && target.Level == dice.Level && !target.isMerging && !dice.isMerging)
+                {
+                    comboChainMap[target] = (int)comboCount;
+                    if (tryMerge != null && tryMerge.Invoke(dice, target))
+                    {
+                        merged = true;
+                        break;
+                    }
+                }
+            }
+
             yield return null;
         }
 
-        if (target != null && target.gameObject.activeInHierarchy)
-        {
-            float distToTarget = Vector3.Distance(dice.transform.position, target.transform.position);
-            float mergeDistance = Mathf.Max(1.2f, config.diceSpacingRadius * 1.25f);
-
-            if (distToTarget <= mergeDistance && target.Level == dice.Level && !target.isMerging && !dice.isMerging)
-            {
-                comboChainMap[target] = comboCount;
-                if (tryMerge != null && tryMerge.Invoke(dice, target))
-                    yield break;
-            }
-        }
+        if (merged || dice == null)
+            yield break;
 
         comboChainMap.Remove(dice);
         if (target != null)
@@ -260,22 +313,24 @@ public class DiceComboService
                 Vector3 horizontalPos = Vector3.Lerp(horizontalStart, horizontalEnd, forwardEase);
 
                 float currentY = boardService.GetBoardSurfaceY() + Mathf.Sin(Mathf.Clamp01(bounceTime) * Mathf.PI) * bounceHeight;
-                dice.transform.position = new Vector3(horizontalPos.x, currentY, horizontalPos.z);
-                dice.transform.rotation = Quaternion.Slerp(startRot, targetRot, 1f - Mathf.Pow(1f - currentBounceT, 3f));
+                Vector3 bouncePos = new Vector3(horizontalPos.x, currentY, horizontalPos.z);
+                Vector3 bounceVelocity = (bouncePos - previousPosition) / Mathf.Max(Time.deltaTime, 0.0001f);
+
+                dice.rb.linearVelocity = bounceVelocity;
+                dice.rb.MovePosition(bouncePos);
+                dice.rb.MoveRotation(Quaternion.Slerp(startRot, targetRot, 1f - Mathf.Pow(1f - currentBounceT, 3f)));
+                previousPosition = bouncePos;
                 yield return null;
             }
         }
 
+        dice.rb.linearVelocity = Vector3.zero;
+        dice.rb.angularVelocity = Vector3.zero;
         dice.transform.position = finalDestination;
         dice.transform.rotation = targetRot;
         dice.rb.position = finalDestination;
         dice.rb.rotation = targetRot;
-        dice.SetCollisionEnabled(true);
         dice.ApplyGroundedConstraints();
-        dice.rb.linearVelocity = Vector3.zero;
-        dice.rb.angularVelocity = Vector3.zero;
-        Physics.SyncTransforms();
-        dice.rb.isKinematic = false;
         dice.rb.Sleep();
         dice.state = DiceState.Idle;
 
@@ -307,6 +362,13 @@ public class DiceComboService
         rigidbody.angularVelocity = Vector3.zero;
     }
 }
+
+
+
+
+
+
+
 
 
 

@@ -382,11 +382,14 @@ MonoBehaviour:
   currentHp: 0
   hpBar: {fileID: 7579299736108074300}
   skeletonGraphic: {fileID: 7603480967361070924}
+  skeletonAnimation: {fileID: 0}
   effectManager: {fileID: 0}
   idleAnim: IDLE
   attackAnim: Attack
   dieAnim: DIE
   hurtAnim: Hurt
+  aimAttackSpeed: 1.5
+  deathFadeDuration: 0.3
   type: 0
   enemyLevel: 0
   damage: 2

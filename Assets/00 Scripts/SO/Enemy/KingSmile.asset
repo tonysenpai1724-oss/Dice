@@ -28,5 +28,6 @@ MonoBehaviour:
   type: 0
   enemyLevel: 2
   skeletonData: {fileID: 11400000, guid: 01cc62cc71d0add4897f50054f5ce20d, type: 2}
+  attackAnimSpeed: 1.5
   level: 1
   coinReward: 0
