@@ -12,6 +12,81 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ea182e1b6a13fa44a357047bf3fbba2, type: 3}
   m_Name: Dice Visual Preset Database SO
   m_EditorClassIdentifier: Assembly-CSharp::DiceVisualPresetDatabaseSO
+  baseLevelMaterials:
+  - level: 1
+    diceMaterial: {fileID: 2100000, guid: 8e105a82ea148574eab4565d6dd50ee4, type: 2}
+    diceColor: {r: 1, g: 1, b: 1, a: 1}
+  - level: 2
+    diceMaterial: {fileID: 2100000, guid: a45327c1499060d4daca7e46b51e97e1, type: 2}
+    diceColor: {r: 0.9843137, g: 0.83137256, b: 0.70980394, a: 1}
+  - level: 3
+    diceMaterial: {fileID: 2100000, guid: 911d2d4c69cfce94f88e008d869f1725, type: 2}
+    diceColor: {r: 0.8980392, g: 0.92156863, b: 0.47058824, a: 1}
+  - level: 4
+    diceMaterial: {fileID: 2100000, guid: 1ef198d14a61584408cf14cbcf25db8d, type: 2}
+    diceColor: {r: 0.4745098, g: 0.99607843, b: 0.54509807, a: 1}
+  - level: 5
+    diceMaterial: {fileID: 2100000, guid: 72c0c4ca97322074e97d9fc35bc2faad, type: 2}
+    diceColor: {r: 0.47058824, g: 0.99215686, b: 0.92156863, a: 1}
+  - level: 6
+    diceMaterial: {fileID: 2100000, guid: d651c0eca9562dd4b8670e47fbd707e7, type: 2}
+    diceColor: {r: 0.3882353, g: 0.53333336, b: 0.99215686, a: 1}
+  - level: 7
+    diceMaterial: {fileID: 2100000, guid: 3c2b543dccdcdae478d26bc8a4928969, type: 2}
+    diceColor: {r: 0.7058824, g: 0.42745098, b: 0.99215686, a: 1}
+  - level: 8
+    diceMaterial: {fileID: 2100000, guid: 472e1dc603b473e47b7d441c9acd1099, type: 2}
+    diceColor: {r: 0.96862745, g: 0.36862746, b: 0.78039217, a: 1}
+  - level: 9
+    diceMaterial: {fileID: 2100000, guid: f2dc03d4fa324d84e90bd33a47e1ea63, type: 2}
+    diceColor: {r: 0.9647059, g: 0.43529412, b: 0.43529412, a: 1}
+  diceTypePresets:
+  - diceType: 9
+    levels:
+    - level: 1
+      decalMaterial:
+      - {fileID: 2100000, guid: ba50ce9ef5d063140905d1ab79a597dd, type: 2}
+      - {fileID: 2100000, guid: 544b1ecc95b00ef4e9f45189f6e60fd3, type: 2}
+    - level: 2
+      decalMaterial:
+      - {fileID: 2100000, guid: 54c64d5a96e972b4781671378c3724af, type: 2}
+      - {fileID: 2100000, guid: 97fd5bb9d0ddb0741a9d445f53410bf9, type: 2}
+    - level: 3
+      decalMaterial:
+      - {fileID: 2100000, guid: 54c64d5a96e972b4781671378c3724af, type: 2}
+      - {fileID: 2100000, guid: 911d2d4c69cfce94f88e008d869f1725, type: 2}
+    - level: 4
+      decalMaterial:
+      - {fileID: 2100000, guid: ba50ce9ef5d063140905d1ab79a597dd, type: 2}
+      - {fileID: 2100000, guid: 1ef198d14a61584408cf14cbcf25db8d, type: 2}
+    - level: 5
+      decalMaterial:
+      - {fileID: 2100000, guid: ba50ce9ef5d063140905d1ab79a597dd, type: 2}
+      - {fileID: 2100000, guid: 72c0c4ca97322074e97d9fc35bc2faad, type: 2}
+    - level: 6
+      decalMaterial:
+      - {fileID: 2100000, guid: ba50ce9ef5d063140905d1ab79a597dd, type: 2}
+      - {fileID: 2100000, guid: d651c0eca9562dd4b8670e47fbd707e7, type: 2}
+    - level: 7
+      decalMaterial:
+      - {fileID: 2100000, guid: ba50ce9ef5d063140905d1ab79a597dd, type: 2}
+      - {fileID: 2100000, guid: 3c2b543dccdcdae478d26bc8a4928969, type: 2}
+    - level: 8
+      decalMaterial:
+      - {fileID: 2100000, guid: ba50ce9ef5d063140905d1ab79a597dd, type: 2}
+      - {fileID: 2100000, guid: 472e1dc603b473e47b7d441c9acd1099, type: 2}
+    - level: 9
+      decalMaterial:
+      - {fileID: 2100000, guid: ba50ce9ef5d063140905d1ab79a597dd, type: 2}
+      - {fileID: 2100000, guid: f2dc03d4fa324d84e90bd33a47e1ea63, type: 2}
+  - diceType: 1
+    levels:
+    - level: 1
+      decalMaterial:
+      - {fileID: 2100000, guid: 0a49a0757c5f493448b88841b0361269, type: 2}
+      - {fileID: 0}
+  baseOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  targetColor: {r: 1, g: 1, b: 1, a: 1}
   presets:
   - diceType: 9
     level: 1

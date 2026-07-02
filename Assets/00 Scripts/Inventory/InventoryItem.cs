@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
@@ -12,6 +12,7 @@ public class InventoryItem : MonoBehaviour
     public List<DecalProjector> decals2 = new();
     public List<MeshRenderer> decalMeshes = new();
     public List<MeshRenderer> decalMeshes2 = new();
+    public bool preferMeshDecals = true;
     public Image itemPreview;
 
     Texture2D previewTexture;
@@ -143,3 +144,4 @@ public class InventoryItem : MonoBehaviour
         }
     }
 }
+

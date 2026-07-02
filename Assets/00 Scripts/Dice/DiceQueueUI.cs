@@ -163,8 +163,14 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
             }
         }
 
-        if (EnemyManager.Instance != null && EnemyManager.Instance.HasAliveEnemies())
-            yield return EnemyManager.Instance.EnemyTurn();
+        if (EnemyManager.Instance != null)
+        {
+            if (EnemyManager.Instance.activeProjectiles > 0)
+                yield return new WaitUntil(() => EnemyManager.Instance.activeProjectiles <= 0);
+
+            if (EnemyManager.Instance.HasAliveEnemies())
+                yield return EnemyManager.Instance.EnemyTurn();
+        }
 
         processing = false;
 

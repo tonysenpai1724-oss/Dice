@@ -31,8 +31,8 @@ MonoBehaviour:
   allowManualOverride: 1
   diceMaterial: {fileID: 2100000, guid: 35c2cac30203f3a4a849667b9438c1f9, type: 2}
   decalMaterial:
-  - {fileID: 2100000, guid: 410d91de9be93b34a9edfedad1b0607a, type: 2}
-  - {fileID: 2100000, guid: f781f403c8fab0642be8bc35749136cc, type: 2}
+  - {fileID: 2100000, guid: 0a49a0757c5f493448b88841b0361269, type: 2}
+  - {fileID: 2100000, guid: 472e1dc603b473e47b7d441c9acd1099, type: 2}
   baseOutlineColor: {r: 0.1882353, g: 0.09803922, b: 0.09803922, a: 1}
   targetColor: {r: 1, g: 1, b: 1, a: 1}
   diceColor: {r: 0.96862745, g: 0.36862746, b: 0.78039217, a: 1}

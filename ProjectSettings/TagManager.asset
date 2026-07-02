@@ -64,3 +64,4 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
+  - 3d

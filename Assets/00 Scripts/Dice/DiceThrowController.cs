@@ -31,10 +31,12 @@ public class DiceThrowController : MonoBehaviour
     public DiceQueueUI diceQueueUI;
 
     Dice currentDice;
+    Dice hoveredBoardDice;
 
     bool dragging;
     bool waitingForBoard;
     float mouseDownTime;
+    bool pointerStartedOverBoardDice;
 
     [Header("Highlight")]
     public Transform diceHighlight;
@@ -82,6 +84,7 @@ public class DiceThrowController : MonoBehaviour
         if (!canLook)
             return;
 
+        UpdateBoardDiceHover();
         RotateCurrentDiceToMouse();
 
         if (WasPointerPressedThisFrame())
@@ -94,6 +97,7 @@ public class DiceThrowController : MonoBehaviour
 
             dragging = true;
             mouseDownTime = Time.time;
+            pointerStartedOverBoardDice = IsPointerOverBoardDice();
         }
 
         if (WasPointerReleasedThisFrame() && dragging)
@@ -103,10 +107,10 @@ public class DiceThrowController : MonoBehaviour
             if (!IsPointerOverBoardMesh())
                 return;
 
-            if (IsAndroid() && IsPointerOverBoardDice())
+            if (IsAndroid() && pointerStartedOverBoardDice)
                 return;
 
-            if (Time.time - mouseDownTime > maxClickShootHoldTime)
+            if (!IsAndroid() && Time.time - mouseDownTime > maxClickShootHoldTime)
                 return;
 
             Shoot();
@@ -345,6 +349,12 @@ public class DiceThrowController : MonoBehaviour
 
     public void Clear()
     {
+        if (hoveredBoardDice != null)
+        {
+            hoveredBoardDice.SetHovered(false);
+            hoveredBoardDice = null;
+        }
+
         if (currentDice != null)
         {
             currentDice.gameObject.SetActive(false);
@@ -377,8 +387,13 @@ public class DiceThrowController : MonoBehaviour
 
     bool IsPointerOverBoardDice()
     {
+        return GetBoardDiceUnderPointer() != null;
+    }
+
+    Dice GetBoardDiceUnderPointer()
+    {
         if (Camera.main == null || !TryGetPointerScreenPosition(out Vector2 screenPosition))
-            return false;
+            return null;
 
         Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit[] hits = Physics.RaycastAll(
@@ -392,10 +407,26 @@ public class DiceThrowController : MonoBehaviour
         {
             Dice dice = hits[i].collider.GetComponentInParent<Dice>();
             if (dice != null && dice != currentDice)
-                return true;
+                return dice;
         }
 
-        return false;
+        return null;
+    }
+
+    void UpdateBoardDiceHover()
+    {
+        Dice targetDice = GetBoardDiceUnderPointer();
+
+        if (hoveredBoardDice == targetDice)
+            return;
+
+        if (hoveredBoardDice != null)
+            hoveredBoardDice.SetHovered(false);
+
+        hoveredBoardDice = targetDice;
+
+        if (hoveredBoardDice != null)
+            hoveredBoardDice.SetHovered(true);
     }
 
     void PrepareHand()
@@ -497,3 +528,6 @@ public class DiceThrowController : MonoBehaviour
         return flatDir;
     }
 }
+
+
+

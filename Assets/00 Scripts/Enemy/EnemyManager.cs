@@ -39,6 +39,7 @@ public class EnemyManager : Singleton<EnemyManager>
     public bool snapSpawnedEnemiesToGrid = true;
 
     public List<Enemy> enemies = new();
+    public int activeProjectiles = 0;
 
     Level currentLevel;
     int currentWaveIndex;
@@ -269,7 +270,10 @@ public class EnemyManager : Singleton<EnemyManager>
     void SpawnProjectile(Enemy target, int damage)
     {
         if (projectilePrefab == null || target == null)
+        {
+            activeProjectiles--;
             return;
+        }
 
         RectTransform projectile =
             Instantiate(projectilePrefab, projectileRoot);
@@ -301,8 +305,10 @@ public class EnemyManager : Singleton<EnemyManager>
         .SetEase(Ease.Linear)
         .OnComplete(() =>
         {
-            target.OnTakeDamage(damage);
+            if (target != null)
+                target.OnTakeDamage(damage);
             Destroy(projectile.gameObject);
+            activeProjectiles--;
         });
     }
     IEnumerator SpawnProjectileDelayed(Enemy target, int damage)
@@ -402,6 +408,8 @@ public class EnemyManager : Singleton<EnemyManager>
             CheckWinGame();
             return;
         }
+
+        activeProjectiles++;
         player.PlayAnimation(player.attackAnim, false);
         StartCoroutine(SpawnProjectileDelayed(target, damage));
 
@@ -588,28 +596,34 @@ public class EnemyManager : Singleton<EnemyManager>
 
         bool attackCompleted = false;
         Spine.TrackEntry attackTrack = enemy.PlayAnimation(enemy.attackAnim, false);
-        if (attackTrack != null)
-            attackTrack.Complete += _ => attackCompleted = true;
+        
+        if (attackTrack == null)
+            yield break;
 
-        float halfTime = attackTrack.Animation.Duration * 0.5f;
+        attackTrack.Complete += _ => attackCompleted = true;
+
+        float duration = attackTrack.Animation.Duration;
+        float halfTime = duration * 0.5f;
+        float timer = 0f;
 
         while (enemy != null && enemy.IsAlive())
         {
-            if (!attackCompleted && attackTrack.TrackTime >= halfTime)
+            timer += Time.deltaTime;
+
+            if (!attackCompleted && (attackTrack.TrackTime >= halfTime || timer >= halfTime))
             {
                 attackCompleted = true;
                 int finalDamage = CombatSystem.ApplyDefenseToPlayer(player, enemy.damage);
                 player.OnTakeDamage(finalDamage);
             }
 
-            if (attackTrack.IsComplete)
+            if (attackTrack.IsComplete || timer >= duration)
                 break;
 
             yield return null;
         }
 
-
-        if (enemy.skeletonGraphic != null)
+        if (enemy != null && enemy.IsAlive() && enemy.skeletonGraphic != null)
         {
             enemy.skeletonGraphic.AnimationState.AddAnimation(
                 0,

@@ -112,14 +112,14 @@ MonoBehaviour:
       gridRow: 0
       gridColumn: 4
     - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
-      position: {x: 264.19202, y: -159.17499, z: 0}
+      position: {x: 264.19202, y: -278.35, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
-      gridRow: 1
+      gridRow: 2
       gridColumn: 4
     - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
-      position: {x: 264.19202, y: -159.17499, z: 0}
+      position: {x: 264.19202, y: -159.175, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0

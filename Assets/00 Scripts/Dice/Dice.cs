@@ -56,6 +56,7 @@ public class Dice : PoolingObject
     public List<DecalProjector> decals2 = new();
     public List<MeshRenderer> decalMeshes = new();
     public List<MeshRenderer> decalMeshes2 = new();
+    public bool preferMeshDecals = true;
 
     [Header("Physics")]
     public float rbMass = 1.2f;
@@ -136,53 +137,55 @@ public class Dice : PoolingObject
             ? data.decalMaterial[1]
             : null;
 
+        bool useProjectorPrimary = !preferMeshDecals || decalMeshes.Count == 0;
         foreach (var d in decals)
         {
-            if (d != null)
+            if (d == null)
+                continue;
+
+            bool enabled = useProjectorPrimary && primaryDecalMaterial != null;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (primaryDecalMaterial != null)
                 d.material = primaryDecalMaterial;
         }
 
         foreach (var d in decalMeshes)
         {
-            if (d != null)
+            if (d == null)
+                continue;
+
+            bool enabled = !useProjectorPrimary && primaryDecalMaterial != null;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (primaryDecalMaterial != null)
                 d.sharedMaterial = primaryDecalMaterial;
         }
 
-        if (secondaryDecalMaterial != null)
+        bool useProjectorSecondary = !preferMeshDecals || decalMeshes2.Count == 0;
+        foreach (var d in decals2)
         {
-            foreach (var d in decals2)
-            {
-                if (d == null)
-                    continue;
+            if (d == null)
+                continue;
 
-                d.gameObject.SetActive(true);
+            bool enabled = useProjectorSecondary && secondaryDecalMaterial != null;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (secondaryDecalMaterial != null)
                 d.material = secondaryDecalMaterial;
-            }
-
-            foreach (var d in decalMeshes2)
-            {
-                if (d == null)
-                    continue;
-
-                d.gameObject.SetActive(true);
-                d.sharedMaterial = secondaryDecalMaterial;
-            }
         }
-        else
+
+        foreach (var d in decalMeshes2)
         {
-            foreach (var d in decals2)
-            {
-                if (d != null)
-                    d.gameObject.SetActive(false);
-            }
+            if (d == null)
+                continue;
 
-            foreach (var d in decalMeshes2)
-            {
-                if (d != null)
-                    d.gameObject.SetActive(false);
-            }
+            bool enabled = !useProjectorSecondary && secondaryDecalMaterial != null;
+            d.gameObject.SetActive(enabled);
+            d.enabled = enabled;
+            if (secondaryDecalMaterial != null)
+                d.sharedMaterial = secondaryDecalMaterial;
         }
-
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = false;
@@ -549,6 +552,8 @@ public class Dice : PoolingObject
     }
 
 }
+
+
 
 
 

@@ -20,6 +20,9 @@ public class DiceDecalBuilderEditor : Editor
     static float angleFadeEnd = 28f;
     static float normalDotTolerance = 0.985f;
     static float planeDistanceTolerance = 0.025f;
+    static float manualFaceSize = 0.7f;
+    static float manualFaceOffset = 0.53f;
+    static float manualFaceLayerOffset = 0.0025f;
 
     public override void OnInspectorGUI()
     {
@@ -42,6 +45,9 @@ public class DiceDecalBuilderEditor : Editor
         angleFadeEnd = EditorGUILayout.Slider("Angle Fade End", angleFadeEnd, 0f, 180f);
         normalDotTolerance = EditorGUILayout.Slider("Normal Group Tolerance", normalDotTolerance, 0.9f, 0.999f);
         planeDistanceTolerance = EditorGUILayout.Slider("Plane Group Tolerance", planeDistanceTolerance, 0.001f, 0.2f);
+        manualFaceSize = EditorGUILayout.Slider("Manual Face Size", manualFaceSize, 0.1f, 2f);
+        manualFaceOffset = EditorGUILayout.Slider("Manual Face Offset", manualFaceOffset, 0.01f, 2f);
+        manualFaceLayerOffset = EditorGUILayout.Slider("Manual Layer Offset", manualFaceLayerOffset, 0f, 0.05f);
 
         Dice dice = (Dice)target;
 
@@ -56,6 +62,9 @@ public class DiceDecalBuilderEditor : Editor
 
         using (new EditorGUILayout.HorizontalScope())
         {
+            if (GUILayout.Button("Build Manual 6 Faces"))
+                BuildManualFaceDecals(dice);
+
             if (GUILayout.Button("Collect Auto Decals"))
                 CollectAutoDecals(dice);
         }
@@ -64,6 +73,67 @@ public class DiceDecalBuilderEditor : Editor
             ClearAutoDecals(dice);
     }
 
+
+    static void BuildManualFaceDecals(Dice dice)
+    {
+        if (dice == null)
+            return;
+
+        if (clearExisting)
+            ClearAutoDecals(dice);
+
+        Transform group = GetOrCreateAutoGroup(dice.transform);
+        List<MeshRenderer> primary = new List<MeshRenderer>();
+        List<MeshRenderer> secondary = new List<MeshRenderer>();
+
+        BuildManualFace(group, dice, "Front", Vector3.forward, Quaternion.identity, primary, secondary);
+        BuildManualFace(group, dice, "Back", Vector3.back, Quaternion.Euler(0f, 180f, 0f), primary, secondary);
+        BuildManualFace(group, dice, "Right", Vector3.right, Quaternion.Euler(0f, 90f, 0f), primary, secondary);
+        BuildManualFace(group, dice, "Left", Vector3.left, Quaternion.Euler(0f, -90f, 0f), primary, secondary);
+        BuildManualFace(group, dice, "Top", Vector3.up, Quaternion.Euler(-90f, 0f, 0f), primary, secondary);
+        BuildManualFace(group, dice, "Bottom", Vector3.down, Quaternion.Euler(90f, 0f, 0f), primary, secondary);
+
+        if (assignToDiceLists)
+            AssignMeshLists(dice, primary, secondary);
+
+        dice.preferMeshDecals = true;
+        EditorUtility.SetDirty(dice);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+        Debug.Log($"{dice.name}: Built 6 manual mesh decal faces.", dice);
+    }
+
+    static void BuildManualFace(Transform parent, Dice dice, string faceName, Vector3 localNormal, Quaternion localRotation, List<MeshRenderer> primary, List<MeshRenderer> secondary)
+    {
+        MeshRenderer first = CreateManualFaceRenderer(parent, dice, faceName, "Primary", localNormal, localRotation, 0f);
+        MeshRenderer second = CreateManualFaceRenderer(parent, dice, faceName, "Secondary", localNormal, localRotation, manualFaceLayerOffset);
+        ApplyPreviewMaterials(dice, first, second);
+        primary.Add(first);
+        secondary.Add(second);
+    }
+
+    static MeshRenderer CreateManualFaceRenderer(Transform parent, Dice dice, string faceName, string suffix, Vector3 localNormal, Quaternion localRotation, float extraOffset)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        go.name = $"{faceName}_{suffix}";
+        Undo.RegisterCreatedObjectUndo(go, "Create manual face decal");
+        go.transform.SetParent(parent, false);
+        go.transform.localRotation = localRotation;
+        go.transform.localPosition = localNormal.normalized * (manualFaceOffset + extraOffset);
+        go.transform.localScale = Vector3.one * manualFaceSize;
+
+        Collider collider = go.GetComponent<Collider>();
+        if (collider != null)
+            Object.DestroyImmediate(collider);
+
+        MeshRenderer renderer = go.GetComponent<MeshRenderer>();
+        renderer.shadowCastingMode = ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        renderer.lightProbeUsage = LightProbeUsage.Off;
+        renderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+        renderer.allowOcclusionWhenDynamic = false;
+
+        return renderer;
+    }
     static void BuildMeshFaceDecals(Dice dice)
     {
         if (dice == null)
@@ -728,3 +798,6 @@ public class DiceDecalBuilderEditor : Editor
         }
     }
 }
+
+
+

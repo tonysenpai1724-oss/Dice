@@ -4631,9 +4631,9 @@ GameObject:
   m_Component:
   - component: {fileID: 394230737}
   - component: {fileID: 394230736}
+  - component: {fileID: 394230738}
   - component: {fileID: 394230735}
   - component: {fileID: 394230734}
-  - component: {fileID: 394230738}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -6346,6 +6346,7 @@ MonoBehaviour:
   gridMoveStagger: 0.08
   snapSpawnedEnemiesToGrid: 1
   enemies: []
+  activeProjectiles: 0
   projectilePrefab: {fileID: 5198677948193440392, guid: b011205b4522a324e85cb39aab95b98a, type: 3}
   projectileRoot: {fileID: 613428042}
   projectileSpeed: 200
@@ -7629,7 +7630,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &625614601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25714,6 +25715,7 @@ GameObject:
   - component: {fileID: 1917797495}
   - component: {fileID: 1917797494}
   - component: {fileID: 1917797493}
+  - component: {fileID: 1917797497}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -25810,7 +25812,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.5, y: 3, z: 3}
+  m_LocalScale: {x: 2.652682, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1520813770}
@@ -25819,6 +25821,24 @@ Transform:
   - {fileID: 744241506}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &1917797497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917797492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f15dc61608d68c4298296534417006c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrthoPlaneViewportFitter
+  targetCamera: {fileID: 394230736}
+  referenceResolution: {x: 1080, y: 1920}
+  referenceScale: {x: 3.5, y: 3, z: 3}
+  fitMode: 0
+  fitOnEnable: 1
+  updateContinuously: 0
 --- !u!1001 &1920135533
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34884,6 +34904,7 @@ MonoBehaviour:
   - {fileID: 3287491762752065640}
   decalMeshes: []
   decalMeshes2: []
+  preferMeshDecals: 1
   rbMass: 1
   rbDrag: 3
   rbAngularDrag: 10
@@ -35969,6 +35990,7 @@ MonoBehaviour:
   - {fileID: 447670911}
   - {fileID: 1266042920}
   - {fileID: 1102618893}
+  preferMeshDecals: 1
   rbMass: 1.2
   rbDrag: 0.22
   rbAngularDrag: 0.7
@@ -36475,6 +36497,7 @@ MonoBehaviour:
   - {fileID: 539847815}
   - {fileID: 1980550820}
   - {fileID: 313968894}
+  preferMeshDecals: 1
   rbMass: 1.2
   rbDrag: 0.22
   rbAngularDrag: 0.7
