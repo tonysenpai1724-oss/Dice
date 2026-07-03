@@ -1,0 +1,140 @@
+*** Begin Patch
+*** Add File: Assets/00 Scripts/Enemy/EnemyWinCoordinator.cs
++using System.Collections;
++using UnityEngine;
++
++public class EnemyWinCoordinator
++{
++    readonly EnemyManager enemyManager;
++    readonly System.Func<bool> hasRemainingEnemies;
++    readonly System.Func<bool> tryAdvanceToNextWave;
++    readonly System.Action endGameAsWin;
++
++    Coroutine pendingCheckCoroutine;
++
++    public EnemyWinCoordinator(
++        EnemyManager enemyManager,
++        System.Func<bool> hasRemainingEnemies,
++        System.Func<bool> tryAdvanceToNextWave,
++        System.Action endGameAsWin)
++    {
++        this.enemyManager = enemyManager;
++        this.hasRemainingEnemies = hasRemainingEnemies;
++        this.tryAdvanceToNextWave = tryAdvanceToNextWave;
++        this.endGameAsWin = endGameAsWin;
++    }
++
++    public void CheckWinGame()
++    {
++        enemyManager.CleanupEnemies();
++
++        if (hasRemainingEnemies() || GameplayManager.Instance == null || GameplayManager.Instance.IsGameEnded)
++            return;
++
++        DiceQueueUI queueUI = DiceManager.Instance != null && DiceManager.Instance.diceQueueUI != null
++            ? DiceManager.Instance.diceQueueUI
++            : DiceQueueUI.Instance;
++        if (queueUI != null && queueUI.IsBusy)
++        {
++            queueUI.RequestFastFlush();
++            return;
++        }
++
++        DiceQueue queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueue : null;
++        if (queue != null && queue.IsBusy)
++        {
++            queue.RequestFastFlush();
++            return;
++        }
++
++        if (tryAdvanceToNextWave())
++            return;
++
++        endGameAsWin?.Invoke();
++    }
++
++    public void RequestDeferredWinCheck()
++    {
++        if (pendingCheckCoroutine != null)
++            return;
++
++        pendingCheckCoroutine = enemyManager.StartCoroutine(DeferredWinCheckRoutine());
++    }
++
++    IEnumerator DeferredWinCheckRoutine()
++    {
++        yield return null;
++        yield return null;
++        pendingCheckCoroutine = null;
++        CheckWinGame();
++    }
++}
+*** Update File: Assets/00 Scripts/Enemy/EnemyManager.cs
+@@
+ public class EnemyManager : Singleton<EnemyManager>
+ {
+-    Coroutine pendingWinCheckCoroutine;
++    EnemyWinCoordinator winCoordinator;
+     public EffectManager effectManager;
+@@
+     public override void Awake()
+     {
+         base.Awake();
+         effectManager = GetComponent<EffectManager>();
+         if (effectManager == null)
+             effectManager = gameObject.AddComponent<EffectManager>();
++
++        winCoordinator = new EnemyWinCoordinator(
++            this,
++            () => enemies.Count != 0,
++            TryAdvanceToNextWave,
++            () => GameplayManager.Instance?.EndGame(true));
+     }
+@@
+     public void CheckWinGame()
+     {
+-        CleanupEnemies();
+-
+-        if (enemies.Count != 0 || GameplayManager.Instance == null || GameplayManager.Instance.IsGameEnded)
+-            return;
+-
+-        DiceQueueUI queueUI = DiceManager.Instance != null && DiceManager.Instance.diceQueueUI != null
+-            ? DiceManager.Instance.diceQueueUI
+-            : DiceQueueUI.Instance;
+-        if (queueUI != null && queueUI.IsBusy)
+-        {
+-            queueUI.RequestFastFlush();
+-            return;
+-        }
+-
+-        DiceQueue queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueue : null;
+-        if (queue != null && queue.IsBusy)
+-        {
+-            queue.RequestFastFlush();
+-            return;
+-        }
+-
+-        if (TryAdvanceToNextWave())
+-            return;
+-
+-        GameplayManager.Instance.EndGame(true);
++        winCoordinator?.CheckWinGame();
+     }
+@@
+     void RequestDeferredWinCheck()
+     {
+-        if (pendingWinCheckCoroutine != null)
+-            return;
+-
+-        pendingWinCheckCoroutine = StartCoroutine(DeferredWinCheckRoutine());
+-    }
+-
+-    IEnumerator DeferredWinCheckRoutine()
+-    {
+-        yield return null;
+-        yield return null;
+-        pendingWinCheckCoroutine = null;
+-        CheckWinGame();
++        winCoordinator?.RequestDeferredWinCheck();
+     }
+*** End Patch
