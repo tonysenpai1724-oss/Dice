@@ -25,6 +25,7 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _EdgeFeather: 0.002
     - _Thickness: 0.02
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

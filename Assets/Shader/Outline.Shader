@@ -1,18 +1,27 @@
-Shader "Custom/URP/DiceOutline"
+﻿Shader "Custom/InvertedHullOutline"
 {
     Properties
     {
-        _BaseColor ("Base Color", Color) = (1, 1, 1, 1)
-        _LineColor ("Line Color", Color) = (0, 0, 0, 1)
-        _Thickness ("Thickness", Range(0.001, 0.1)) = 0.02
+        _OutlineColor ("Outline Color", Color) = (0, 0, 0, 1)
+        _Thickness ("Outline Thickness", Float) = 0.01
     }
 
     SubShader
     {
-        Tags { "RenderPipeline" = "UniversalRenderPipeline" }
+        Tags
+        {
+            "RenderType" = "Opaque"
+            "RenderPipeline" = "UniversalPipeline"
+            "Queue" = "Geometry+1"
+        }
 
         Pass
         {
+            Name "Outline"
+            // Bước sống còn: Chỉ vẽ mặt sau, ẩn mặt trước
+            Cull Front
+            ZWrite On
+
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -22,35 +31,33 @@ Shader "Custom/URP/DiceOutline"
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float3 bary : TEXCOORD1;
+                float3 normalOS : NORMAL;
             };
 
             struct Varyings
             {
-                float4 positionHCS : SV_POSITION;
-                float3 bary : TEXCOORD0;
+                float4 positionCS : SV_POSITION;
             };
 
-            float4 _BaseColor;
-            float4 _LineColor;
+            float4 _OutlineColor;
             float _Thickness;
 
-            Varyings vert(Attributes IN)
+            Varyings vert(Attributes input)
             {
-                Varyings OUT;
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.bary = IN.bary;
-                return OUT;
+                Varyings output;
+
+                // Đẩy các đỉnh dọc theo hướng Normal (vector pháp tuyến) để làm dày viền
+                float3 extrudedPositionOS = input.positionOS.xyz + (input.normalOS * _Thickness);
+
+                // Chuyển không gian sang Clip Space để hiển thị lên màn hình
+                output.positionCS = TransformObjectToHClip(extrudedPositionOS);
+                return output;
             }
 
-            half4 frag(Varyings IN) : SV_Target
+            float4 frag(Varyings input) : SV_Target
             {
-                float edge = min(IN.bary.x, min(IN.bary.y, IN.bary.z));
-
-                if(edge < _Thickness)
-                    return _LineColor;
-
-                return _BaseColor;
+                // Trả về một màu phẳng duy nhất cho đường viền
+                return _OutlineColor;
             }
             ENDHLSL
         }

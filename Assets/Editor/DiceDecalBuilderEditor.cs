@@ -479,8 +479,8 @@ public class DiceDecalBuilderEditor : Editor
     static void AssignLists(Dice dice, List<DecalProjector> primary, List<DecalProjector> secondary)
     {
         Undo.RecordObject(dice, "Assign dice decals");
-        dice.decals = primary;
-        dice.decals2 = secondary;
+        //  dice.decals = primary;
+        // dice.decals2 = secondary;
         EditorUtility.SetDirty(dice);
         PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
     }
@@ -536,8 +536,8 @@ public class DiceDecalBuilderEditor : Editor
     {
         Transform group = dice.transform.Find(AutoGroupName);
         Undo.RecordObject(dice, "Clear dice decals");
-        dice.decals.Clear();
-        dice.decals2.Clear();
+        //  dice.decals.Clear();
+        //  dice.decals2.Clear();
         dice.decalMeshes.Clear();
         dice.decalMeshes2.Clear();
         EditorUtility.SetDirty(dice);
