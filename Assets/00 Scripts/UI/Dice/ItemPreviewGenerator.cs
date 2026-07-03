@@ -14,28 +14,20 @@ public class ItemPreviewGenerator : MonoBehaviour
     [Range(0f, 0.5f)] public float cropPaddingPercent = 0.08f;
     [Range(0f, 1f)] public float alphaThreshold = 0.02f;
 
+    InventoryItem pooledPreviewItem;
+    InventoryItem pooledPreviewPrefab;
+
     public Texture2D Capture(InventoryItem itemPrefab, DiceData diceData)
     {
         if (itemPrefab == null || diceData == null || previewCamera == null || renderTexture == null)
             return null;
 
-        Transform root = previewRoot != null ? previewRoot : transform;
-        InventoryItem item = Instantiate(itemPrefab, root);
-        item.transform.localPosition = previewLocalPosition;
-        item.transform.localScale = previewLocalScale;
-        item.transform.localRotation = Quaternion.Euler(previewLocalEulerAngles);
-        item.Setup(diceData);
-        // foreach (Transform t in item.GetComponentsInChildren<Transform>(true))
-        // {
-        //     Debug.Log($"{t.name} | Layer = {LayerMask.LayerToName(t.gameObject.layer)}");
-        // }
+        InventoryItem item = GetOrCreatePreviewItem(itemPrefab);
+        if (item == null)
+            return null;
 
-        Texture2D texture = Capture();
-
-        item.gameObject.SetActive(false);
-        Destroy(item.gameObject);
-
-        return texture;
+        PreparePreviewItem(item, diceData);
+        return Capture();
     }
 
     public Texture2D Capture()
@@ -79,7 +71,44 @@ public class ItemPreviewGenerator : MonoBehaviour
         previewCamera.clearFlags = currentClearFlags;
         previewCamera.backgroundColor = currentBackgroundColor;
 
+        if (pooledPreviewItem != null)
+            pooledPreviewItem.gameObject.SetActive(false);
+
         return cropTransparentPixels ? CropToVisiblePixels(tex) : tex;
+    }
+
+    InventoryItem GetOrCreatePreviewItem(InventoryItem itemPrefab)
+    {
+        if (pooledPreviewItem != null && pooledPreviewPrefab == itemPrefab)
+            return pooledPreviewItem;
+
+        ReleasePreviewItem();
+
+        Transform root = previewRoot != null ? previewRoot : transform;
+        pooledPreviewItem = Instantiate(itemPrefab, root);
+        pooledPreviewPrefab = itemPrefab;
+        return pooledPreviewItem;
+    }
+
+    void PreparePreviewItem(InventoryItem item, DiceData diceData)
+    {
+        if (item == null)
+            return;
+
+        item.gameObject.SetActive(true);
+        item.transform.localPosition = previewLocalPosition;
+        item.transform.localScale = previewLocalScale;
+        item.transform.localRotation = Quaternion.Euler(previewLocalEulerAngles);
+        item.Setup(diceData);
+    }
+
+    void ReleasePreviewItem()
+    {
+        if (pooledPreviewItem != null)
+            Destroy(pooledPreviewItem.gameObject);
+
+        pooledPreviewItem = null;
+        pooledPreviewPrefab = null;
     }
 
     Texture2D CropToVisiblePixels(Texture2D source)
@@ -126,9 +155,8 @@ public class ItemPreviewGenerator : MonoBehaviour
         cropSize = Mathf.Min(cropSize, Mathf.Max(width, height));
 
         int centerX = Mathf.RoundToInt((minX + maxX) * 0.5f);
-        int centerY = Mathf.RoundToInt((minY + maxY) * 0.5f);
         int startX = centerX - cropSize / 2;
-        int startY = centerY - cropSize / 2;
+        int startY = minY - padding;
 
         Texture2D cropped = new Texture2D(cropSize, cropSize, TextureFormat.RGBA32, false);
         Color32[] clearPixels = new Color32[cropSize * cropSize];
@@ -153,5 +181,10 @@ public class ItemPreviewGenerator : MonoBehaviour
         cropped.Apply();
         Destroy(source);
         return cropped;
+    }
+
+    void OnDestroy()
+    {
+        ReleasePreviewItem();
     }
 }
