@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -265,5 +265,6 @@ public class GameManager : Singleton<GameManager>
     }
     #endregion
 }
+
 
 

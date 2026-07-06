@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,10 +10,18 @@ public class UiHome : MonoBehaviour
     public Transform coinBar, heartBar;
     public List<HomeToggleButton> homeToggleButtons;
     public List<HomePanel> homePanels;
+    public GameObject rollPlane;
+    public static UiHome Instance;
+    public Transform rollPlaneAnchor;
+    void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
         UIManager.Instance.uIHome = this;
+        ShowRollPlane(false);
     }
     public void InitHome()
     {
@@ -35,5 +43,11 @@ public class UiHome : MonoBehaviour
             homeToggleButtons[i].SetActive(homeToggleButtons[i] == button);
             homePanels[i].SetActive(homeToggleButtons[i] == button);
         }
+    }
+
+    public void ShowRollPlane(bool show)
+    {
+        if (rollPlane != null)
+            rollPlane.SetActive(show);
     }
 }
