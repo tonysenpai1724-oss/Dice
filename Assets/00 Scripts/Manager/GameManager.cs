@@ -162,9 +162,13 @@ public class GameManager : Singleton<GameManager>
                         return;
                     case LevelType.Upgrade:
                         UIManager.Instance?.ShowPopupUpgradeDice();
+
                         return;
                     case LevelType.Shop:
                         UIManager.Instance?.ShowPopupShop();
+                        return;
+                    case LevelType.Roll:
+                        UIManager.Instance?.ShowPopupRoll();
                         return;
                 }
             }
@@ -261,3 +265,5 @@ public class GameManager : Singleton<GameManager>
     }
     #endregion
 }
+
+

@@ -290,6 +290,11 @@ public class UIManager : Singleton<UIManager>
         UIBase ui = GetUI("UI Base");
         ui.Show();
     }
+    public void ShowPopupRoll()
+    {
+        PopupRoll ui = GetUI("Popup Roll Dice") as PopupRoll;
+        ui?.Show();
+    }
     public void ShowPopupReward(PackageResource resource)
     {
         PopupShowReward ui = GetUI("Popup Show Reward") as PopupShowReward;
@@ -460,5 +465,6 @@ public class UIManager : Singleton<UIManager>
     }
     #endregion
 }
+
 
 
