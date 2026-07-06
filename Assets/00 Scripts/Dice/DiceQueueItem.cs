@@ -156,8 +156,9 @@ public class DiceQueueItem : PoolingObject
         ownedPreviewTexture = null;
     }
 
-    void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         ReleaseOwnedPreview();
 
         if (previewImage != null)

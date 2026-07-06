@@ -24,73 +24,11 @@ MonoBehaviour:
   levelNumber: 1
   waves:
   - waveName: Wave
-    enemyDatas:
-    - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
-    - {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
-    - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-    - {fileID: 11400000, guid: 5030cf9c8216e3149b0fe130fcf8723c, type: 2}
-    enemySpawnPlacements:
-    - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
-      position: {x: 440.32, y: -40, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 1
-      gridRow: 0
-      gridColumn: 5
-    - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
-      position: {x: 440.32, y: -40, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 0
-      gridRow: 0
-      gridColumn: 5
-    - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-      position: {x: 440.32, y: -159.17499, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 0
-      gridRow: 1
-      gridColumn: 5
-    - data: {fileID: 11400000, guid: 5030cf9c8216e3149b0fe130fcf8723c, type: 2}
-      position: {x: 440.32, y: -278.34998, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 0
-      gridRow: 2
-      gridColumn: 5
+    enemyEntries: []
+    enemyDatas: []
+    enemySpawnPlacements: []
   - waveName: Wave
-    enemyDatas:
-    - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
-    - {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
-    - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-    - {fileID: 11400000, guid: 5030cf9c8216e3149b0fe130fcf8723c, type: 2}
-    enemySpawnPlacements:
-    - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
-      position: {x: 440.32, y: -40, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 1
-      gridRow: 0
-      gridColumn: 5
-    - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
-      position: {x: 440.32, y: -40, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 0
-      gridRow: 0
-      gridColumn: 5
-    - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-      position: {x: 440.32, y: -159.17499, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 0
-      gridRow: 1
-      gridColumn: 5
-    - data: {fileID: 11400000, guid: 5030cf9c8216e3149b0fe130fcf8723c, type: 2}
-      position: {x: 440.32, y: -278.34998, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 0
-      gridRow: 2
-      gridColumn: 5
+    enemyEntries: []
+    enemyDatas: []
+    enemySpawnPlacements: []
   leveltype: 0

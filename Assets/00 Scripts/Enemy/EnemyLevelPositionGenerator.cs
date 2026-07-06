@@ -15,6 +15,7 @@ public class EnemySpawnPlacement
     public bool isBackRow;
     public int gridRow;
     public int gridColumn;
+    public int entryIndex = -1;
 }
 
 public class EnemyLevelPositionGenerator : MonoBehaviour
@@ -87,7 +88,7 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
                 continue;
 
             wave.enemySpawnPlacements.Clear();
-            List<EnemySpawnPlacement> generatedPlacements = BuildPlacements(level.GetWaveEnemyDatas(waveIndex));
+            List<EnemySpawnPlacement> generatedPlacements = BuildPlacements(level.GetWaveEnemyEntries(waveIndex));
             wave.enemySpawnPlacements = new List<EnemySpawnPlacement>(generatedPlacements);
 
             if (previewPlacements.Count == 0)
@@ -116,7 +117,7 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
                 continue;
 
             wave.enemySpawnPlacements.Clear();
-            List<EnemySpawnPlacement> generatedPlacements = BuildBottomRowPlacements(level.GetWaveEnemyDatas(waveIndex));
+            List<EnemySpawnPlacement> generatedPlacements = BuildBottomRowPlacements(level.GetWaveEnemyEntries(waveIndex));
             wave.enemySpawnPlacements = new List<EnemySpawnPlacement>(generatedPlacements);
 
             if (previewPlacements.Count == 0)
@@ -128,152 +129,83 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
 #endif
     }
 
-    public List<EnemySpawnPlacement> BuildPlacements(List<EnemyData> enemyDatas)
+    public List<EnemySpawnPlacement> BuildPlacements(List<EnemyEntryConfig> enemyEntries)
     {
         List<EnemySpawnPlacement> placements = new();
-        if (enemyDatas == null)
+        if (enemyEntries == null)
             return placements;
 
         if (spawnArea == null || !spawnArea.HasValidArea)
-            return BuildFallbackPlacements(enemyDatas);
+            return BuildFallbackPlacements(enemyEntries);
 
-        List<EnemyData> meleeEnemies = new();
-        List<EnemyData> rangeEnemies = new();
+        List<EnemyEntryConfig> meleeEntries = new();
+        List<EnemyEntryConfig> rangeEntries = new();
 
-        for (int i = 0; i < enemyDatas.Count; i++)
+        for (int i = 0; i < enemyEntries.Count; i++)
         {
-            EnemyData data = enemyDatas[i];
+            EnemyEntryConfig entry = enemyEntries[i];
+            EnemyData data = entry != null ? entry.Data : null;
             if (data == null)
                 continue;
 
             if (data.type == EnemyType.Range)
-                rangeEnemies.Add(data);
+                rangeEntries.Add(entry);
             else
-                meleeEnemies.Add(data);
+                meleeEntries.Add(entry);
         }
 
         int rows = Mathf.Max(1, gridRows);
         int columns = Mathf.Max(2, gridColumns);
         int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
-        int rangedStartColumn = Mathf.Clamp(5, minEnemyColumn, columns - 1);
-        int nextMeleeColumn = AddGridPlacements(placements, rangeEnemies, rangedStartColumn, minEnemyColumn, true, rows, -1);
+        int frontColumn = Mathf.Clamp(meleeStartColumn, minEnemyColumn, columns - 1);
+        int backColumn = Mathf.Clamp(rangeStartColumn, frontColumn, columns - 1);
 
-        if (meleeEnemies.Count > 0)
-        {
-            int meleeStartColumn = Mathf.Clamp(nextMeleeColumn, minEnemyColumn, columns - 1);
-            AddGridPlacements(placements, meleeEnemies, meleeStartColumn, minEnemyColumn, false, rows, -1);
-        }
+        AddOrderedPlacements(placements, meleeEntries, frontColumn, false, enemyEntries);
+        AddOrderedPlacements(placements, rangeEntries, backColumn, true, enemyEntries);
 
-        return placements.Count > 0 ? placements : BuildFallbackPlacements(enemyDatas);
+        return placements.Count > 0 ? placements : BuildFallbackPlacements(enemyEntries);
     }
 
-    int AddGridPlacements(List<EnemySpawnPlacement> placements, List<EnemyData> enemiesToPlace, int startColumn, int minColumn, bool isBackRow, int rows, int reservedFirstColumnRow)
+    void AddOrderedPlacements(List<EnemySpawnPlacement> placements, List<EnemyEntryConfig> entries, int column, bool isBackRow, List<EnemyEntryConfig> sourceEntries)
     {
-        if (enemiesToPlace == null || enemiesToPlace.Count == 0)
-            return startColumn - 1;
+        if (entries == null)
+            return;
 
-        int column = startColumn;
-        int slotIndex = 0;
-        bool bossPlaced = false;
-        int bossRow = GetBossSpawnRow(rows);
-
-        for (int i = 0; i < enemiesToPlace.Count; i++)
+        int rows = Mathf.Max(1, gridRows);
+        for (int i = 0; i < entries.Count; i++)
         {
-            EnemyData data = enemiesToPlace[i];
-
-            if (column < minColumn)
-                break;
-
-            if (IsBossEnemy(data) && !bossPlaced)
-            {
-                placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(bossRow, column), isBackRow, bossRow, column));
-                bossPlaced = true;
-
-                if (rows == 1)
-                {
-                    column--;
-                    slotIndex = 0;
-                }
-
-                continue;
-            }
-
-            int reservedRow = reservedFirstColumnRow;
-            if (bossPlaced && column == startColumn)
-                reservedRow = bossRow;
-
-            int row = GetNextAvailableRow(rows, reservedRow, slotIndex);
-
-            if (row < 0)
-            {
-                column--;
-                slotIndex = 0;
-
-                if (column < minColumn)
-                    break;
-
-                reservedRow = -1;
-                row = GetNextAvailableRow(rows, reservedRow, slotIndex);
-            }
-
-            placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(row, column), isBackRow, row, column));
-            slotIndex++;
-
-            int capacity = GetColumnCapacity(rows, reservedRow);
-            if (slotIndex >= capacity)
-            {
-                column--;
-                slotIndex = 0;
-            }
-        }
-
-        return column;
-    }
-
-    int GetNextAvailableRow(int rows, int reservedRow, int slotIndex)
-    {
-        for (int row = 0; row < rows; row++)
-        {
-            if (row == reservedRow)
+            EnemyEntryConfig entry = entries[i];
+            EnemyData data = entry != null ? entry.Data : null;
+            if (data == null)
                 continue;
 
-            if (slotIndex == 0)
-                return row;
-
-            slotIndex--;
+            int row = rows <= 1 ? 0 : Mathf.Clamp(i, 0, rows - 1);
+            int entryIndex = sourceEntries != null ? sourceEntries.IndexOf(entry) : -1;
+            placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(row, column), isBackRow, row, column, entryIndex));
         }
-
-        return -1;
     }
 
-    int GetColumnCapacity(int rows, int reservedRow)
-    {
-        int capacity = rows;
-        if (reservedRow >= 0 && reservedRow < rows)
-            capacity--;
-
-        return Mathf.Max(0, capacity);
-    }
-
-    public List<EnemySpawnPlacement> BuildBottomRowPlacements(List<EnemyData> enemyDatas)
+    public List<EnemySpawnPlacement> BuildBottomRowPlacements(List<EnemyEntryConfig> enemyEntries)
     {
         List<EnemySpawnPlacement> placements = new();
-        if (enemyDatas == null)
+        if (enemyEntries == null)
             return placements;
 
         if (spawnArea == null || !spawnArea.HasValidArea)
-            return BuildBottomRowFallbackPlacements(enemyDatas);
+            return BuildBottomRowFallbackPlacements(enemyEntries);
 
-        List<EnemyData> validDatas = new();
-        for (int i = 0; i < enemyDatas.Count; i++)
+        List<EnemyEntryConfig> validEntries = new();
+        for (int i = 0; i < enemyEntries.Count; i++)
         {
-            if (enemyDatas[i] != null)
-                validDatas.Add(enemyDatas[i]);
+            if (enemyEntries[i] != null && enemyEntries[i].Data != null)
+                validEntries.Add(enemyEntries[i]);
         }
 
-        for (int i = 0; i < validDatas.Count; i++)
+        for (int i = 0; i < validEntries.Count; i++)
         {
-            EnemyData data = validDatas[i];
+            EnemyEntryConfig entry = validEntries[i];
+            EnemyData data = entry.Data;
+            int entryIndex = enemyEntries.IndexOf(entry);
             if (IsBossEnemy(data))
             {
                 int rows = Mathf.Max(1, gridRows);
@@ -281,18 +213,18 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
                 int minEnemyColumn = Mathf.Clamp(playerColumn + 1, 1, columns - 1);
                 int row = GetBossSpawnRow(rows);
                 int column = GetBossSpawnColumn(columns, minEnemyColumn);
-                placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(row, column), false, row, column));
+                placements.Add(CreatePlacement(data, GetGridAreaLocalPosition(row, column), false, row, column, entryIndex));
                 continue;
             }
 
-            bool isMelee = data != null && data.type != EnemyType.Range;
-            placements.Add(CreatePlacement(data, GetBottomRowFallback(i, validDatas.Count, isMelee), false));
+            bool isMelee = data.type != EnemyType.Range;
+            placements.Add(CreatePlacement(data, GetBottomRowFallback(i, validEntries.Count, isMelee), false, 0, 0, entryIndex));
         }
 
         return placements;
     }
 
-    EnemySpawnPlacement CreatePlacement(EnemyData data, Vector3 position, bool isBackRow, int gridRow = 0, int gridColumn = 0)
+    EnemySpawnPlacement CreatePlacement(EnemyData data, Vector3 position, bool isBackRow, int gridRow = 0, int gridColumn = 0, int entryIndex = -1)
     {
         bool useWorldPosition = spawnArea != null && spawnArea.spawnSpace == EnemySpawnSpace.World;
         return new EnemySpawnPlacement
@@ -303,7 +235,8 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
             useWorldPosition = useWorldPosition,
             isBackRow = isBackRow,
             gridRow = gridRow,
-            gridColumn = gridColumn
+            gridColumn = gridColumn,
+            entryIndex = entryIndex,
         };
     }
 
@@ -351,12 +284,13 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
         return Mathf.Clamp(columns / 2, minEnemyColumn, Mathf.Max(minEnemyColumn, columns - 1));
     }
 
-    List<EnemySpawnPlacement> BuildFallbackPlacements(List<EnemyData> enemyDatas)
+    List<EnemySpawnPlacement> BuildFallbackPlacements(List<EnemyEntryConfig> enemyEntries)
     {
         List<EnemySpawnPlacement> placements = new();
-        for (int i = 0; i < enemyDatas.Count; i++)
+        for (int i = 0; i < enemyEntries.Count; i++)
         {
-            EnemyData data = enemyDatas[i];
+            EnemyEntryConfig entry = enemyEntries[i];
+            EnemyData data = entry != null ? entry.Data : null;
             if (data == null)
                 continue;
 
@@ -364,48 +298,44 @@ public class EnemyLevelPositionGenerator : MonoBehaviour
                 ? Vector3.zero
                 : new Vector3(Random.Range(-fallbackSpacing, fallbackSpacing), 0f, 0f);
 
-            placements.Add(CreatePlacement(data, position, false));
+            placements.Add(CreatePlacement(data, position, false, 0, 0, i));
         }
 
         return placements;
     }
 
-    List<EnemySpawnPlacement> BuildBottomRowFallbackPlacements(List<EnemyData> enemyDatas)
+    List<EnemySpawnPlacement> BuildBottomRowFallbackPlacements(List<EnemyEntryConfig> enemyEntries)
     {
         List<EnemySpawnPlacement> placements = new();
-        if (enemyDatas == null)
+        if (enemyEntries == null)
             return placements;
 
         int validCount = 0;
-        for (int i = 0; i < enemyDatas.Count; i++)
+        for (int i = 0; i < enemyEntries.Count; i++)
         {
-            if (enemyDatas[i] != null)
+            if (enemyEntries[i] != null && enemyEntries[i].Data != null)
                 validCount++;
         }
 
         int index = 0;
-        for (int i = 0; i < enemyDatas.Count; i++)
+        for (int i = 0; i < enemyEntries.Count; i++)
         {
-            EnemyData data = enemyDatas[i];
+            EnemyEntryConfig entry = enemyEntries[i];
+            EnemyData data = entry != null ? entry.Data : null;
             if (data == null)
                 continue;
 
             if (IsBossEnemy(data))
             {
-                placements.Add(CreatePlacement(data, Vector3.zero, false));
+                placements.Add(CreatePlacement(data, Vector3.zero, false, 0, 0, i));
                 continue;
             }
 
             float x01 = validCount <= 1 ? 0.5f : (float)index / (validCount - 1);
             index++;
-            placements.Add(CreatePlacement(data, new Vector3(Mathf.Lerp(-fallbackSpacing, fallbackSpacing, x01), 0f, 0f), false));
+            placements.Add(CreatePlacement(data, new Vector3(Mathf.Lerp(-fallbackSpacing, fallbackSpacing, x01), 0f, 0f), false, 0, 0, i));
         }
 
         return placements;
     }
 }
-
-
-
-
-

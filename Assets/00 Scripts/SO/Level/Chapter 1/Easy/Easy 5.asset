@@ -24,6 +24,7 @@ MonoBehaviour:
   levelNumber: 5
   waves:
   - waveName: Wave
+    enemyEntries: []
     enemyDatas:
     - {fileID: 0}
     enemySpawnPlacements: []

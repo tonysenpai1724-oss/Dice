@@ -22,8 +22,30 @@ public class Level : SerializedScriptableObject
         return WaveCount > 0;
     }
 
+    public List<EnemyEntryConfig> GetWaveEnemyEntries(int waveIndex)
+    {
+        if (waves != null && waveIndex >= 0 && waveIndex < waves.Count)
+            return waves[waveIndex] != null ? waves[waveIndex].enemyEntries : null;
+
+        return null;
+    }
+
     public List<EnemyData> GetWaveEnemyDatas(int waveIndex)
     {
+        List<EnemyEntryConfig> entries = GetWaveEnemyEntries(waveIndex);
+        if (entries != null && entries.Count > 0)
+        {
+            List<EnemyData> datas = new();
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i] != null && entries[i].Data != null)
+                    datas.Add(entries[i].Data);
+            }
+
+            if (datas.Count > 0)
+                return datas;
+        }
+
         if (waves != null && waveIndex >= 0 && waveIndex < waves.Count)
             return waves[waveIndex] != null ? waves[waveIndex].enemyDatas : null;
 
@@ -40,6 +62,20 @@ public class Level : SerializedScriptableObject
 
     public int GetWaveEnemyCount(int waveIndex)
     {
+        List<EnemyEntryConfig> entries = GetWaveEnemyEntries(waveIndex);
+        if (entries != null && entries.Count > 0)
+        {
+            int countEntries = 0;
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i] != null && entries[i].Data != null)
+                    countEntries++;
+            }
+
+            if (countEntries > 0)
+                return countEntries;
+        }
+
         List<EnemyData> datas = GetWaveEnemyDatas(waveIndex);
         if (datas == null)
             return 0;
@@ -59,6 +95,7 @@ public class Level : SerializedScriptableObject
 public class LevelWaveData
 {
     public string waveName = "Wave";
+    public List<EnemyEntryConfig> enemyEntries = new();
     public List<EnemyData> enemyDatas = new();
     public List<EnemySpawnPlacement> enemySpawnPlacements = new();
 }
@@ -75,4 +112,5 @@ public enum LevelType
     Upgrade,
     FinalBoss,
     ChestReward,
+
 }

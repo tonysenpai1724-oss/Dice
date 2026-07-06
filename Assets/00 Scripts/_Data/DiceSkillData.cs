@@ -241,7 +241,7 @@ public static class BonusAtkDiceSkillData
         if (bonusDamage <= 0)
             return;
 
-        PlayerStats.Shared.AddTemporaryStat(
+        PlayerStats.Shared.AddTemporaryLevelStat(
             HeroStatType.Damage,
             bonusDamage,
             "BonusAtk",
@@ -343,7 +343,7 @@ public static class DiceEvoSkillRuntime
         if (doubledBonusDamage <= 0)
             return false;
 
-        PlayerStats.Shared.AddTemporaryStat(
+        PlayerStats.Shared.AddTemporaryLevelStat(
             HeroStatType.Damage,
             doubledBonusDamage,
             "X2BonusAtk",
@@ -410,6 +410,7 @@ public static class DiceEvoSkillRuntime
         return true;
     }
 }
+
 
 
 

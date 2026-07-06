@@ -100,6 +100,7 @@ public class EnemyWaveSpawner
         snapPlayerToConfiguredGrid?.Invoke();
 
         int currentWaveIndex = getCurrentWaveIndex();
+        List<EnemyEntryConfig> waveEntries = currentLevel.GetWaveEnemyEntries(currentWaveIndex);
         List<EnemyData> waveEnemyDatas = currentLevel.GetWaveEnemyDatas(currentWaveIndex);
         List<EnemySpawnPlacement> wavePlacements = currentLevel.GetWaveSpawnPlacements(currentWaveIndex);
 
@@ -109,7 +110,7 @@ public class EnemyWaveSpawner
         List<EnemySpawnPlacement> placements = wavePlacements != null && wavePlacements.Count > 0
             ? wavePlacements
             : getSpawnPositionGenerator?.Invoke() != null
-                ? getSpawnPositionGenerator().BuildPlacements(waveEnemyDatas)
+                ? getSpawnPositionGenerator().BuildPlacements(waveEntries)
                 : null;
 
         List<Enemy> enemies = getEnemies?.Invoke();
@@ -127,7 +128,21 @@ public class EnemyWaveSpawner
 
                 Enemy enemy = UnityEngine.Object.Instantiate(enemyPrefab, root, false);
                 registerEnemy?.Invoke(enemy);
-                enemy.Setup(placement.data);
+
+                EnemyEntryConfig entry = null;
+                if (waveEntries != null)
+                {
+                    if (placement.entryIndex >= 0 && placement.entryIndex < waveEntries.Count)
+                        entry = waveEntries[placement.entryIndex];
+                    else if (i < waveEntries.Count)
+                        entry = waveEntries[i];
+                }
+
+                if (entry != null && entry.Data == placement.data)
+                    enemy.Setup(entry);
+                else
+                    enemy.Setup(placement.data);
+
                 enemies?.Add(enemy);
                 setEnemyPosition?.Invoke(
                     enemy,
@@ -148,15 +163,22 @@ public class EnemyWaveSpawner
         if (waveEnemyDatas == null)
             return;
 
-        for (int i = 0; i < waveEnemyDatas.Count; i++)
+        int spawnCount = waveEntries != null && waveEntries.Count > 0 ? waveEntries.Count : waveEnemyDatas.Count;
+        for (int i = 0; i < spawnCount; i++)
         {
-            EnemyData data = waveEnemyDatas[i];
+            EnemyEntryConfig entry = waveEntries != null && i < waveEntries.Count ? waveEntries[i] : null;
+            EnemyData data = entry != null ? entry.Data : waveEnemyDatas[i];
             if (data == null)
                 continue;
 
             Enemy enemy = UnityEngine.Object.Instantiate(enemyPrefab, root, false);
             registerEnemy?.Invoke(enemy);
-            enemy.Setup(data);
+
+            if (entry != null)
+                enemy.Setup(entry);
+            else
+                enemy.Setup(data);
+
             enemies?.Add(enemy);
             setEnemyPosition?.Invoke(
                 enemy,

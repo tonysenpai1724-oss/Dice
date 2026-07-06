@@ -13,8 +13,6 @@ public class Enemy : GameUnit
     public EnemyLevel enemyLevel;
     public int damage;
     public EnemyData data;
-    // public int distanceToPlayer;
-    //public int attackRange;
     public int gridRow;
     public int gridColumn;
 
@@ -42,8 +40,29 @@ public class Enemy : GameUnit
         data = newData;
         type = data.type;
         SetHp(data.hp, data.damage);
-        // distanceToPlayer = Mathf.Max(0, data.startDistance);
-        // attackRange = Mathf.Max(1, data.attackRange);
+
+        transform.localScale = data.scale;
+        enemyAttackAnimSpeed = Mathf.Max(0.1f, data.attackAnimSpeed);
+        ResetDeathFade();
+
+        if (skeletonGraphic != null)
+        {
+            skeletonGraphic.skeletonDataAsset = data.skeletonData;
+            skeletonGraphic.Initialize(true);
+            ResetVisualAlpha();
+            PlayAnimation(idleAnim, true);
+        }
+        NotifyHpChanged();
+    }
+
+    public virtual void Setup(EnemyEntryConfig entry)
+    {
+        if (entry == null || entry.Data == null)
+            return;
+
+        data = entry.Data;
+        type = data.type;
+        SetHp(entry.GetHp(), entry.GetDamage());
 
         transform.localScale = data.scale;
         enemyAttackAnimSpeed = Mathf.Max(0.1f, data.attackAnimSpeed);
@@ -84,8 +103,6 @@ public class Enemy : GameUnit
             gridColumn -= amount;
         else
             gridColumn += amount;
-
-        //   distanceToPlayer = Mathf.Max(0, distanceToPlayer - amount);
     }
 
     public override void OnDie()
@@ -154,7 +171,6 @@ public class Enemy : GameUnit
 
 public enum EnemyType
 {
-    // Normal,
     Range,
     Melee,
     Chest,
@@ -165,4 +181,3 @@ public enum EnemyLevel
     MiniBoss,
     Boss,
 }
-
