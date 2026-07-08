@@ -378,8 +378,8 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4155905585476737637}
   serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
+  m_Mass: 0.7
+  m_LinearDamping: 0.2
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -394,9 +394,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!65 &8035855832383463713
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -430,8 +430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf684fbb18bd954998e8867aa513293, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RollDiceVisual
-  rb: {fileID: 6252814532033887582}
-  cachedCollider: {fileID: 8035855832383463713}
+  visualRoot: {fileID: 0}
   facePoints:
   - {fileID: 4700978034459513828}
   - {fileID: 6597773277049717280}
@@ -439,6 +438,39 @@ MonoBehaviour:
   - {fileID: 4298314615855966185}
   - {fileID: 7630114985479319598}
   - {fileID: 7343324582979782531}
+  body: {fileID: 6252814532033887582}
+  spawnHeight: 3.2
+  mainArcHeight: 2.6
+  mainDuration: 0.34
+  mainForwardDistance: 1.35
+  sideScatter: 0.55
+  landingUprightBlend: 0.2
+  bounceCount: 3
+  bounceHeights:
+  - 6
+  - 4
+  - 1.5
+  bounceDurations:
+  - 0.3
+  - 0.2
+  - 0.1
+  bounceTravelDistance: 2.5
+  bounceTravelDecay: 1
+  bounceSideRandom: 0.4
+  bounceHeightNoise: 0.03
+  bounceSpinByStep:
+  - {x: 85, y: 20, z: 110}
+  - {x: 35, y: 10, z: 42}
+  - {x: 10, y: 4, z: 12}
+  bounceRotationBlend: 0.85
+  mainSpinDegrees: {x: 960, y: 260, z: 1080}
+  settleDuration: 0.22
+  settleScaleAmount: 0.18
+  settleBottomAlignBlend: 1
+  settleNoise: 0.003
+  baseScale: {x: 1.5, y: 1.5, z: 1.5}
+  squashAmount: 0.12
+  stretchAmount: 0.08
 --- !u!1 &4960609463233352098
 GameObject:
   m_ObjectHideFlags: 0

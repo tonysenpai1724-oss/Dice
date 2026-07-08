@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,30 +33,41 @@ public class PopupRoll : UIBase
     [Header("Roll Visual")]
     public RollDiceVisual rollDicePrefab;
     public Transform rollBoardAnchor;
-    public Vector3 rollSpawnOffset = new Vector3(0f, 7f, 0f);
-    public float dropSpeed = 18f;
-    public Vector3 rollTorqueMin = new Vector3(-28f, -18f, -28f);
-    public Vector3 rollTorqueMax = new Vector3(28f, 18f, 28f);
-    public float settleVelocityThreshold = 0.2f;
-    public float settleAngularThreshold = 0.28f;
-    public float settleHoldDuration = 0.45f;
-    public float maxRollDuration = 4f;
+    public Vector3 rollSpawnOffset = new Vector3(0f, 0f, 0f);
+    public Vector3 rollDirectionMin = new Vector3(-0.8f, 0f, 0.35f);
+    public Vector3 rollDirectionMax = new Vector3(0.8f, 0f, 1f);
+    public float rollResultDelay = 1.5f;
+    public float visualCleanupDelay = 0.25f;
+    public bool forceRuntimeTuning = true;
 
     [Header("Roll")]
-    public float resultDelay = 0.05f;
-    public float closeDelayOnMiss = 0.8f;
+    public float resultDelay = 0.03f;
+    public float closeDelayOnMiss = 0.55f;
 
     RollGuessType? selectedGuess;
     bool rollResolved;
     bool rewardGranted;
-    bool shouldCompleteRoomOnHide;
     Coroutine rollRoutine;
     RollDiceVisual activeRollVisual;
 
     void Awake()
     {
         Instance = this;
+        if (forceRuntimeTuning)
+            ApplyRecommendedTuning();
         BindButtons();
+    }
+
+    [Sirenix.OdinInspector.Button("Apply Recommended Tuning")]
+    public void ApplyRecommendedTuning()
+    {
+        rollSpawnOffset = Vector3.zero;
+        rollDirectionMin = new Vector3(-0.8f, 0f, 0.35f);
+        rollDirectionMax = new Vector3(0.8f, 0f, 1f);
+        rollResultDelay = 1.5f;
+        visualCleanupDelay = 0.25f;
+        resultDelay = 0.03f;
+        closeDelayOnMiss = 0.55f;
     }
 
     void BindButtons()
@@ -101,6 +113,9 @@ public class PopupRoll : UIBase
     {
         base.Show();
 
+        if (forceRuntimeTuning)
+            ApplyRecommendedTuning();
+
         if (rollRoutine != null)
         {
             StopCoroutine(rollRoutine);
@@ -110,7 +125,6 @@ public class PopupRoll : UIBase
         selectedGuess = null;
         rollResolved = false;
         rewardGranted = false;
-        shouldCompleteRoomOnHide = false;
         ClearRollVisual();
 
         if (txtTitle != null)
@@ -143,19 +157,40 @@ public class PopupRoll : UIBase
     IEnumerator IERollAndReveal()
     {
         UiHome.Instance?.ShowRollPlane(true);
-        rollBoardAnchor = UiHome.Instance?.rollPlaneAnchor;
-        SpawnRollVisual();
+        rollBoardAnchor = UiHome.Instance != null ? UiHome.Instance.rollPlaneAnchor : rollBoardAnchor;
+        int resolvedFace = Random.Range(1, 7);
+        SpawnRollVisual(resolvedFace);
         yield return new WaitForSecondsRealtime(resultDelay);
 
-        int roll = 1;
-        if (activeRollVisual != null)
-            yield return StartCoroutine(WaitForRollToSettle(activeRollVisual, value => roll = value));
+        bool animationFinished = activeRollVisual == null;
+        System.Action onRollVisualFinished = () => animationFinished = true;
 
+        if (activeRollVisual != null)
+        {
+            activeRollVisual.ClearFinishedListeners();
+            activeRollVisual.Finished += onRollVisualFinished;
+            yield return new WaitUntil(() => animationFinished || activeRollVisual == null);
+
+            if (activeRollVisual != null)
+            {
+                activeRollVisual.Finished -= onRollVisualFinished;
+            }
+        }
+        else
+        {
+            yield return new WaitForSecondsRealtime(rollResultDelay);
+        }
+
+        int roll = activeRollVisual != null ? activeRollVisual.CurrentFace : resolvedFace;
         bool isWin = EvaluateGuess(selectedGuess.GetValueOrDefault(), roll);
         rollResolved = true;
 
         if (txtResult != null)
             txtResult.text = $"Dice rolled {roll}. " + (isWin ? "Correct! Pick a reward." : "Wrong guess.");
+
+        yield return new WaitForSecondsRealtime(visualCleanupDelay);
+        ClearRollVisual();
+        UiHome.Instance?.ShowRollPlane(false);
 
         if (isWin)
         {
@@ -168,10 +203,11 @@ public class PopupRoll : UIBase
         }
 
         yield return new WaitForSecondsRealtime(closeDelayOnMiss);
+        Hide();
         rollRoutine = null;
     }
 
-    void SpawnRollVisual()
+    void SpawnRollVisual(int targetFace)
     {
         ClearRollVisual();
 
@@ -179,57 +215,23 @@ public class PopupRoll : UIBase
             return;
 
         Vector3 spawnPosition = rollBoardAnchor.position + rollSpawnOffset;
-        activeRollVisual = Instantiate(rollDicePrefab, spawnPosition, Random.rotation);
-
-        Vector3 dropForce = Vector3.down * dropSpeed;
-        activeRollVisual.Roll(dropForce, GetRandomTorque());
+        Vector3 rollDirection = GetRollDirection();
+        activeRollVisual = Instantiate(rollDicePrefab, spawnPosition, Quaternion.identity, rollBoardAnchor);
+        activeRollVisual.SpawnAndRoll(spawnPosition, rollDirection, targetFace);
     }
 
-    IEnumerator WaitForRollToSettle(RollDiceVisual visual, System.Action<int> onResolved)
+    Vector3 GetRollDirection()
     {
-        if (visual == null || visual.rb == null)
-        {
-            onResolved?.Invoke(1);
-            yield break;
-        }
-
-        float elapsed = 0f;
-        float stableTime = 0f;
-
-        while (elapsed < maxRollDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-
-            bool stable = visual.rb.linearVelocity.sqrMagnitude <= settleVelocityThreshold * settleVelocityThreshold &&
-                          visual.rb.angularVelocity.sqrMagnitude <= settleAngularThreshold * settleAngularThreshold;
-
-            if (stable)
-            {
-                stableTime += Time.unscaledDeltaTime;
-                if (stableTime >= settleHoldDuration)
-                    break;
-            }
-            else
-            {
-                stableTime = 0f;
-            }
-
-            yield return null;
-        }
-
-        onResolved?.Invoke(visual.GetTopFace());
-        yield return new WaitForSecondsRealtime(1f);
-        ClearRollVisual();
-        UiHome.Instance?.ShowRollPlane(false);
-    }
-
-    Vector3 GetRandomTorque()
-    {
-        return new Vector3(
-            Random.Range(rollTorqueMin.x, rollTorqueMax.x),
-            Random.Range(rollTorqueMin.y, rollTorqueMax.y),
-            Random.Range(rollTorqueMin.z, rollTorqueMax.z)
+        Vector3 direction = new Vector3(
+            Random.Range(rollDirectionMin.x, rollDirectionMax.x),
+            0f,
+            Random.Range(rollDirectionMin.z, rollDirectionMax.z)
         );
+
+        if (direction.sqrMagnitude < 0.0001f)
+            direction = Vector3.forward;
+
+        return direction.normalized;
     }
 
     bool EvaluateGuess(RollGuessType guess, int roll)
@@ -249,7 +251,6 @@ public class PopupRoll : UIBase
             return;
 
         rewardGranted = true;
-        shouldCompleteRoomOnHide = true;
         PlayerStats.Shared.AddTemporaryChapterStat(statType, percentValue, keyLocal, false);
         SetRewardButtonsInteractable(false);
         Hide();
@@ -288,6 +289,9 @@ public class PopupRoll : UIBase
     {
         rollRoutine = null;
         ClearRollVisual();
+        UiHome.Instance?.ShowRollPlane(false);
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Roll);
     }
 }
+
+

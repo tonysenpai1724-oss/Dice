@@ -5872,15 +5872,16 @@ MonoBehaviour:
   rollDicePrefab: {fileID: 2808318767607432134, guid: 9edb46f4733c2b14c88bbfed4e15dc96, type: 3}
   rollBoardAnchor: {fileID: 0}
   rollSpawnOffset: {x: 0, y: 6, z: 0}
-  dropSpeed: 18
-  rollTorqueMin: {x: -35, y: -60, z: -35}
-  rollTorqueMax: {x: 35, y: 60, z: 35}
-  settleVelocityThreshold: 0.15
-  settleAngularThreshold: 0.2
-  settleHoldDuration: 0.35
-  maxRollDuration: 5
-  resultDelay: 0.15
-  closeDelayOnMiss: 0.8
+  rollHorizontalVelocityMin: {x: -35, y: -60, z: -35}
+  rollHorizontalVelocityMax: {x: 35, y: 60, z: 35}
+  rollDownVelocity: 100
+  rollTorqueMin: {x: -18, y: -7, z: -18}
+  rollTorqueMax: {x: 18, y: 7, z: 18}
+  maxRollDuration: 2.45
+  visualCleanupDelay: 0.28
+  forceRuntimeTuning: 1
+  resultDelay: 0.03
+  closeDelayOnMiss: 0.55
 --- !u!1 &9096428379861596923
 GameObject:
   m_ObjectHideFlags: 0
