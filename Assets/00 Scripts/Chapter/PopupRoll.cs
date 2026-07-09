@@ -1,5 +1,5 @@
-
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,9 +8,9 @@ public class PopupRoll : UIBase
 {
     public enum RollGuessType
     {
-        LessThanThree,
-        GreaterThanThree,
-        EqualThree,
+        Dice1LessThanDice2,
+        Dice1GreaterThanDice2,
+        Dice1EqualDice2,
     }
 
     public static PopupRoll Instance;
@@ -30,11 +30,15 @@ public class PopupRoll : UIBase
     public TextMeshProUGUI txtTitle;
     public TextMeshProUGUI txtResult;
 
+    [Header("Roll")]
+    public float closeDelayOnMiss = 0.55f;
+    public float resultResolveDelay = 0.2f;
 
     RollGuessType? selectedGuess;
     bool rollResolved;
     bool rewardGranted;
     Coroutine rollRoutine;
+    readonly Dictionary<int, int> diceResults = new Dictionary<int, int>();
 
     void Awake()
     {
@@ -57,19 +61,19 @@ public class PopupRoll : UIBase
         if (buttonLessThanThree != null)
         {
             buttonLessThanThree.onClick.RemoveAllListeners();
-            buttonLessThanThree.onClick.AddListener(() => OnChooseGuess(RollGuessType.LessThanThree));
+            buttonLessThanThree.onClick.AddListener(() => OnChooseGuess(RollGuessType.Dice1LessThanDice2));
         }
 
         if (buttonGreaterThanThree != null)
         {
             buttonGreaterThanThree.onClick.RemoveAllListeners();
-            buttonGreaterThanThree.onClick.AddListener(() => OnChooseGuess(RollGuessType.GreaterThanThree));
+            buttonGreaterThanThree.onClick.AddListener(() => OnChooseGuess(RollGuessType.Dice1GreaterThanDice2));
         }
 
         if (buttonEqualThree != null)
         {
             buttonEqualThree.onClick.RemoveAllListeners();
-            buttonEqualThree.onClick.AddListener(() => OnChooseGuess(RollGuessType.EqualThree));
+            buttonEqualThree.onClick.AddListener(() => OnChooseGuess(RollGuessType.Dice1EqualDice2));
         }
 
         if (buttonAtkReward != null)
@@ -104,13 +108,13 @@ public class PopupRoll : UIBase
         selectedGuess = null;
         rollResolved = false;
         rewardGranted = false;
-        ClearRollVisual();
+        diceResults.Clear();
 
         if (txtTitle != null)
             txtTitle.text = "Roll Guess";
 
         if (txtResult != null)
-            txtResult.text = "Choose <3, >3, or =3, then roll the dice.";
+            txtResult.text = "Choose Dice 1 < Dice 2, >, or =, then roll the dice.";
 
         if (rewardRoot != null)
             rewardRoot.SetActive(false);
@@ -125,22 +129,22 @@ public class PopupRoll : UIBase
             return;
 
         selectedGuess = guess;
+        diceResults.Clear();
         SetGuessButtonsInteractable(false);
 
         if (txtResult != null)
-            txtResult.text = "Rolling...";
+            txtResult.text = "Rolling 2 dice...";
+
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
-
-
     }
 
-    bool EvaluateGuess(RollGuessType guess, int roll)
+    bool EvaluateGuess(RollGuessType guess, int dice1, int dice2)
     {
         return guess switch
         {
-            RollGuessType.LessThanThree => roll < 3,
-            RollGuessType.GreaterThanThree => roll > 3,
-            RollGuessType.EqualThree => roll == 3,
+            RollGuessType.Dice1LessThanDice2 => dice1 < dice2,
+            RollGuessType.Dice1GreaterThanDice2 => dice1 > dice2,
+            RollGuessType.Dice1EqualDice2 => dice1 == dice2,
             _ => false,
         };
     }
@@ -176,38 +180,59 @@ public class PopupRoll : UIBase
             buttonHpReward.interactable = interactable;
     }
 
-    void ClearRollVisual()
-    {
-    }
-
     void OnDiceResultReceived(int diceIndex, int roll)
     {
-        if (!selectedGuess.HasValue || rollResolved || diceIndex != 0)
+        if (!selectedGuess.HasValue || rollResolved)
             return;
 
-        bool isWin = EvaluateGuess(selectedGuess.Value, roll);
+        diceResults[diceIndex] = roll;
+        if (diceResults.Count < 2 || !diceResults.ContainsKey(0) || !diceResults.ContainsKey(1))
+            return;
+
+        int dice1 = diceResults[0];
+        int dice2 = diceResults[1];
+        bool isWin = EvaluateGuess(selectedGuess.Value, dice1, dice2);
         rollResolved = true;
 
         if (txtResult != null)
-            txtResult.text = $"Dice rolled {roll}. " + (isWin ? "Correct! Pick a reward." : "Wrong guess.");
+            txtResult.text = $"Dice 1: {dice1} | Dice 2: {dice2}. " + (isWin ? "Correct! Pick a reward." : "Wrong guess.");
 
         if (rollRoutine != null)
         {
             StopCoroutine(rollRoutine);
             rollRoutine = null;
         }
+        TigerForge.EventManager.EmitEvent(Constant.EVENT_ON_ROLL_RESULT);
+
+
+        rollRoutine = StartCoroutine(ResolveRollResult(isWin));
     }
 
+    IEnumerator ResolveRollResult(bool isWin)
+    {
+        yield return new WaitForSecondsRealtime(resultResolveDelay);
+        UiHome.Instance?.ShowRollPlane(false);
+
+        if (isWin)
+        {
+            if (rewardRoot != null)
+                rewardRoot.SetActive(true);
+
+            SetRewardButtonsInteractable(true);
+            rollRoutine = null;
+            yield break;
+        }
+
+        yield return new WaitForSecondsRealtime(closeDelayOnMiss);
+        //  Hide();
+        rollRoutine = null;
+    }
 
     public override void AfterHideAction()
     {
         rollRoutine = null;
-        ClearRollVisual();
+        diceResults.Clear();
         UiHome.Instance?.ShowRollPlane(false);
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Roll);
     }
 }
-
-
-
-

@@ -5,49 +5,67 @@ using UnityEngine;
 public class DiceThrower : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private DiceRoll dicePrefab; // Kéo Prefab viên xúc xắc vào đây
-    [SerializeField] private int amountOfDice = 2; // Số lượng xúc xắc muốn ném
+    [SerializeField] private DiceRoll dicePrefab;
+    [SerializeField] private DiceRoll dicePrefab2;
 
     [Header("Physics Settings")]
-    [SerializeField] private float throwForce = 5f; // Lực đẩy tiến tới
-    [SerializeField] private float rollForce = 10f; // Lực xoắn nhào lộn
-    private List<GameObject> spawnedDice = new List<GameObject>();
+    [SerializeField] private float throwForce = 5f;
+    [SerializeField] private float rollForce = 10f;
+    [SerializeField] private Vector3 dice1Offset = new Vector3(-0.2f, 0f, 0f);
+    [SerializeField] private Vector3 dice2Offset = new Vector3(0.2f, 0f, 0f);
+    [SerializeField] private float wallDelay = 1f;
+
+    readonly List<GameObject> spawnedDice = new List<GameObject>();
+
     void Start()
     {
         TigerForge.EventManager.StartListening(Constant.EVENT_ROLL_DICE, RollAllDice);
+        TigerForge.EventManager.StartListening(Constant.EVENT_ON_ROLL_RESULT, DestroyAllDice);
     }
 
-    public async void RollAllDice()
+    void OnDestroy()
     {
-        if (dicePrefab == null) return;
-
-        // Xóa sạch các viên xúc xắc cũ đã ném ở lượt trước để tránh chật bàn
+        TigerForge.EventManager.StopListening(Constant.EVENT_ROLL_DICE, RollAllDice);
+        TigerForge.EventManager.StopListening(Constant.EVENT_ON_ROLL_RESULT, DestroyAllDice);
+    }
+    public void DestroyAllDice()
+    {
         foreach (GameObject die in spawnedDice)
         {
-            Destroy(die);
+            if (die != null)
+                Destroy(die);
         }
+        spawnedDice.Clear();
+    }
+    public async void RollAllDice()
+    {
+        if (dicePrefab == null || dicePrefab2 == null)
+            return;
+
+        foreach (GameObject die in spawnedDice)
+        {
+            if (die != null)
+                Destroy(die);
+        }
+
         spawnedDice.Clear();
         UiHome.Instance.rollPlane.SetActive(true);
         UiHome.Instance.wall.SetActive(false);
 
-        // Vòng lặp sinh ra số lượng xúc xắc cấu hình
-        for (int i = 0; i < amountOfDice; i++)
-        {
-            // Tạo xúc xắc tại vị trí và góc xoay của bộ ném này
-            DiceRoll newDie = Instantiate(dicePrefab, transform.position, transform.rotation);
+        SpawnAndRoll(dicePrefab, dice1Offset, 0);
+        SpawnAndRoll(dicePrefab2, dice2Offset, 1);
 
-            // Lưu vào danh sách quản lý
-            spawnedDice.Add(newDie.gameObject);
+        await Task.Delay(Mathf.RoundToInt(wallDelay * 1000f));
 
-            // Gọi hàm ném vật lý từ viên xúc xắc
-            newDie.RollDice(throwForce, rollForce, i);
-            await Task.Delay(1000);
+        if (UiHome.Instance != null && UiHome.Instance.wall != null)
             UiHome.Instance.wall.SetActive(true);
-
-            // Chờ 1 Frame tiếp theo mới sinh viên tiếp theo để tránh hai viên chồng lấp va chạm lỗi nhau
-            await Task.Yield();
-        }
     }
 
+    void SpawnAndRoll(DiceRoll prefab, Vector3 localOffset, int index)
+    {
+        Vector3 spawnPosition = transform.position + transform.TransformDirection(localOffset);
+        DiceRoll newDie = Instantiate(prefab, spawnPosition, transform.rotation);
+        spawnedDice.Add(newDie.gameObject);
+        newDie.RollDice(throwForce, rollForce, index);
+    }
 }
-
