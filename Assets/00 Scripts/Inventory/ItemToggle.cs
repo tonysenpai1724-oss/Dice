@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class ItemToggle : MonoBehaviour
 {
     public DiceData data;
+    public RuneSkillData runeData;
     public Button btn;
     public RawImage previewRawImage;
     public Image previewImage;
@@ -35,6 +36,7 @@ public class ItemToggle : MonoBehaviour
     public void Setup(DiceData diceData, Texture2D texture, Action<ItemToggle> onSelectedCallback = null)
     {
         data = diceData;
+        runeData = null;
         onSelected = onSelectedCallback;
         SetPreview(texture);
 
@@ -42,11 +44,23 @@ public class ItemToggle : MonoBehaviour
             btn.interactable = data != null;
     }
 
+    public void Setup(RuneSkillData runeSkillData, Sprite sprite, Action<ItemToggle> onSelectedCallback = null)
+    {
+        data = null;
+        runeData = runeSkillData;
+        onSelected = onSelectedCallback;
+        SetPreview(sprite);
+
+        if (btn != null)
+            btn.interactable = runeData != null;
+    }
+
     public void Clear()
     {
         data = null;
+        runeData = null;
         onSelected = null;
-        SetPreview(null);
+        SetPreview((Texture2D)null);
 
         if (btn != null)
             btn.interactable = false;
@@ -54,10 +68,14 @@ public class ItemToggle : MonoBehaviour
 
     public void OnClick()
     {
-        if (data == null)
+        if (data == null && runeData == null)
             return;
 
-        Debug.Log(data.diceName);
+        if (data != null)
+            Debug.Log(data.diceName);
+        else if (runeData != null)
+            Debug.Log(runeData.name);
+
         onSelected?.Invoke(this);
     }
 
@@ -103,6 +121,24 @@ public class ItemToggle : MonoBehaviour
         previewImage.sprite = previewSprite;
         previewImage.preserveAspect = true;
         previewImage.enabled = true;
+    }
+
+    void SetPreview(Sprite sprite)
+    {
+        ReleasePreview();
+
+        if (previewRawImage != null)
+        {
+            previewRawImage.texture = null;
+            previewRawImage.enabled = false;
+        }
+
+        if (previewImage == null)
+            return;
+
+        previewImage.sprite = sprite;
+        previewImage.preserveAspect = true;
+        previewImage.enabled = sprite != null;
     }
 
     void ReleasePreview()

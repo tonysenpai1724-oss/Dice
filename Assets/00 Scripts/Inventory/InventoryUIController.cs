@@ -1,12 +1,19 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum InventoryDiceSource
 {
     ChapterSession,
     PlayerController,
     ManualList
+}
+
+public enum InventoryViewTab
+{
+    Dice,
+    Rune
 }
 
 public class InventoryUIController : MonoBehaviour
@@ -19,6 +26,11 @@ public class InventoryUIController : MonoBehaviour
     public List<DiceData> diceItems = new();
     public List<ItemToggle> itemToggles;
 
+    [Header("Tabs")]
+    public Button diceButton;
+    public Button runeButton;
+    public InventoryViewTab defaultTab = InventoryViewTab.Dice;
+
     public event Action<ItemToggle> ItemSelected;
 
     [Header("Layout")]
@@ -28,11 +40,14 @@ public class InventoryUIController : MonoBehaviour
 
     readonly List<InventoryItem> spawnedItems = new();
     readonly List<ItemToggle> spawnedToggles = new();
+    InventoryViewTab currentTab = InventoryViewTab.Dice;
+
     void Start()
     {
-        // itemToggles.AddRange(GetComponentsInChildren<ItemToggle>());
-        RefreshItems();
-        TigerForge.EventManager.StartListening(Constant.ON_EQUIMENT_DICE_CHANGED, RefreshItems);
+        BindTabButtons();
+        SelectTab(defaultTab, false);
+        TigerForge.EventManager.StartListening(Constant.ON_EQUIMENT_DICE_CHANGED, RefreshCurrentTab);
+        TigerForge.EventManager.StartListening(Constant.ON_RUNE_CHANGE, RefreshCurrentTab);
     }
 
     public void SetDiceItems(List<DiceData> newDiceItems)
@@ -42,11 +57,30 @@ public class InventoryUIController : MonoBehaviour
             ? new List<DiceData>(newDiceItems)
             : new List<DiceData>();
 
-        RefreshItems();
+        if (currentTab == InventoryViewTab.Dice)
+            RefreshItems();
     }
+
     void OnEnable()
     {
-        RefreshItems();
+        BindTabButtons();
+        SelectTab(defaultTab, false);
+    }
+
+    void OnDestroy()
+    {
+        TigerForge.EventManager.StopListening(Constant.ON_EQUIMENT_DICE_CHANGED, RefreshCurrentTab);
+        TigerForge.EventManager.StopListening(Constant.ON_RUNE_CHANGE, RefreshCurrentTab);
+    }
+
+    public void ShowDice()
+    {
+        SelectTab(InventoryViewTab.Dice);
+    }
+
+    public void ShowRunes()
+    {
+        SelectTab(InventoryViewTab.Rune);
     }
 
     public void RefreshItems()
@@ -71,7 +105,6 @@ public class InventoryUIController : MonoBehaviour
 
         for (int i = 0; i < diceItems.Count; i++)
         {
-
             DiceData diceData = diceItems[i];
             if (diceData == null)
                 continue;
@@ -79,6 +112,39 @@ public class InventoryUIController : MonoBehaviour
             Texture2D previewTexture = previewGenerator.Capture(itemPrefab, diceData);
             ItemToggle itemToggle = Instantiate(itemTogglePrefab, parent);
             itemToggle.Setup(diceData, previewTexture, OnItemToggleSelected);
+            itemToggles.Add(itemToggle);
+            spawnedToggles.Add(itemToggle);
+        }
+    }
+
+    public void RefreshRunes()
+    {
+        ClearItems();
+
+        if (itemTogglePrefab == null)
+            return;
+
+        Transform parent = itemParent != null ? itemParent : transform;
+        itemToggles.Clear();
+
+        RuneManager runeManager = RuneManager.Instance;
+        RuneViewManager runeViewManager = RuneViewManager.Instance;
+
+        if (runeManager == null)
+            return;
+
+        for (int i = 0; i < runeManager.SlotCount; i++)
+        {
+            if (!runeManager.IsSlotUnlocked(i))
+                continue;
+
+            RuneSkillData runeData = runeManager.GetRune(i);
+            if (runeData == null)
+                continue;
+
+            Sprite runeSprite = runeViewManager != null ? runeViewManager.GetRuneSprite(runeData) : null;
+            ItemToggle itemToggle = Instantiate(itemTogglePrefab, parent);
+            itemToggle.Setup(runeData, runeSprite, OnItemToggleSelected);
             itemToggles.Add(itemToggle);
             spawnedToggles.Add(itemToggle);
         }
@@ -133,6 +199,55 @@ public class InventoryUIController : MonoBehaviour
             : new List<DiceData>();
     }
 
+    void BindTabButtons()
+    {
+        if (diceButton != null)
+        {
+            diceButton.onClick.RemoveListener(ShowDice);
+            diceButton.onClick.AddListener(ShowDice);
+        }
+
+        if (runeButton != null)
+        {
+            runeButton.onClick.RemoveListener(ShowRunes);
+            runeButton.onClick.AddListener(ShowRunes);
+        }
+    }
+
+    void SelectTab(InventoryViewTab tab, bool refresh = true)
+    {
+        currentTab = tab;
+        UpdateTabButtonState();
+
+        if (!refresh)
+        {
+            RefreshCurrentTab();
+            return;
+        }
+
+        RefreshCurrentTab();
+    }
+
+    void RefreshCurrentTab()
+    {
+        if (currentTab == InventoryViewTab.Rune)
+        {
+            RefreshRunes();
+            return;
+        }
+
+        RefreshItems();
+    }
+
+    void UpdateTabButtonState()
+    {
+        if (diceButton != null)
+            diceButton.interactable = currentTab != InventoryViewTab.Dice;
+
+        if (runeButton != null)
+            runeButton.interactable = currentTab != InventoryViewTab.Rune;
+    }
+
     Vector3 GetItemPosition(int index)
     {
         int column = index % itemsPerRow;
@@ -147,6 +262,9 @@ public class InventoryUIController : MonoBehaviour
 
     void ClearItems()
     {
+        if (itemToggles == null)
+            itemToggles = new List<ItemToggle>();
+
         for (int i = spawnedToggles.Count - 1; i >= 0; i--)
         {
             if (spawnedToggles[i] != null)

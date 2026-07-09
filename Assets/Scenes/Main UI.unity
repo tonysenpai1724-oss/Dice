@@ -5642,6 +5642,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Popup Shop
       objectReference: {fileID: 0}
+    - target: {fileID: 1595128702202723591, guid: 917a7131c59c6514898675a0ce282d50, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6066730084349958926, guid: 917a7131c59c6514898675a0ce282d50, type: 3}
       propertyPath: previewGenerator
       value: 
