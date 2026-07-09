@@ -4,15 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Sirenix.OdinInspector;
-
 public class UiHome : MonoBehaviour
 {
     public Transform coinBar, heartBar;
     public List<HomeToggleButton> homeToggleButtons;
     public List<HomePanel> homePanels;
     public GameObject rollPlane;
-    public static UiHome Instance;
-    public Transform rollPlaneAnchor;
+    public static UiHome Instance; public GameObject wall;
     void Awake()
     {
         Instance = this;

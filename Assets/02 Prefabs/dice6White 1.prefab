@@ -283,10 +283,9 @@ GameObject:
   - component: {fileID: 758909534533667558}
   - component: {fileID: 6252814532033887582}
   - component: {fileID: 8035855832383463713}
-  - component: {fileID: 2808318767607432134}
   - component: {fileID: 2572680990333550505}
   m_Layer: 0
-  m_Name: dice6White
+  m_Name: dice6White 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -419,40 +418,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.5598726, y: 2.5662084, z: 2.6147203}
   m_Center: {x: 0.09802895, y: 0.28310463, z: -0.042034388}
---- !u!114 &2808318767607432134
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4155905585476737637}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdf684fbb18bd954998e8867aa513293, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RollDiceVisual
-  visualRoot: {fileID: 0}
-  facePoints:
-  - {fileID: 4700978034459513828}
-  - {fileID: 6597773277049717280}
-  - {fileID: 6161194808421526279}
-  - {fileID: 4298314615855966185}
-  - {fileID: 7630114985479319598}
-  - {fileID: 7343324582979782531}
-  body: {fileID: 6252814532033887582}
-  boardCollider: {fileID: 0}
-  throwSpawnPoint: {fileID: 0}
-  throwForce: 8.5
-  upwardForce: 2.25
-  sideForce: 0.2
-  torqueForce: 14
-  randomVariance: 0.15
-  targetAreaPadding: {x: 0.18, y: 0.18}
-  stopVelocity: 0.12
-  stopAngularVelocity: 0.18
-  stopDelay: 0.25
-  maxThrowDuration: 6
-  baseScale: {x: 1.5, y: 1.5, z: 1.5}
 --- !u!114 &2572680990333550505
 MonoBehaviour:
   m_ObjectHideFlags: 0

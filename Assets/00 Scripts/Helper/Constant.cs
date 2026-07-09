@@ -120,7 +120,7 @@ public static class Constant
     public const string ON_EQUIPMENT_UPGRADED = "ON_EQUIPMENT_UPGRADED";
 
     public const string ON_EQUIMENT_DICE_CHANGED = "ON_EQUIMENT_DICE_CHANGED";
-
+    public const string EVENT_ROLL_DICE = "EventRollDice";
     #endregion
 }
 

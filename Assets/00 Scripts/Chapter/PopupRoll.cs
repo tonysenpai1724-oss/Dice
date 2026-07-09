@@ -1,4 +1,4 @@
-﻿
+
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -30,44 +30,26 @@ public class PopupRoll : UIBase
     public TextMeshProUGUI txtTitle;
     public TextMeshProUGUI txtResult;
 
-    [Header("Roll Visual")]
-    public RollDiceVisual rollDicePrefab;
-    public Transform rollBoardAnchor;
-    public Vector3 rollSpawnOffset = new Vector3(0f, 0f, 0f);
-    public Vector3 rollDirectionMin = new Vector3(-0.8f, 0f, 0.35f);
-    public Vector3 rollDirectionMax = new Vector3(0.8f, 0f, 1f);
-    public float rollResultDelay = 1.5f;
-    public float visualCleanupDelay = 0.25f;
-    public bool forceRuntimeTuning = true;
-
-    [Header("Roll")]
-    public float resultDelay = 0.03f;
-    public float closeDelayOnMiss = 0.55f;
 
     RollGuessType? selectedGuess;
     bool rollResolved;
     bool rewardGranted;
     Coroutine rollRoutine;
-    RollDiceVisual activeRollVisual;
 
     void Awake()
     {
         Instance = this;
-        if (forceRuntimeTuning)
-            ApplyRecommendedTuning();
         BindButtons();
     }
 
-    [Sirenix.OdinInspector.Button("Apply Recommended Tuning")]
-    public void ApplyRecommendedTuning()
+    void OnEnable()
     {
-        rollSpawnOffset = Vector3.zero;
-        rollDirectionMin = new Vector3(-0.8f, 0f, 0.35f);
-        rollDirectionMax = new Vector3(0.8f, 0f, 1f);
-        rollResultDelay = 1.5f;
-        visualCleanupDelay = 0.25f;
-        resultDelay = 0.03f;
-        closeDelayOnMiss = 0.55f;
+        DiceRoll.OnDiceResult += OnDiceResultReceived;
+    }
+
+    void OnDisable()
+    {
+        DiceRoll.OnDiceResult -= OnDiceResultReceived;
     }
 
     void BindButtons()
@@ -113,9 +95,6 @@ public class PopupRoll : UIBase
     {
         base.Show();
 
-        if (forceRuntimeTuning)
-            ApplyRecommendedTuning();
-
         if (rollRoutine != null)
         {
             StopCoroutine(rollRoutine);
@@ -150,88 +129,9 @@ public class PopupRoll : UIBase
 
         if (txtResult != null)
             txtResult.text = "Rolling...";
+        TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
 
-        rollRoutine = StartCoroutine(IERollAndReveal());
-    }
 
-    IEnumerator IERollAndReveal()
-    {
-        UiHome.Instance?.ShowRollPlane(true);
-        rollBoardAnchor = UiHome.Instance != null ? UiHome.Instance.rollPlaneAnchor : rollBoardAnchor;
-        int resolvedFace = Random.Range(1, 7);
-        SpawnRollVisual(resolvedFace);
-        yield return new WaitForSecondsRealtime(resultDelay);
-
-        bool animationFinished = activeRollVisual == null;
-        System.Action onRollVisualFinished = () => animationFinished = true;
-
-        if (activeRollVisual != null)
-        {
-            activeRollVisual.ClearFinishedListeners();
-            activeRollVisual.Finished += onRollVisualFinished;
-            yield return new WaitUntil(() => animationFinished || activeRollVisual == null);
-
-            if (activeRollVisual != null)
-            {
-                activeRollVisual.Finished -= onRollVisualFinished;
-            }
-        }
-        else
-        {
-            yield return new WaitForSecondsRealtime(rollResultDelay);
-        }
-
-        int roll = activeRollVisual != null ? activeRollVisual.CurrentFace : resolvedFace;
-        bool isWin = EvaluateGuess(selectedGuess.GetValueOrDefault(), roll);
-        rollResolved = true;
-
-        if (txtResult != null)
-            txtResult.text = $"Dice rolled {roll}. " + (isWin ? "Correct! Pick a reward." : "Wrong guess.");
-
-        yield return new WaitForSecondsRealtime(visualCleanupDelay);
-        ClearRollVisual();
-        UiHome.Instance?.ShowRollPlane(false);
-
-        if (isWin)
-        {
-            if (rewardRoot != null)
-                rewardRoot.SetActive(true);
-
-            SetRewardButtonsInteractable(true);
-            rollRoutine = null;
-            yield break;
-        }
-
-        yield return new WaitForSecondsRealtime(closeDelayOnMiss);
-        Hide();
-        rollRoutine = null;
-    }
-
-    void SpawnRollVisual(int targetFace)
-    {
-        ClearRollVisual();
-
-        if (rollDicePrefab == null || rollBoardAnchor == null)
-            return;
-
-        Vector3 spawnPosition = rollBoardAnchor.position + rollSpawnOffset;
-        Vector3 rollDirection = GetRollDirection();
-        activeRollVisual = Instantiate(rollDicePrefab, spawnPosition, Quaternion.identity, rollBoardAnchor);
-        activeRollVisual.SpawnAndRoll(spawnPosition, rollDirection, targetFace);
-    }
-
-    Vector3 GetRollDirection()
-    {
-        Vector3 direction = new Vector3(
-            Random.Range(rollDirectionMin.x, rollDirectionMax.x),
-            0f,
-            Random.Range(rollDirectionMin.z, rollDirectionMax.z)
-        );
-
-        if (direction.sqrMagnitude < 0.0001f)
-            direction = Vector3.forward;
-
-        return direction.normalized;
     }
 
     bool EvaluateGuess(RollGuessType guess, int roll)
@@ -278,12 +178,26 @@ public class PopupRoll : UIBase
 
     void ClearRollVisual()
     {
-        if (activeRollVisual == null)
+    }
+
+    void OnDiceResultReceived(int diceIndex, int roll)
+    {
+        if (!selectedGuess.HasValue || rollResolved || diceIndex != 0)
             return;
 
-        Destroy(activeRollVisual.gameObject);
-        activeRollVisual = null;
+        bool isWin = EvaluateGuess(selectedGuess.Value, roll);
+        rollResolved = true;
+
+        if (txtResult != null)
+            txtResult.text = $"Dice rolled {roll}. " + (isWin ? "Correct! Pick a reward." : "Wrong guess.");
+
+        if (rollRoutine != null)
+        {
+            StopCoroutine(rollRoutine);
+            rollRoutine = null;
+        }
     }
+
 
     public override void AfterHideAction()
     {
@@ -293,5 +207,7 @@ public class PopupRoll : UIBase
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Roll);
     }
 }
+
+
 
 

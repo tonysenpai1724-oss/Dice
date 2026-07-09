@@ -949,8 +949,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 285922438}
+  - component: {fileID: 285922439}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: ThrowDiceRoll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -964,13 +965,29 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 285922437}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 10, z: -34}
+  m_LocalRotation: {x: 0.10499601, y: 0.021712493, z: -0.03965993, w: 0.9934443}
+  m_LocalPosition: {x: -3.5, y: 12, z: -59.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 12.142, y: 2.041, z: -4.355}
+--- !u!114 &285922439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285922437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 636d8e5223dd9f444a7033d7b469689e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DiceThrower
+  dicePrefab: {fileID: 520693340571359731, guid: 70dcc77b79f4b3644896d5d1ecc154b5, type: 3}
+  amountOfDice: 1
+  throwForce: 30
+  rollForce: 5
 --- !u!1 &288121318
 GameObject:
   m_ObjectHideFlags: 0
@@ -6671,7 +6688,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1299363225
 Transform:
   m_ObjectHideFlags: 0
@@ -8187,7 +8204,7 @@ MonoBehaviour:
   - {fileID: 1184857292}
   - {fileID: 6888549903499275415}
   rollPlane: {fileID: 1771714161}
-  rollPlaneAnchor: {fileID: 285922438}
+  wall: {fileID: 1299363224}
 --- !u!1 &1562247139
 GameObject:
   m_ObjectHideFlags: 0
@@ -9551,7 +9568,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1771714161}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 048aee50788538f4988fe3712fa323d7, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
