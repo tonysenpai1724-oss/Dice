@@ -481,8 +481,8 @@ public class DiceManager : MonoBehaviour
                 continue;
 
             // Sửa: gọi qua boardService
-            Vector3 position = boardService.FindClearPosition(plannedPositions[i]);
-            if (boardService.IsOccupied(position, null))
+            Vector3 position = boardService.FindClearPosition(plannedPositions[i], null, diceSpacingRadius);
+            if (boardService.IsOccupied(position, null, diceSpacingRadius))
                 continue;
 
             SpawnDice(data, position);
@@ -584,9 +584,9 @@ public class DiceManager : MonoBehaviour
             {
                 attempts++;
                 Vector3 position = boardService.GetRandomPositionOnBoard();
-                Vector3 clearPos = boardService.FindClearPosition(position);
+                Vector3 clearPos = boardService.FindClearPosition(position, null, diceSpacingRadius);
 
-                if (!boardService.IsOccupied(clearPos, null))
+                if (!boardService.IsOccupied(clearPos, null, diceSpacingRadius))
                 {
                     SpawnDice(data, clearPos);
                     break;
@@ -616,10 +616,14 @@ public class DiceManager : MonoBehaviour
 
         d.Setup(data);
 
-        d.transform.position = pos;
+        Vector3 clearPos = boardService != null
+            ? boardService.FindClearPosition(pos, d, diceSpacingRadius)
+            : pos;
+
+        d.transform.position = clearPos;
         d.rb.linearVelocity = Vector3.zero;
         d.rb.angularVelocity = Vector3.zero;
-        d.rb.position = pos;
+        d.rb.position = clearPos;
         d.rb.rotation = d.GetUprightRotation();
         d.rb.Sleep();
         d.ApplyGroundedConstraints();
@@ -849,6 +853,8 @@ public class DiceManager : MonoBehaviour
     #endregion
 
 }
+
+
 
 
 

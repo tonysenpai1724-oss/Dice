@@ -14793,7 +14793,7 @@ MonoBehaviour:
   maxSingleDiceShare: 0.5
   minStartLevel: 1
   maxStartLevel: 3
-  diceSpacingRadius: 0.95
+  diceSpacingRadius: 1.4
   comboConfig:
     maxComboDistance: 4
     comboArcHeight: 4

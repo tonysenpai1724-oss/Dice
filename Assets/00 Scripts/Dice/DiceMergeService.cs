@@ -26,6 +26,7 @@ public class DiceMergeService
     readonly Action<IEnumerator> runCoroutine;
     readonly Action<Dice> continueCombo;
     readonly Dictionary<Dice, int> comboChainMap;
+    readonly HashSet<Dice> pendingMergeClaims = new HashSet<Dice>();
 
     public DiceMergeService(
         BoardService boardService,
@@ -66,11 +67,17 @@ public class DiceMergeService
         if (!a.gameObject.activeInHierarchy || !b.gameObject.activeInHierarchy)
             return false;
 
+        if (pendingMergeClaims.Contains(a) || pendingMergeClaims.Contains(b))
+            return false;
+
         if (a.Level != b.Level)
             return false;
 
         if (a.state == DiceState.Merging || b.state == DiceState.Merging)
             return false;
+
+        pendingMergeClaims.Add(a);
+        pendingMergeClaims.Add(b);
 
         a.isMerging = true;
         b.isMerging = true;
@@ -80,51 +87,65 @@ public class DiceMergeService
 
     public IEnumerator MergeRoutine(Dice a, Dice b)
     {
-        a.FreezeForMerge();
-        b.FreezeForMerge();
-
-        Vector3 mergePos = (a.transform.position + b.transform.position) * 0.5f;
-        mergePos.y = boardService.GetBoardSurfaceY();
-
-        EnqueueDice(a.data, mergePos);
-        EnqueueDice(b.data, mergePos);
-
-        int chain = comboChainMap.TryGetValue(a, out int chainValue) ? chainValue : 1;
-
-        returnBoardDice?.Invoke(a);
-        returnBoardDice?.Invoke(b);
-
-        DiceData bombData = GetBombDiceData(a.data, b.data);
-        if (bombData != null)
-            ExplodeBoardDice(mergePos, bombData);
-
-        DiceData nextData = getDiceData?.Invoke(a.Level + 1, DiceType.Normal);
-        if (nextData == null)
+        try
         {
-            Debug.LogError($"Khong tim thay data Level {a.Level + 1} Type {a.type}");
-            yield break;
+            if (a == null || b == null)
+                yield break;
+
+            a.FreezeForMerge();
+            b.FreezeForMerge();
+
+            Vector3 mergePos = (a.transform.position + b.transform.position) * 0.5f;
+            mergePos.y = boardService.GetBoardSurfaceY();
+
+            EnqueueDice(a.data, mergePos);
+            EnqueueDice(b.data, mergePos);
+
+            int chain = comboChainMap.TryGetValue(a, out int chainValue) ? chainValue : 1;
+
+            returnBoardDice?.Invoke(a);
+            returnBoardDice?.Invoke(b);
+
+            DiceData bombData = GetBombDiceData(a.data, b.data);
+            if (bombData != null)
+                ExplodeBoardDice(mergePos, bombData);
+
+            DiceData nextData = getDiceData?.Invoke(a.Level + 1, DiceType.Normal);
+            if (nextData == null)
+            {
+                Debug.LogError($"Khong tim thay data Level {a.Level + 1} Type {a.type}");
+                yield break;
+            }
+
+            Vector3 spawnPos = boardService.FindClearPosition(mergePos);
+            Dice merged = spawnDice?.Invoke(nextData, spawnPos);
+            if (merged == null)
+                yield break;
+
+            spawnMergeFloatingText?.Invoke(merged.transform.position, merged.data.level.ToString(), merged.data.diceColor);
+
+            if (merged.data != null && merged.data.hitEffectPrefab != null)
+            {
+                Vector3 fxPos = merged.transform.position;
+                if (merged.cachedCollider != null)
+                    fxPos.y = 1.5f;
+
+                GameObject fx = UnityEngine.Object.Instantiate(merged.data.hitEffectPrefab, fxPos, Quaternion.identity);
+                UnityEngine.Object.Destroy(fx, 1f);
+            }
+
+            comboChainMap[merged] = chain;
+            merged.PlaceUpright(merged.transform.position);
+            continueCombo?.Invoke(merged);
         }
-
-        Vector3 spawnPos = boardService.FindClearPosition(mergePos);
-        Dice merged = spawnDice?.Invoke(nextData, spawnPos);
-        if (merged == null)
-            yield break;
-
-        spawnMergeFloatingText?.Invoke(merged.transform.position, merged.data.level.ToString(), merged.data.diceColor);
-
-        if (merged.data != null && merged.data.hitEffectPrefab != null)
+        finally
         {
-            Vector3 fxPos = merged.transform.position;
-            if (merged.cachedCollider != null)
-                fxPos.y = 1.5f;
+            if (a != null)
+                pendingMergeClaims.Remove(a);
 
-            GameObject fx = UnityEngine.Object.Instantiate(merged.data.hitEffectPrefab, fxPos, Quaternion.identity);
-            UnityEngine.Object.Destroy(fx, 1f);
+            if (b != null)
+                pendingMergeClaims.Remove(b);
         }
-
-        comboChainMap[merged] = chain;
-        merged.PlaceUpright(merged.transform.position);
-        continueCombo?.Invoke(merged);
     }
 
     DiceData GetBombDiceData(DiceData first, DiceData second)
@@ -199,3 +220,5 @@ public class DiceMergeService
         }
     }
 }
+
+
