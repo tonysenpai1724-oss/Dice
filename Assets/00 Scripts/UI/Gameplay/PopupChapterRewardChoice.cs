@@ -79,7 +79,7 @@ public class PopupChapterRewardChoice : UIBase
             return null;
 
         if (option.type == ChapterRewardChoiceType.AddRune)
-            return RuneViewManager.Instance != null ? RuneViewManager.Instance.GetRuneSprite(option.runeSkill) : null;
+            return option.runeSkill != null ? option.runeSkill.runeSprite : null;
 
         DiceData diceData = GetOptionDice(option);
         if (inventoryUIController == null || diceData == null)

@@ -12,6 +12,9 @@ public class RuneSkillData : SerializedScriptableObject
     public int stackApply;
 
     public int valueApply = 1;
+    public string runeName;
+    public string description;
+    public Sprite runeSprite;
 
     public virtual void Execute()
     {

@@ -24,3 +24,6 @@ MonoBehaviour:
   TargetType: 0
   stackApply: 1
   valueApply: 10
+  runeName: Bomb
+  description: ssssssss
+  runeSprite: {fileID: 21300000, guid: 91d3eda13b449df44a9d059ae37a4063, type: 3}

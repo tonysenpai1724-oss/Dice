@@ -19,6 +19,8 @@ public class DiceData : SerializedScriptableObject
     public bool useVisualPreset = true;
     public DiceVisualPresetDatabaseSO visualPresetDatabase;
     public bool allowManualOverride = true;
+    public string description;
+    public string diceStatsDes;
 
     //public Mesh mesh;
 

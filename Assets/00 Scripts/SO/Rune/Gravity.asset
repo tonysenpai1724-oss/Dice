@@ -24,3 +24,6 @@ MonoBehaviour:
   TargetType: 4
   stackApply: 50
   valueApply: 7
+  runeName: Gravity
+  description: skankcfska
+  runeSprite: {fileID: 21300000, guid: ea90fd739461c44448ce9f9ffa11b318, type: 3}

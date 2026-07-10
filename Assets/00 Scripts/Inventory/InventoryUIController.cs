@@ -16,7 +16,7 @@ public enum InventoryViewTab
     Rune
 }
 
-public class InventoryUIController : MonoBehaviour
+public class InventoryUIController : UIBase
 {
     public InventoryItem itemPrefab;
     public Transform itemParent;
@@ -142,7 +142,7 @@ public class InventoryUIController : MonoBehaviour
             if (runeData == null)
                 continue;
 
-            Sprite runeSprite = runeViewManager != null ? runeViewManager.GetRuneSprite(runeData) : null;
+            Sprite runeSprite = runeData.runeSprite;
             ItemToggle itemToggle = Instantiate(itemTogglePrefab, parent);
             itemToggle.Setup(runeData, runeSprite, OnItemToggleSelected);
             itemToggles.Add(itemToggle);
@@ -167,7 +167,23 @@ public class InventoryUIController : MonoBehaviour
 
     void OnItemToggleSelected(ItemToggle itemToggle)
     {
+        if (itemToggle == null)
+            return;
+
         ItemSelected?.Invoke(itemToggle);
+
+        if (UIManager.Instance == null)
+            return;
+
+        switch (itemToggle.itemType)
+        {
+            case ItemToggleType.Dice:
+                UIManager.Instance.ShowPopupDiceDetail(itemToggle.data, itemToggle.PreviewSprite);
+                break;
+            case ItemToggleType.Rune:
+                UIManager.Instance.ShowPopupRuneDetail(itemToggle.runeData);
+                break;
+        }
     }
 
     void CacheItemToggles()
@@ -286,3 +302,8 @@ public class InventoryUIController : MonoBehaviour
         spawnedItems.Clear();
     }
 }
+
+
+
+
+

@@ -29,6 +29,8 @@ MonoBehaviour:
   useVisualPreset: 1
   visualPresetDatabase: {fileID: 0}
   allowManualOverride: 1
+  description: Attack twice on the target
+  diceStatsDes: 'Random Enemy, Atk*Dice '
   diceMaterial: {fileID: 2100000, guid: c3e0bf38caecb3a4eabc66547ce91011, type: 2}
   decalMaterial:
   - {fileID: 2100000, guid: 50c4ae62527b22b4faa93b7a247a24a3, type: 2}

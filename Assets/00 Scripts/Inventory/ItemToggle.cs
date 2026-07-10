@@ -2,8 +2,16 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum ItemToggleType
+{
+    None,
+    Dice,
+    Rune
+}
+
 public class ItemToggle : MonoBehaviour
 {
+    public ItemToggleType itemType;
     public DiceData data;
     public RuneSkillData runeData;
     public Button btn;
@@ -35,6 +43,7 @@ public class ItemToggle : MonoBehaviour
 
     public void Setup(DiceData diceData, Texture2D texture, Action<ItemToggle> onSelectedCallback = null)
     {
+        itemType = ItemToggleType.Dice;
         data = diceData;
         runeData = null;
         onSelected = onSelectedCallback;
@@ -46,6 +55,7 @@ public class ItemToggle : MonoBehaviour
 
     public void Setup(RuneSkillData runeSkillData, Sprite sprite, Action<ItemToggle> onSelectedCallback = null)
     {
+        itemType = ItemToggleType.Rune;
         data = null;
         runeData = runeSkillData;
         onSelected = onSelectedCallback;
@@ -57,6 +67,7 @@ public class ItemToggle : MonoBehaviour
 
     public void Clear()
     {
+        itemType = ItemToggleType.None;
         data = null;
         runeData = null;
         onSelected = null;
@@ -68,13 +79,24 @@ public class ItemToggle : MonoBehaviour
 
     public void OnClick()
     {
-        if (data == null && runeData == null)
+        if (itemType == ItemToggleType.None)
             return;
 
-        if (data != null)
-            Debug.Log(data.diceName);
-        else if (runeData != null)
-            Debug.Log(runeData.name);
+        switch (itemType)
+        {
+            case ItemToggleType.Dice:
+                if (data == null)
+                    return;
+                Debug.Log(data.diceName);
+                break;
+            case ItemToggleType.Rune:
+                if (runeData == null)
+                    return;
+                Debug.Log(runeData.name);
+                break;
+            default:
+                return;
+        }
 
         onSelected?.Invoke(this);
     }

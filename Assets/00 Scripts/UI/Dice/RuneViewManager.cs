@@ -7,7 +7,6 @@ public class RuneViewManager : SerializedMonoBehaviour
     public static RuneViewManager Instance { get; private set; }
 
     [Header("Data")]
-    public RuneUIData runeUIData;
     public Sprite lockedSprite;
 
     [Header("Slots")]
@@ -68,31 +67,7 @@ public class RuneViewManager : SerializedMonoBehaviour
 
     public Sprite GetRuneSprite(RuneSkillData runeSkill)
     {
-        if (runeSkill == null)
-            return null;
-
-        if (runeUIData == null)
-        {
-            Debug.Log("RuneViewManager missing RuneUIData", this);
-            return null;
-        }
-
-        if (runeUIData.dicRuneUIData == null)
-        {
-            Debug.Log("RuneUIData dictionary is null", runeUIData);
-            return null;
-        }
-
-        if (runeUIData != null &&
-            runeUIData.dicRuneUIData != null &&
-            runeUIData.dicRuneUIData.TryGetValue(runeSkill.TargetType, out Sprite sprite))
-        {
-            return sprite;
-        }
-
-        Debug.Log($"RuneUIData missing sprite for rune type {runeSkill.TargetType}", runeUIData);
-
-        return null;
+        return runeSkill != null ? runeSkill.runeSprite : null;
     }
 
     void ApplySlotPosition(RuneUI runeUI, int index)
@@ -131,3 +106,4 @@ public class RuneViewManager : SerializedMonoBehaviour
         }
     }
 }
+

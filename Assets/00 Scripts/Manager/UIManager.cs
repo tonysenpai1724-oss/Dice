@@ -1,4 +1,4 @@
-﻿using Sirenix.OdinInspector;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -370,6 +370,38 @@ public class UIManager : Singleton<UIManager>
         UIBase ui = GetUI("Popup Coppy Seed Phrase");
         ui.Show();
     }
+    public void ShowPopupDiceDetail(DiceData data, Sprite sprite)
+    {
+        if (data == null)
+            return;
+
+        PopupDiceDetail ui = GetUI("Popup Dice Detail") as PopupDiceDetail;
+        if (ui == null)
+            return;
+
+        ui.SetDiceDetails(data, sprite);
+        ui.Show();
+    }
+    public void ShowInventoryDice()
+    {
+        UIBase ui = GetUI("Popup Inventory Dice");
+        if (ui == null)
+            return;
+
+        ui.Show();
+    }
+    public void ShowPopupRuneDetail(RuneSkillData runeData)
+    {
+        if (runeData == null)
+            return;
+
+        PopupRuneDetail ui = GetUI("Popup Rune Detail") as PopupRuneDetail;
+        if (ui == null)
+            return;
+
+        ui.ShowRuneDetails(runeData);
+        ui.Show();
+    }
     public void ShowPopupConfirm(System.Action actionOk, System.Action actionNo = null, string txtDesc = "Confirm Action?", string txtTile = "Warning", EButtonColor okColor = EButtonColor.Yellow, string txtBtnOk = "OK", EButtonColor noColor = EButtonColor.Blue, string txtBtnNo = "No")
     {
         PopupConfirmAction ui = GetUI("Popup Confirm Action") as PopupConfirmAction;
@@ -470,6 +502,11 @@ public class UIManager : Singleton<UIManager>
     }
     #endregion
 }
+
+
+
+
+
 
 
 
