@@ -170,6 +170,9 @@ public class GameManager : Singleton<GameManager>
                     case LevelType.Roll:
                         UIManager.Instance?.ShowPopupRoll();
                         return;
+                    case LevelType.Jester:
+                        UIManager.Instance?.ShowPopupRollBuff();
+                        return;
                 }
             }
 

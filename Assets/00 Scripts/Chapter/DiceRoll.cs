@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -8,6 +9,10 @@ public class DiceRoll : MonoBehaviour
     [Header("References")]
     public Transform[] diceFaces;
     public Rigidbody rb;
+
+    [Header("Roll Detect")]
+    public float settleLinearVelocityThreshold = 0.01f;
+    public float settleAngularVelocityThreshold = 0.01f;
 
     private int diceIndex = -1;
     private bool hasStoppedRolling;
@@ -29,7 +34,9 @@ public class DiceRoll : MonoBehaviour
         if (!delayFinished)
             return;
 
-        if (!hasStoppedRolling && rb.linearVelocity.sqrMagnitude == 0f)
+        if (!hasStoppedRolling &&
+            rb.linearVelocity.sqrMagnitude <= settleLinearVelocityThreshold * settleLinearVelocityThreshold &&
+            rb.angularVelocity.sqrMagnitude <= settleAngularVelocityThreshold * settleAngularVelocityThreshold)
         {
             hasStoppedRolling = true;
             GetNumberOnTopFace();
@@ -41,6 +48,9 @@ public class DiceRoll : MonoBehaviour
         diceIndex = index;
         hasStoppedRolling = false;
         delayFinished = false;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
 
         float randomVariance = UnityEngine.Random.Range(-0.5f, 0.5f);
 
@@ -61,7 +71,7 @@ public class DiceRoll : MonoBehaviour
         delayFinished = true;
     }
 
-    [ContextMenu("Get Top Face")]
+    [Button("Get Top Face")]
     int GetNumberOnTopFace()
     {
         if (diceFaces == null || diceFaces.Length == 0)
@@ -70,7 +80,7 @@ public class DiceRoll : MonoBehaviour
         int topFaceIndex = 0;
         float lastYPosition = diceFaces[0].position.y;
 
-        for (int i = 0; i < diceFaces.Length; i++)
+        for (int i = 1; i < diceFaces.Length; i++)
         {
             if (diceFaces[i].position.y > lastYPosition)
             {
@@ -83,7 +93,6 @@ public class DiceRoll : MonoBehaviour
         OnDiceResult?.Invoke(diceIndex, finalResult);
 
         Debug.Log($"Xuc xac so {diceIndex} ra mat: {finalResult}");
-        // Destroy(gameObject);
         return finalResult;
     }
 }

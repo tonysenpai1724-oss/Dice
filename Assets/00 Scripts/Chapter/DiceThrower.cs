@@ -4,9 +4,22 @@ using UnityEngine;
 
 public class DiceThrower : MonoBehaviour
 {
+    public enum RollMode
+    {
+        TwoDice,
+        Dice8,
+        Dice12,
+        Dice20,
+    }
+
+    public static RollMode CurrentRollMode = RollMode.TwoDice;
+
     [Header("References")]
     [SerializeField] private DiceRoll dicePrefab;
     [SerializeField] private DiceRoll dicePrefab2;
+    [SerializeField] private DiceRoll dice8Prefab;
+    [SerializeField] private DiceRoll dice12Prefab;
+    [SerializeField] private DiceRoll dice20Prefab;
 
     [Header("Physics Settings")]
     [SerializeField] private float throwForce = 5f;
@@ -28,6 +41,7 @@ public class DiceThrower : MonoBehaviour
         TigerForge.EventManager.StopListening(Constant.EVENT_ROLL_DICE, RollAllDice);
         TigerForge.EventManager.StopListening(Constant.EVENT_ON_ROLL_RESULT, DestroyAllDice);
     }
+
     public void DestroyAllDice()
     {
         foreach (GameObject die in spawnedDice)
@@ -35,25 +49,38 @@ public class DiceThrower : MonoBehaviour
             if (die != null)
                 Destroy(die);
         }
+
         spawnedDice.Clear();
     }
+
     public async void RollAllDice()
     {
-        if (dicePrefab == null || dicePrefab2 == null)
-            return;
-
-        foreach (GameObject die in spawnedDice)
-        {
-            if (die != null)
-                Destroy(die);
-        }
-
-        spawnedDice.Clear();
+        DestroyAllDice();
         UiHome.Instance.rollPlane.SetActive(true);
         UiHome.Instance.wall.SetActive(false);
 
-        SpawnAndRoll(dicePrefab, dice1Offset, 0);
-        SpawnAndRoll(dicePrefab2, dice2Offset, 1);
+        switch (CurrentRollMode)
+        {
+            case RollMode.Dice8:
+                if (dice8Prefab != null)
+                    SpawnAndRoll(dice8Prefab, Vector3.zero, 0);
+                break;
+            case RollMode.Dice12:
+                if (dice12Prefab != null)
+                    SpawnAndRoll(dice12Prefab, Vector3.zero, 0);
+                break;
+            case RollMode.Dice20:
+                if (dice20Prefab != null)
+                    SpawnAndRoll(dice20Prefab, Vector3.zero, 0);
+                break;
+            default:
+                if (dicePrefab == null || dicePrefab2 == null)
+                    return;
+
+                SpawnAndRoll(dicePrefab, dice1Offset, 0);
+                SpawnAndRoll(dicePrefab2, dice2Offset, 1);
+                break;
+        }
 
         await Task.Delay(Mathf.RoundToInt(wallDelay * 1000f));
 

@@ -19,12 +19,15 @@ public class PopupRoll : UIBase
     public Button buttonLessThanThree;
     public Button buttonGreaterThanThree;
     public Button buttonEqualThree;
+    public GameObject guessRoot;
 
     [Header("Reward")]
     public GameObject rewardRoot;
     public Button buttonAtkReward;
     public Button buttonCritReward;
     public Button buttonHpReward;
+    [Header("Fail")]
+    public GameObject failRoot;
 
     [Header("Text")]
     public TextMeshProUGUI txtTitle;
@@ -118,6 +121,10 @@ public class PopupRoll : UIBase
 
         if (rewardRoot != null)
             rewardRoot.SetActive(false);
+        if (failRoot != null)
+            failRoot.SetActive(false);
+        if (guessRoot != null)
+            guessRoot.SetActive(true);
 
         SetGuessButtonsInteractable(true);
         SetRewardButtonsInteractable(false);
@@ -134,6 +141,8 @@ public class PopupRoll : UIBase
 
         if (txtResult != null)
             txtResult.text = "Rolling 2 dice...";
+        if (guessRoot != null)
+            guessRoot.SetActive(false);
 
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
     }
@@ -222,7 +231,11 @@ public class PopupRoll : UIBase
             rollRoutine = null;
             yield break;
         }
+        if (failRoot != null)
+            failRoot.SetActive(true);
 
+        if (rewardRoot != null)
+            rewardRoot.SetActive(false);
         yield return new WaitForSecondsRealtime(closeDelayOnMiss);
         //  Hide();
         rollRoutine = null;

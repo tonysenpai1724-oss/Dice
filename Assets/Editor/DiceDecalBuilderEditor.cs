@@ -22,7 +22,6 @@ public class DiceDecalBuilderEditor : Editor
     static float planeDistanceTolerance = 0.025f;
     static float manualFaceSize = 0.7f;
     static float manualFaceOffset = 0.53f;
-    static float manualFaceLayerOffset = 0.0025f;
 
     public override void OnInspectorGUI()
     {
@@ -47,7 +46,6 @@ public class DiceDecalBuilderEditor : Editor
         planeDistanceTolerance = EditorGUILayout.Slider("Plane Group Tolerance", planeDistanceTolerance, 0.001f, 0.2f);
         manualFaceSize = EditorGUILayout.Slider("Manual Face Size", manualFaceSize, 0.1f, 2f);
         manualFaceOffset = EditorGUILayout.Slider("Manual Face Offset", manualFaceOffset, 0.01f, 2f);
-        manualFaceLayerOffset = EditorGUILayout.Slider("Manual Layer Offset", manualFaceLayerOffset, 0f, 0.05f);
 
         Dice dice = (Dice)target;
 
@@ -69,11 +67,54 @@ public class DiceDecalBuilderEditor : Editor
                 CollectAutoDecals(dice);
         }
 
-        if (GUILayout.Button("Clear Auto Decals"))
-            ClearAutoDecals(dice);
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            if (GUILayout.Button("Save Cached Decals"))
+                SaveCachedDecals(dice);
+
+            if (GUILayout.Button("Clear Auto Decals"))
+                ClearAutoDecals(dice);
+        }
     }
 
 
+    static void SaveCachedDecals(Dice dice)
+    {
+        if (dice == null)
+            return;
+
+        DiceDecalMeshCache cache = dice.GetComponent<DiceDecalMeshCache>();
+        if (cache == null || cache.decalMeshes == null || cache.decalMeshes.Count == 0)
+        {
+            Debug.LogWarning($"{dice.name}: Khong co cached decal meshes de luu.", dice);
+            return;
+        }
+
+        int savedCount = 0;
+        for (int i = 0; i < cache.decalMeshes.Count; i++)
+        {
+            MeshRenderer renderer = cache.decalMeshes[i];
+            if (renderer == null)
+                continue;
+
+            MeshFilter meshFilter = renderer.GetComponent<MeshFilter>();
+            if (meshFilter == null || meshFilter.sharedMesh == null)
+                continue;
+
+            string meshName = string.IsNullOrEmpty(renderer.name) ? $"CachedDecal_{i:00}" : renderer.name;
+            meshFilter.sharedMesh = PersistGeneratedMesh(dice, Object.Instantiate(meshFilter.sharedMesh), meshName);
+            EditorUtility.SetDirty(meshFilter);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(meshFilter);
+            savedCount++;
+        }
+
+        EditorUtility.SetDirty(cache);
+        EditorUtility.SetDirty(dice);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(cache);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+        AssetDatabase.SaveAssets();
+        Debug.Log($"{dice.name}: Saved {savedCount} cached decal meshes to prefab asset.", dice);
+    }
     static void BuildManualFaceDecals(Dice dice)
     {
         if (dice == null)
@@ -84,41 +125,39 @@ public class DiceDecalBuilderEditor : Editor
 
         Transform group = GetOrCreateAutoGroup(dice.transform);
         List<MeshRenderer> primary = new List<MeshRenderer>();
-        List<MeshRenderer> secondary = new List<MeshRenderer>();
 
-        BuildManualFace(group, dice, "Front", Vector3.forward, Quaternion.identity, primary, secondary);
-        BuildManualFace(group, dice, "Back", Vector3.back, Quaternion.Euler(0f, 180f, 0f), primary, secondary);
-        BuildManualFace(group, dice, "Right", Vector3.right, Quaternion.Euler(0f, 90f, 0f), primary, secondary);
-        BuildManualFace(group, dice, "Left", Vector3.left, Quaternion.Euler(0f, -90f, 0f), primary, secondary);
-        BuildManualFace(group, dice, "Top", Vector3.up, Quaternion.Euler(-90f, 0f, 0f), primary, secondary);
-        BuildManualFace(group, dice, "Bottom", Vector3.down, Quaternion.Euler(90f, 0f, 0f), primary, secondary);
+        BuildManualFace(group, dice, "Front", Vector3.forward, Quaternion.identity, primary);
+        BuildManualFace(group, dice, "Back", Vector3.back, Quaternion.Euler(0f, 180f, 0f), primary);
+        BuildManualFace(group, dice, "Right", Vector3.right, Quaternion.Euler(0f, 90f, 0f), primary);
+        BuildManualFace(group, dice, "Left", Vector3.left, Quaternion.Euler(0f, -90f, 0f), primary);
+        BuildManualFace(group, dice, "Top", Vector3.up, Quaternion.Euler(-90f, 0f, 0f), primary);
+        BuildManualFace(group, dice, "Bottom", Vector3.down, Quaternion.Euler(90f, 0f, 0f), primary);
 
         if (assignToDiceLists)
-            AssignMeshLists(dice, primary, secondary);
+            AssignMeshLists(dice, primary);
 
         dice.preferMeshDecals = true;
         EditorUtility.SetDirty(dice);
         PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+        AssetDatabase.SaveAssets();
         Debug.Log($"{dice.name}: Built 6 manual mesh decal faces.", dice);
     }
 
-    static void BuildManualFace(Transform parent, Dice dice, string faceName, Vector3 localNormal, Quaternion localRotation, List<MeshRenderer> primary, List<MeshRenderer> secondary)
+    static void BuildManualFace(Transform parent, Dice dice, string faceName, Vector3 localNormal, Quaternion localRotation, List<MeshRenderer> primary)
     {
-        MeshRenderer first = CreateManualFaceRenderer(parent, dice, faceName, "Primary", localNormal, localRotation, 0f);
-        MeshRenderer second = CreateManualFaceRenderer(parent, dice, faceName, "Secondary", localNormal, localRotation, manualFaceLayerOffset);
-        ApplyPreviewMaterials(dice, first, second);
-        primary.Add(first);
-        secondary.Add(second);
+        MeshRenderer renderer = CreateManualFaceRenderer(parent, dice, faceName, "Primary", localNormal, localRotation, 0f);
+        ApplyPreviewMaterial(dice, renderer);
+        primary.Add(renderer);
     }
 
     static MeshRenderer CreateManualFaceRenderer(Transform parent, Dice dice, string faceName, string suffix, Vector3 localNormal, Quaternion localRotation, float extraOffset)
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        Undo.RegisterCreatedObjectUndo(go, "Create manual dice face mesh decal");
         go.name = $"{faceName}_{suffix}";
-        Undo.RegisterCreatedObjectUndo(go, "Create manual face decal");
         go.transform.SetParent(parent, false);
         go.transform.localRotation = localRotation;
-        go.transform.localPosition = localNormal.normalized * (manualFaceOffset + extraOffset);
+        go.transform.localPosition = localNormal * (manualFaceOffset + extraOffset);
         go.transform.localScale = Vector3.one * manualFaceSize;
 
         Collider collider = go.GetComponent<Collider>();
@@ -134,6 +173,7 @@ public class DiceDecalBuilderEditor : Editor
 
         return renderer;
     }
+
     static void BuildMeshFaceDecals(Dice dice)
     {
         if (dice == null)
@@ -158,22 +198,20 @@ public class DiceDecalBuilderEditor : Editor
 
         Transform group = GetOrCreateAutoGroup(dice.transform);
         List<MeshRenderer> primary = new List<MeshRenderer>();
-        List<MeshRenderer> secondary = new List<MeshRenderer>();
 
         for (int i = 0; i < faces.Count; i++)
         {
-            MeshRenderer first = CreateMeshDecal(group, faces[i], i + 1, "Primary", 0f, faces.Count);
-            MeshRenderer second = CreateMeshDecal(group, faces[i], i + 1, "Secondary", 0.0005f, faces.Count);
-            ApplyPreviewMaterials(dice, first, second);
-            primary.Add(first);
-            secondary.Add(second);
+            MeshRenderer renderer = CreateMeshDecal(group, dice, faces[i], i + 1, "Primary", 0f, faces.Count);
+            ApplyPreviewMaterial(dice, renderer);
+            primary.Add(renderer);
         }
 
         if (assignToDiceLists)
-            AssignMeshLists(dice, primary, secondary);
+            AssignMeshLists(dice, primary);
 
         EditorUtility.SetDirty(dice);
         PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+        AssetDatabase.SaveAssets();
         Debug.Log($"{dice.name}: Built {faces.Count} mesh decal faces from '{meshFilter.name}'.", dice);
     }
 
@@ -201,23 +239,21 @@ public class DiceDecalBuilderEditor : Editor
 
         Transform group = GetOrCreateAutoGroup(dice.transform);
         List<DecalProjector> primary = new List<DecalProjector>();
-        List<DecalProjector> secondary = new List<DecalProjector>();
 
         for (int i = 0; i < faces.Count; i++)
         {
             FaceBuildData face = faces[i].Build(facePadding);
-            DecalProjector first = CreateProjector(group, face, i + 1, "Primary", 0f);
-            DecalProjector second = CreateProjector(group, face, i + 1, "Secondary", 0.01f);
-            ApplyPreviewMaterials(dice, first, second);
-            primary.Add(first);
-            secondary.Add(second);
+            DecalProjector projector = CreateProjector(group, face, i + 1, "Primary", 0f);
+            ApplyPreviewMaterial(dice, projector);
+            primary.Add(projector);
         }
 
         if (assignToDiceLists)
-            AssignLists(dice, primary, secondary);
+            AssignLists(dice, primary);
 
         EditorUtility.SetDirty(dice);
         PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+        AssetDatabase.SaveAssets();
         Debug.Log($"{dice.name}: Built {faces.Count} projector decal faces from '{meshFilter.name}'.", dice);
     }
 
@@ -267,48 +303,39 @@ public class DiceDecalBuilderEditor : Editor
         Mesh mesh = meshFilter.sharedMesh;
         Vector3[] meshVertices = mesh.vertices;
         int[] triangles = mesh.triangles;
-        Vector3 meshCenter = ToDiceLocal(dice, meshFilter, mesh.bounds.center);
 
         int triangleCount = triangles.Length / 3;
-        Vector3[] aPoints = new Vector3[triangleCount];
-        Vector3[] bPoints = new Vector3[triangleCount];
-        Vector3[] cPoints = new Vector3[triangleCount];
         Vector3[] normals = new Vector3[triangleCount];
         float[] distances = new float[triangleCount];
-
         Dictionary<int, List<int>> vertexToTriangles = new Dictionary<int, List<int>>();
-        for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
+
+        for (int i = 0; i < triangleCount; i++)
         {
-            int baseIndex = triangleIndex * 3;
-            int indexA = triangles[baseIndex];
-            int indexB = triangles[baseIndex + 1];
-            int indexC = triangles[baseIndex + 2];
+            int index = i * 3;
+            int ia = triangles[index];
+            int ib = triangles[index + 1];
+            int ic = triangles[index + 2];
 
-            Vector3 a = ToDiceLocal(dice, meshFilter, meshVertices[indexA]);
-            Vector3 b = ToDiceLocal(dice, meshFilter, meshVertices[indexB]);
-            Vector3 c = ToDiceLocal(dice, meshFilter, meshVertices[indexC]);
+            Vector3 a = ToDiceLocal(dice, meshFilter, meshVertices[ia]);
+            Vector3 b = ToDiceLocal(dice, meshFilter, meshVertices[ib]);
+            Vector3 c = ToDiceLocal(dice, meshFilter, meshVertices[ic]);
 
-            Vector3 normal = Vector3.Cross(b - a, c - a).normalized;
-            if (normal.sqrMagnitude < 0.001f)
-                continue;
+            Vector3 normal = Vector3.Cross(b - a, c - a);
+            if (normal.sqrMagnitude > 0.000001f)
+                normal.Normalize();
 
-            Vector3 triangleCenter = (a + b + c) / 3f;
-            if (Vector3.Dot(normal, triangleCenter - meshCenter) < 0f)
-                normal = -normal;
+            Vector3 center = (a + b + c) / 3f;
+            normals[i] = normal;
+            distances[i] = Vector3.Dot(normal, center);
 
-            aPoints[triangleIndex] = a;
-            bPoints[triangleIndex] = b;
-            cPoints[triangleIndex] = c;
-            normals[triangleIndex] = normal;
-            distances[triangleIndex] = Vector3.Dot(normal, a);
-
-            AddTriangleLink(vertexToTriangles, indexA, triangleIndex);
-            AddTriangleLink(vertexToTriangles, indexB, triangleIndex);
-            AddTriangleLink(vertexToTriangles, indexC, triangleIndex);
+            AddTriangleLink(vertexToTriangles, ia, i);
+            AddTriangleLink(vertexToTriangles, ib, i);
+            AddTriangleLink(vertexToTriangles, ic, i);
         }
 
         List<FaceGroup> faces = new List<FaceGroup>();
         bool[] visited = new bool[triangleCount];
+        Queue<int> queue = new Queue<int>();
 
         for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++)
         {
@@ -319,20 +346,26 @@ public class DiceDecalBuilderEditor : Editor
             if (seedNormal.sqrMagnitude < 0.001f)
                 continue;
 
-            FaceGroup group = new FaceGroup(seedNormal, distances[triangleIndex]);
-            Queue<int> queue = new Queue<int>();
-            queue.Enqueue(triangleIndex);
             visited[triangleIndex] = true;
+            queue.Enqueue(triangleIndex);
+            FaceGroup group = new FaceGroup(seedNormal, distances[triangleIndex]);
 
             while (queue.Count > 0)
             {
                 int current = queue.Dequeue();
-                group.AddTriangle(aPoints[current], bPoints[current], cPoints[current]);
+                int triBase = current * 3;
+                int ia = triangles[triBase];
+                int ib = triangles[triBase + 1];
+                int ic = triangles[triBase + 2];
 
-                int currentBase = current * 3;
+                group.AddTriangle(
+                    ToDiceLocal(dice, meshFilter, meshVertices[ia]),
+                    ToDiceLocal(dice, meshFilter, meshVertices[ib]),
+                    ToDiceLocal(dice, meshFilter, meshVertices[ic]));
+
                 for (int corner = 0; corner < 3; corner++)
                 {
-                    int vertexIndex = triangles[currentBase + corner];
+                    int vertexIndex = triangles[triBase + corner];
                     if (!vertexToTriangles.TryGetValue(vertexIndex, out List<int> neighbors))
                         continue;
 
@@ -417,7 +450,7 @@ public class DiceDecalBuilderEditor : Editor
         return projector;
     }
 
-    static MeshRenderer CreateMeshDecal(Transform parent, FaceGroup face, int faceIndex, string label, float offset, int faceCount)
+    static MeshRenderer CreateMeshDecal(Transform parent, Dice dice, FaceGroup face, int faceIndex, string label, float offset, int faceCount)
     {
         GameObject go = new GameObject($"Face {faceIndex:00} {label} Mesh");
         Undo.RegisterCreatedObjectUndo(go, "Create dice mesh decal");
@@ -433,238 +466,260 @@ public class DiceDecalBuilderEditor : Editor
         renderer.lightProbeUsage = LightProbeUsage.Off;
         renderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
 
-        meshFilter.sharedMesh = face.CreateWorldSpaceMesh($"{go.name} Mesh", meshInset, offset, faceIndex - 1, faceCount);
+        Mesh mesh = face.CreateWorldSpaceMesh($"{go.name} Mesh", meshInset, offset, faceIndex - 1, faceCount);
+        meshFilter.sharedMesh = PersistGeneratedMesh(dice, mesh, go.name);
         return renderer;
     }
 
-    static void ApplyPreviewMaterials(Dice dice, DecalProjector first, DecalProjector second)
+    static Mesh PersistGeneratedMesh(Dice dice, Mesh mesh, string meshName)
     {
-        if (dice.data == null || dice.data.decalMaterial == null)
-            return;
+        if (mesh == null)
+            return null;
 
-        if (dice.data.decalMaterial.Count > 0)
-            first.material = dice.data.decalMaterial[0];
+        mesh.name = meshName;
+        string prefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(dice.gameObject);
+        if (string.IsNullOrEmpty(prefabPath))
+            return mesh;
 
-        if (dice.data.decalMaterial.Count > 1)
-            second.material = dice.data.decalMaterial[1];
+        Object prefabAsset = AssetDatabase.LoadMainAssetAtPath(prefabPath);
+        if (prefabAsset == null)
+            return mesh;
+
+        Mesh existingMesh = FindSubAssetMesh(prefabPath, meshName);
+        if (existingMesh != null)
+            AssetDatabase.RemoveObjectFromAsset(existingMesh);
+
+        mesh.hideFlags = HideFlags.HideInHierarchy;
+        AssetDatabase.AddObjectToAsset(mesh, prefabAsset);
+        EditorUtility.SetDirty(mesh);
+        AssetDatabase.SaveAssets();
+
+        Mesh savedMesh = FindSubAssetMesh(prefabPath, meshName);
+        return savedMesh != null ? savedMesh : mesh;
     }
 
-    static void ApplyPreviewMaterials(Dice dice, MeshRenderer first, MeshRenderer second)
+    static Mesh FindSubAssetMesh(string assetPath, string meshName)
     {
-        if (dice.data == null || dice.data.decalMaterial == null)
-            return;
+        Object[] assets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+        for (int i = 0; i < assets.Length; i++)
+        {
+            Mesh candidate = assets[i] as Mesh;
+            if (candidate != null && candidate.name == meshName)
+                return candidate;
+        }
 
-        if (dice.data.decalMaterial.Count > 0)
-            first.sharedMaterial = dice.data.decalMaterial[0];
-
-        if (dice.data.decalMaterial.Count > 1)
-            second.sharedMaterial = dice.data.decalMaterial[1];
+        return null;
     }
 
-    static Transform GetOrCreateAutoGroup(Transform diceTransform)
+    static void ApplyPreviewMaterial(Dice dice, DecalProjector projector)
     {
-        Transform existing = diceTransform.Find(AutoGroupName);
+        if (dice.data == null || dice.data.decalMaterial == null || dice.data.decalMaterial.Count == 0)
+            return;
+
+        projector.material = dice.data.decalMaterial[0];
+    }
+
+    static void ApplyPreviewMaterial(Dice dice, MeshRenderer renderer)
+    {
+        if (dice.data == null || dice.data.decalMaterial == null || dice.data.decalMaterial.Count == 0)
+            return;
+
+        renderer.sharedMaterial = dice.data.decalMaterial[0];
+    }
+
+    static void AssignLists(Dice dice, List<DecalProjector> primary)
+    {
+        EditorUtility.SetDirty(dice);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+    }
+
+    static void AssignMeshLists(Dice dice, List<MeshRenderer> primary)
+    {
+        dice.decalMeshes = primary;
+        dice.decalMeshes2 = new List<MeshRenderer>();
+        dice.decalMeshes3 = new List<MeshRenderer>();
+        dice.preferMeshDecals = true;
+        EditorUtility.SetDirty(dice);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+    }
+
+
+    static void CacheGeneratedMeshes(Dice dice, List<MeshRenderer> renderers)
+    {
+        DiceDecalMeshCache cache = dice.GetComponent<DiceDecalMeshCache>();
+        if (cache == null)
+            cache = Undo.AddComponent<DiceDecalMeshCache>(dice.gameObject);
+
+        cache.decalMeshes.Clear();
+        for (int i = 0; i < renderers.Count; i++)
+        {
+            MeshRenderer renderer = renderers[i];
+            if (renderer == null)
+                continue;
+
+            cache.decalMeshes.Add(renderer);
+        }
+
+        EditorUtility.SetDirty(cache);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(cache);
+    }
+    static void CollectAutoDecals(Dice dice)
+    {
+        if (dice == null)
+            return;
+
+        Transform group = FindAutoGroup(dice.transform);
+        if (group == null)
+        {
+            Debug.LogWarning($"{dice.name}: Khong tim thay '{AutoGroupName}' de collect.", dice);
+            return;
+        }
+
+        List<DecalProjector> primary = new List<DecalProjector>();
+        List<MeshRenderer> meshPrimary = new List<MeshRenderer>();
+        DecalProjector[] projectors = group.GetComponentsInChildren<DecalProjector>(true);
+        MeshRenderer[] meshRenderers = group.GetComponentsInChildren<MeshRenderer>(true);
+
+        for (int i = 0; i < projectors.Length; i++)
+            primary.Add(projectors[i]);
+
+        for (int i = 0; i < meshRenderers.Length; i++)
+            meshPrimary.Add(meshRenderers[i]);
+
+        primary.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+        meshPrimary.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+
+        AssignLists(dice, primary);
+        AssignMeshLists(dice, meshPrimary);
+
+        Debug.Log($"{dice.name}: Collected {meshPrimary.Count} mesh decals, {primary.Count} projector decals.", dice);
+    }
+
+    static void ClearAutoDecals(Dice dice)
+    {
+        if (dice == null)
+            return;
+
+        Transform group = FindAutoGroup(dice.transform);
+        if (group != null)
+            Undo.DestroyObjectImmediate(group.gameObject);
+
+        dice.decalMeshes.Clear();
+        dice.decalMeshes2.Clear();
+        dice.decalMeshes3.Clear();
+        EditorUtility.SetDirty(dice);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
+    }
+
+    static Transform GetOrCreateAutoGroup(Transform parent)
+    {
+        Transform existing = FindAutoGroup(parent);
         if (existing != null)
             return existing;
 
         GameObject group = new GameObject(AutoGroupName);
-        Undo.RegisterCreatedObjectUndo(group, "Create dice decal group");
-        group.transform.SetParent(diceTransform, false);
+        Undo.RegisterCreatedObjectUndo(group, "Create auto decal group");
+        group.transform.SetParent(parent, false);
         group.transform.localPosition = Vector3.zero;
         group.transform.localRotation = Quaternion.identity;
         group.transform.localScale = Vector3.one;
         return group.transform;
     }
 
-    static void AssignLists(Dice dice, List<DecalProjector> primary, List<DecalProjector> secondary)
+    static Transform FindAutoGroup(Transform parent)
     {
-        Undo.RecordObject(dice, "Assign dice decals");
-        //  dice.decals = primary;
-        // dice.decals2 = secondary;
-        EditorUtility.SetDirty(dice);
-        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
-    }
-
-    static void AssignMeshLists(Dice dice, List<MeshRenderer> primary, List<MeshRenderer> secondary)
-    {
-        Undo.RecordObject(dice, "Assign dice mesh decals");
-        dice.decalMeshes = primary;
-        dice.decalMeshes2 = secondary;
-        EditorUtility.SetDirty(dice);
-        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
-    }
-
-    static void CollectAutoDecals(Dice dice)
-    {
-        Transform group = dice.transform.Find(AutoGroupName);
-        if (group == null)
+        for (int i = 0; i < parent.childCount; i++)
         {
-            Debug.LogWarning($"{dice.name}: Khong co group '{AutoGroupName}' de collect.", dice);
-            return;
+            Transform child = parent.GetChild(i);
+            if (child.name == AutoGroupName)
+                return child;
         }
 
-        List<DecalProjector> primary = new List<DecalProjector>();
-        List<DecalProjector> secondary = new List<DecalProjector>();
-        List<MeshRenderer> meshPrimary = new List<MeshRenderer>();
-        List<MeshRenderer> meshSecondary = new List<MeshRenderer>();
-        DecalProjector[] projectors = group.GetComponentsInChildren<DecalProjector>(true);
-        MeshRenderer[] meshRenderers = group.GetComponentsInChildren<MeshRenderer>(true);
-
-        for (int i = 0; i < projectors.Length; i++)
-        {
-            DecalProjector projector = projectors[i];
-            if (projector.name.Contains("Secondary"))
-                secondary.Add(projector);
-            else
-                primary.Add(projector);
-        }
-
-        for (int i = 0; i < meshRenderers.Length; i++)
-        {
-            MeshRenderer meshRenderer = meshRenderers[i];
-            if (meshRenderer.name.Contains("Secondary"))
-                meshSecondary.Add(meshRenderer);
-            else
-                meshPrimary.Add(meshRenderer);
-        }
-
-        AssignLists(dice, primary, secondary);
-        AssignMeshLists(dice, meshPrimary, meshSecondary);
+        return null;
     }
 
-    static void ClearAutoDecals(Dice dice)
-    {
-        Transform group = dice.transform.Find(AutoGroupName);
-        Undo.RecordObject(dice, "Clear dice decals");
-        //  dice.decals.Clear();
-        //  dice.decals2.Clear();
-        dice.decalMeshes.Clear();
-        dice.decalMeshes2.Clear();
-        EditorUtility.SetDirty(dice);
-        PrefabUtility.RecordPrefabInstancePropertyModifications(dice);
-
-        if (group != null)
-            Undo.DestroyObjectImmediate(group.gameObject);
-    }
-
-    static int GetQuarterTurnForFace(int faceIndex, int faceCount)
-    {
-        if (faceCount != 8)
-            return 0;
-
-        int[] turns = { 0, 2, 1, 1, 3, 3, 2, 0 };
-        return turns[Mathf.Clamp(faceIndex, 0, turns.Length - 1)];
-    }
-
-    static Vector2 RotateUv(Vector2 uv, int quarterTurn)
-    {
-        switch ((quarterTurn % 4 + 4) % 4)
-        {
-            case 0:
-                return new Vector2(1f - uv.x, uv.y);
-            case 1:
-                return new Vector2(1f - uv.y, 1f - uv.x);
-            case 2:
-                return new Vector2(uv.x, 1f - uv.y);
-            case 3:
-                return new Vector2(uv.y, uv.x);
-            default:
-                return uv;
-        }
-    }
-
-    class FaceGroup
+    sealed class FaceGroup
     {
         readonly List<Vector3> vertices = new List<Vector3>();
         readonly List<int> triangles = new List<int>();
+        readonly Dictionary<Vector3Key, int> vertexLookup = new Dictionary<Vector3Key, int>();
 
-        public Vector3 Normal { get; private set; }
-        public float Distance { get; private set; }
-        public Vector3 Center
-        {
-            get
-            {
-                Vector3 center = Vector3.zero;
-                for (int i = 0; i < vertices.Count; i++)
-                    center += vertices[i];
-
-                return vertices.Count > 0 ? center / vertices.Count : Vector3.zero;
-            }
-        }
+        public Vector3 Normal { get; }
+        public float Distance { get; }
+        public Vector3 Center { get; private set; }
 
         public FaceGroup(Vector3 normal, float distance)
         {
             Normal = normal.normalized;
             Distance = distance;
+            Center = Vector3.zero;
         }
 
         public void AddTriangle(Vector3 a, Vector3 b, Vector3 c)
         {
-            int indexA = AddVertex(a);
-            int indexB = AddVertex(b);
-            int indexC = AddVertex(c);
-            triangles.Add(indexA);
-            triangles.Add(indexB);
-            triangles.Add(indexC);
+            int ia = AddVertex(a);
+            int ib = AddVertex(b);
+            int ic = AddVertex(c);
+
+            triangles.Add(ia);
+            triangles.Add(ib);
+            triangles.Add(ic);
+            Center = GetProjectedCenter();
         }
 
         int AddVertex(Vector3 vertex)
         {
-            for (int i = 0; i < vertices.Count; i++)
-            {
-                if ((vertices[i] - vertex).sqrMagnitude < 0.000001f)
-                    return i;
-            }
+            Vector3Key key = new Vector3Key(vertex);
+            if (vertexLookup.TryGetValue(key, out int existingIndex))
+                return existingIndex;
 
+            int newIndex = vertices.Count;
+            vertexLookup.Add(key, newIndex);
             vertices.Add(vertex);
-            return vertices.Count - 1;
+            return newIndex;
         }
 
         public FaceBuildData Build(float padding)
         {
             Vector3 center = GetProjectedCenter();
-            Vector3 tangent;
-            Vector3 up;
-            GetFrame(out tangent, out up);
-
-            float minX = float.MaxValue;
-            float maxX = float.MinValue;
-            float minY = float.MaxValue;
-            float maxY = float.MinValue;
-
-            for (int i = 0; i < vertices.Count; i++)
-            {
-                Vector3 delta = vertices[i] - center;
-                float x = Vector3.Dot(delta, tangent);
-                float y = Vector3.Dot(delta, up);
-                minX = Mathf.Min(minX, x);
-                maxX = Mathf.Max(maxX, x);
-                minY = Mathf.Min(minY, y);
-                maxY = Mathf.Max(maxY, y);
-            }
-
-            float width = Mathf.Max(0.01f, maxX - minX) * padding;
-            float height = Mathf.Max(0.01f, maxY - minY) * padding;
+            GetFrame(out Vector3 tangent, out Vector3 up);
+            float width = GetAxisSize(center, tangent) * padding;
+            float height = GetAxisSize(center, up) * padding;
 
             if (useInscribedFit)
             {
-                float innerSize = GetInnerFitSize(center, tangent, up) * padding;
-                if (innerSize > 0.01f)
+                float innerFit = GetInnerFitSize(center, tangent, up);
+                if (innerFit > 0.0001f)
                 {
-                    width = innerSize;
-                    height = innerSize;
+                    width = Mathf.Min(width, innerFit * facePadding);
+                    height = Mathf.Min(height, innerFit * facePadding);
                 }
             }
 
-            return new FaceBuildData(center, Normal, up, width, height);
+            width = Mathf.Max(width, 0.001f);
+            height = Mathf.Max(height, 0.001f);
+            return new FaceBuildData(center + Normal * surfaceOffset, Normal, up, width, height);
+        }
+
+        float GetAxisSize(Vector3 center, Vector3 axis)
+        {
+            float min = float.MaxValue;
+            float max = float.MinValue;
+
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                float distance = Vector3.Dot(vertices[i] - center, axis);
+                min = Mathf.Min(min, distance);
+                max = Mathf.Max(max, distance);
+            }
+
+            return max - min;
         }
 
         public Mesh CreateWorldSpaceMesh(string meshName, float inset, float offset, int faceIndex, int faceCount)
         {
             Vector3 center = GetProjectedCenter();
-            Vector3 tangent;
-            Vector3 up;
-            GetFrame(out tangent, out up);
+            GetFrame(out Vector3 tangent, out Vector3 up);
 
             Vector3[] meshVertices = new Vector3[vertices.Count];
             Vector2[] uvs = new Vector2[vertices.Count];
@@ -679,9 +734,7 @@ public class DiceDecalBuilderEditor : Editor
             for (int i = 0; i < vertices.Count; i++)
             {
                 Vector3 delta = vertices[i] - center;
-                Vector2 point = new Vector2(
-                    Vector3.Dot(delta, tangent),
-                    Vector3.Dot(delta, up));
+                Vector2 point = new Vector2(Vector3.Dot(delta, tangent), Vector3.Dot(delta, up));
                 points2D[i] = point;
                 minX = Mathf.Min(minX, point.x);
                 maxX = Mathf.Max(maxX, point.x);
@@ -739,9 +792,7 @@ public class DiceDecalBuilderEditor : Editor
             for (int i = 0; i < vertices.Count; i++)
             {
                 Vector3 delta = vertices[i] - center;
-                points.Add(new Vector2(
-                    Vector3.Dot(delta, tangent),
-                    Vector3.Dot(delta, up)));
+                points.Add(new Vector2(Vector3.Dot(delta, tangent), Vector3.Dot(delta, up)));
             }
 
             SortClockwise(points);
@@ -759,12 +810,7 @@ public class DiceDecalBuilderEditor : Editor
 
         static void SortClockwise(List<Vector2> points)
         {
-            points.Sort((a, b) =>
-            {
-                float angleA = Mathf.Atan2(a.y, a.x);
-                float angleB = Mathf.Atan2(b.y, b.x);
-                return angleA.CompareTo(angleB);
-            });
+            points.Sort((a, b) => Mathf.Atan2(a.y, a.x).CompareTo(Mathf.Atan2(b.y, b.x)));
         }
 
         static float DistancePointToSegment(Vector2 point, Vector2 a, Vector2 b)
@@ -777,6 +823,32 @@ public class DiceDecalBuilderEditor : Editor
             float t = Mathf.Clamp01(Vector2.Dot(point - a, ab) / sqrMagnitude);
             Vector2 closest = a + ab * t;
             return Vector2.Distance(point, closest);
+        }
+    }
+
+    static int GetQuarterTurnForFace(int faceIndex, int faceCount)
+    {
+        if (faceCount != 8)
+            return 0;
+
+        int[] turns = { 0, 2, 1, 1, 3, 3, 2, 0 };
+        return turns[Mathf.Clamp(faceIndex, 0, turns.Length - 1)];
+    }
+
+    static Vector2 RotateUv(Vector2 uv, int quarterTurn)
+    {
+        switch ((quarterTurn % 4 + 4) % 4)
+        {
+            case 0:
+                return new Vector2(1f - uv.x, uv.y);
+            case 1:
+                return new Vector2(1f - uv.y, 1f - uv.x);
+            case 2:
+                return new Vector2(uv.x, 1f - uv.y);
+            case 3:
+                return new Vector2(uv.y, uv.x);
+            default:
+                return uv;
         }
     }
 
@@ -797,7 +869,23 @@ public class DiceDecalBuilderEditor : Editor
             Height = height;
         }
     }
+
+    readonly struct Vector3Key
+    {
+        readonly int x;
+        readonly int y;
+        readonly int z;
+
+        public Vector3Key(Vector3 vector)
+        {
+            x = Mathf.RoundToInt(vector.x * 10000f);
+            y = Mathf.RoundToInt(vector.y * 10000f);
+            z = Mathf.RoundToInt(vector.z * 10000f);
+        }
+    }
 }
+
+
 
 
 
