@@ -65,6 +65,36 @@ public class CompositeStats
         CalculateValue();
     }
 
+
+    public float GetValue(string keyGlobal)
+    {
+        float result = 0f;
+
+        if (!dicValueCount.ContainsKey(keyGlobal))
+            return result;
+
+        foreach (var child in dicValueCount[keyGlobal])
+        {
+            result += child.Value;
+        }
+
+        return result;
+    }
+
+    public float GetPercent(string keyGlobal)
+    {
+        float result = 0f;
+
+        if (!dicValuePercent.ContainsKey(keyGlobal))
+            return result;
+
+        foreach (var child in dicValuePercent[keyGlobal])
+        {
+            result += child.Value;
+        }
+
+        return result;
+    }
     void CalculateValue()
     {
         float valueCount = 0f;
@@ -91,4 +121,5 @@ public class CompositeStats
         Value = valueCount * valuePercent;
     }
 }
+
 

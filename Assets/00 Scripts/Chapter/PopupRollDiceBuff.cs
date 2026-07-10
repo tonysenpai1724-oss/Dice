@@ -152,6 +152,11 @@ public class PopupRollDiceBuff : UIBase
 
         rewardGranted = true;
         PlayerStats.Shared.AddTemporaryChapterStat(statType, percentValue, keyLocal, false);
+
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        if (player != null)
+            player.RefreshStatsFromEquipment();
+
         SetRewardButtonsInteractable(false);
         Hide();
     }
@@ -231,3 +236,5 @@ public class PopupRollDiceBuff : UIBase
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Jester);
     }
 }
+
+

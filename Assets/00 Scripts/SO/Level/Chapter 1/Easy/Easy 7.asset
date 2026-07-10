@@ -49,7 +49,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
     enemySpawnPlacements:
     - data: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
-      position: {x: 440.32, y: -159.17499, z: 0}
+      position: {x: 440.32, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
     enemySpawnPlacements:
     - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
-      position: {x: 264.19202, y: -159.17499, z: 0}
+      position: {x: 264.19202, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0

@@ -120,4 +120,4 @@ MonoBehaviour:
   luck: 0
   type: 3
   rarity: 0
-  skeletonData: {fileID: 11400000, guid: 51d70e5886d449946b92473e64256ae5, type: 2}
+  skeletonData: {fileID: 11400000, guid: 61d62fe836803214ebf393bb1edecfc1, type: 2}

@@ -64,7 +64,7 @@ MonoBehaviour:
       gridColumn: 4
       entryIndex: 1
     - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-      position: {x: 264.19202, y: -159.17499, z: 0}
+      position: {x: 264.19202, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
@@ -80,7 +80,7 @@ MonoBehaviour:
       gridColumn: 5
       entryIndex: 0
     - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
-      position: {x: 440.32, y: -159.17499, z: 0}
+      position: {x: 440.32, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 1
@@ -128,7 +128,7 @@ MonoBehaviour:
       gridColumn: 4
       entryIndex: 1
     - data: {fileID: 11400000, guid: 5030cf9c8216e3149b0fe130fcf8723c, type: 2}
-      position: {x: 264.19202, y: -159.17499, z: 0}
+      position: {x: 264.19202, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
@@ -144,7 +144,7 @@ MonoBehaviour:
       gridColumn: 5
       entryIndex: 0
     - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
-      position: {x: 440.32, y: -159.17499, z: 0}
+      position: {x: 440.32, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 1

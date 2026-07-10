@@ -82,19 +82,19 @@ public class PopupRoll : UIBase
         if (buttonAtkReward != null)
         {
             buttonAtkReward.onClick.RemoveAllListeners();
-            buttonAtkReward.onClick.AddListener(() => OnChooseReward(HeroStatType.Damage, 0.2f, "RollAtk20"));
+            buttonAtkReward.onClick.AddListener(() => OnChooseReward(HeroStatType.Damage, 20f, "RollAtk20"));
         }
 
         if (buttonCritReward != null)
         {
             buttonCritReward.onClick.RemoveAllListeners();
-            buttonCritReward.onClick.AddListener(() => OnChooseReward(HeroStatType.CritRate, 0.1f, "RollCrit10"));
+            buttonCritReward.onClick.AddListener(() => OnChooseReward(HeroStatType.CritRate, 10f, "RollCrit10"));
         }
 
         if (buttonHpReward != null)
         {
             buttonHpReward.onClick.RemoveAllListeners();
-            buttonHpReward.onClick.AddListener(() => OnChooseReward(HeroStatType.Hp, 0.3f, "RollHp30"));
+            buttonHpReward.onClick.AddListener(() => OnChooseReward(HeroStatType.Hp, 30f, "RollHp30"));
         }
     }
 
@@ -164,7 +164,13 @@ public class PopupRoll : UIBase
             return;
 
         rewardGranted = true;
+        Debug.Log($"[PopupRoll] Reward chosen stat={statType} value={percentValue} key={keyLocal}");
         PlayerStats.Shared.AddTemporaryChapterStat(statType, percentValue, keyLocal, false);
+
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        if (player != null)
+            player.RefreshStatsFromEquipment();
+
         SetRewardButtonsInteractable(false);
         Hide();
     }
@@ -249,3 +255,10 @@ public class PopupRoll : UIBase
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Roll);
     }
 }
+
+
+
+
+
+
+

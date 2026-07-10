@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -207,7 +207,7 @@ public class GameManager : Singleton<GameManager>
         // if (GameState == EGameState.Loading)
         //     return;
 
-        PlayerStats.Shared.ClearTemporaryStats();
+        PlayerStats.Shared.ClearTemporaryLevelStats();
         SetState(EGameState.Loading);
         StartCoroutine(IEReplayGame());
     }
@@ -220,7 +220,7 @@ public class GameManager : Singleton<GameManager>
 
     void GoSceneGameplay()
     {
-        PlayerStats.Shared.ClearTemporaryStats();
+        PlayerStats.Shared.ClearTemporaryLevelStats();
         SetState(EGameState.Loading);
         StartCoroutine(SceneHelper.Instance.IEGoGameplay());
     }
@@ -268,6 +268,7 @@ public class GameManager : Singleton<GameManager>
     }
     #endregion
 }
+
 
 
 

@@ -49,7 +49,7 @@ public class PlayerStats
         }
 
         RefreshTemporaryScopes();
-        RebuildFromCurrentSources();
+        RebuildFromCurrentSources(ResolveCurrentHeroData());
     }
 
     public void Dispose()
@@ -63,7 +63,25 @@ public class PlayerStats
 
     void OnEquipmentChange()
     {
-        RebuildFromCurrentSources();
+        RebuildFromCurrentSources(ResolveCurrentHeroData());
+    }
+
+    HeroData ResolveCurrentHeroData()
+    {
+        if (ChapterDiceSession.Instance != null)
+        {
+            HeroData chapterHero = ChapterDiceSession.Instance.ResolveHeroData();
+            if (chapterHero != null)
+                return chapterHero;
+        }
+
+        if (HeroSelectionSession.Instance != null)
+            return HeroSelectionSession.Instance.GetSelectedHero();
+
+        if (EquipmentManager.Instance != null)
+            return EquipmentManager.Instance.GetHeroData();
+
+        return null;
     }
 
     public void RebuildFromCurrentSources(HeroData heroData = null)
@@ -73,9 +91,8 @@ public class PlayerStats
         ClearStats(HeroBaseKey);
         ClearStats(EquipmentKey);
 
-        HeroData resolvedHeroData = heroData;
-        if (resolvedHeroData == null && EquipmentManager.Instance != null)
-            resolvedHeroData = EquipmentManager.Instance.GetHeroData();
+        HeroData resolvedHeroData = heroData != null ? heroData : ResolveCurrentHeroData();
+        Debug.Log($"[PlayerStats] RebuildFromCurrentSources hero={(resolvedHeroData != null ? resolvedHeroData.name : "null")} equipmentManager={(EquipmentManager.Instance != null)}");
 
         if (resolvedHeroData != null)
             ApplyHeroBaseStats(resolvedHeroData);
@@ -89,13 +106,19 @@ public class PlayerStats
     void RefreshTemporaryScopes()
     {
         if (ChapterManager.Instance == null)
+        {
+            Debug.Log("[PlayerStats] RefreshTemporaryScopes skipped: ChapterManager.Instance is null");
             return;
+        }
 
         int currentChapterId = ChapterManager.Instance.CurrentChapterId;
         int currentLevelIndex = ChapterManager.Instance.CurrentLevelIndex;
 
+        Debug.Log($"[PlayerStats] RefreshTemporaryScopes currentChapter={currentChapterId} currentLevel={currentLevelIndex} cachedChapter={cachedChapterId} cachedLevel={cachedLevelIndex}");
+
         if (cachedChapterId != currentChapterId)
         {
+            Debug.Log($"[PlayerStats] Chapter changed => clear temp chapter + temp level | from chapter {cachedChapterId} to {currentChapterId}");
             ClearTemporaryChapterStats();
             ClearTemporaryLevelStats();
             cachedChapterId = currentChapterId;
@@ -105,6 +128,7 @@ public class PlayerStats
 
         if (cachedLevelIndex != currentLevelIndex)
         {
+            Debug.Log($"[PlayerStats] Level changed => clear temp level | from level {cachedLevelIndex} to {currentLevelIndex}");
             ClearTemporaryLevelStats();
             cachedLevelIndex = currentLevelIndex;
         }
@@ -193,12 +217,14 @@ public class PlayerStats
 
     public void ClearTemporaryLevelStats()
     {
+        Debug.Log("[PlayerStats] ClearTemporaryLevelStats");
         ClearStats(TemporaryLevelKey);
         temporaryLevelStatApplyIndex = 0;
     }
 
     public void ClearTemporaryChapterStats()
     {
+        Debug.Log("[PlayerStats] ClearTemporaryChapterStats");
         ClearStats(TemporaryChapterKey);
         temporaryChapterStatApplyIndex = 0;
     }
@@ -212,13 +238,21 @@ public class PlayerStats
     public void ApplyTemporaryLevelStat(HeroStatType statType, float value, string keyLocal, bool isFlatValue)
     {
         RefreshTemporaryScopes();
+        Debug.Log($"[PlayerStats] ApplyTemporaryLevelStat stat={statType} value={value} key={keyLocal} isFlat={isFlatValue}");
         ApplyStats(statType, value, TemporaryLevelKey, keyLocal, isFlatValue);
+        RebuildFromCurrentSources(ResolveCurrentHeroData());
+        Debug.Log($"[PlayerStats] After ApplyTemporaryLevelStat => {statType}={GetStatValue(statType)}");
+        EventManager.EmitEvent(Constant.ON_PLAYER_STATS_CHANGED);
     }
 
     public void ApplyTemporaryChapterStat(HeroStatType statType, float value, string keyLocal, bool isFlatValue)
     {
         RefreshTemporaryScopes();
+        Debug.Log($"[PlayerStats] ApplyTemporaryChapterStat stat={statType} value={value} key={keyLocal} isFlat={isFlatValue}");
         ApplyStats(statType, value, TemporaryChapterKey, keyLocal, isFlatValue);
+        RebuildFromCurrentSources(ResolveCurrentHeroData());
+        Debug.Log($"[PlayerStats] After ApplyTemporaryChapterStat => {statType}={GetStatValue(statType)}");
+        EventManager.EmitEvent(Constant.ON_PLAYER_STATS_CHANGED);
     }
 
     public void AddTemporaryLevelStat(HeroStatType statType, float value, string keyLocal, bool isFlatValue)

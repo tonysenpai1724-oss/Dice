@@ -75,11 +75,13 @@ public class PlayerController : GameUnit
     void OnEnable()
     {
         EventManager.StartListening(Constant.ON_PLAYER_EQUIPMENT_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
+        EventManager.StartListening(Constant.ON_PLAYER_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
     }
 
     void OnDisable()
     {
         EventManager.StopListening(Constant.ON_PLAYER_EQUIPMENT_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
+        EventManager.StopListening(Constant.ON_PLAYER_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
     }
 
     public void InitializeDiceDatas()
@@ -143,12 +145,13 @@ public class PlayerController : GameUnit
             return;
 
         EnsurePlayerStats();
+        Debug.Log($"[PlayerController] RefreshStatsFromEquipment before rebuild | currentHp={currentHp} hp={hp}");
         playerStats.RebuildFromCurrentSources(data);
 
         HeroStatSnapshot finalStats = playerStats.ToHeroStatSnapshot(data);
-        int currentHpValue = currentHp > 0 ? currentHp : finalStats.hp;
-        SetHealth(finalStats.hp, finalStats.hp);
-        Debug.Log("dam base:" + data.damage + "- dam runtime:" + finalStats.damage);
+        int currentHpValue = currentHp > 0 ? Mathf.Min(currentHp, finalStats.hp) : finalStats.hp;
+        Debug.Log($"[PlayerController] RefreshStatsFromEquipment after rebuild | hp={finalStats.hp} dmg={finalStats.damage} def={finalStats.defense} critRate={finalStats.critRate} critDmg={finalStats.critDamage} luck={finalStats.luck} currentHpTarget={currentHpValue}");
+        SetHealth(finalStats.hp, currentHpValue);
     }
 
     void RefreshStatsFromEquipmentEvent()
@@ -213,3 +216,8 @@ public class PlayerController : GameUnit
         Debug.Log($"[PlayerController] {context} count={diceDatas.Count} list=[{builder}]");
     }
 }
+
+
+
+
+

@@ -56,7 +56,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
     enemySpawnPlacements:
     - data: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
-      position: {x: 440.32, y: -159.17499, z: 0}
+      position: {x: 440.32, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
@@ -72,7 +72,7 @@ MonoBehaviour:
       gridColumn: 4
       entryIndex: 1
     - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-      position: {x: 264.19202, y: -159.17499, z: 0}
+      position: {x: 264.19202, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
@@ -120,7 +120,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
     enemySpawnPlacements:
     - data: {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
-      position: {x: 264.19202, y: -159.17499, z: 0}
+      position: {x: 264.19202, y: -119.61, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
@@ -136,7 +136,7 @@ MonoBehaviour:
       gridColumn: 4
       entryIndex: 1
     - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
-      position: {x: 264.19202, y: -278.34998, z: 0}
+      position: {x: 264.19202, y: -199.22, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
