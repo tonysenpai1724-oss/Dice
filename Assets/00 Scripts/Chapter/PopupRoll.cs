@@ -165,16 +165,51 @@ public class PopupRoll : UIBase
 
         rewardGranted = true;
         Debug.Log($"[PopupRoll] Reward chosen stat={statType} value={percentValue} key={keyLocal}");
-        PlayerStats.Shared.AddTemporaryChapterStat(statType, percentValue, keyLocal, false);
-
-        PlayerController player = FindFirstObjectByType<PlayerController>();
-        if (player != null)
-            player.RefreshStatsFromEquipment();
+        ApplyTemporaryChapterStat(statType, percentValue, keyLocal);
 
         SetRewardButtonsInteractable(false);
         Hide();
     }
 
+    void ApplyTemporaryChapterStat(HeroStatType statType, float percentValue, string keyLocal)
+    {
+        ChapterDiceSession session = ChapterDiceSession.GetOrCreate();
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        int oldCurrentHp = GetCurrentHpForStatChange(player, session);
+
+        PlayerStats.Shared.AddTemporaryChapterStat(statType, percentValue, keyLocal, false);
+
+        if (player != null)
+            player.RefreshStatsFromEquipment();
+
+        if (statType != HeroStatType.Hp)
+            return;
+
+        int scaledCurrentHp = Mathf.RoundToInt(oldCurrentHp * Mathf.Max(0f, 1f + percentValue / 100f));
+        if (oldCurrentHp > 0)
+            scaledCurrentHp = Mathf.Max(1, scaledCurrentHp);
+
+        session.SetCurrentHp(scaledCurrentHp);
+
+        if (player != null)
+            player.SetHealth(player.hp, scaledCurrentHp);
+    }
+
+    int GetCurrentHpForStatChange(PlayerController player, ChapterDiceSession session)
+    {
+        if (player != null)
+            return player.currentHp;
+
+        if (session != null && session.TryGetCurrentHp(out int savedCurrentHp))
+            return savedCurrentHp;
+
+        int currentMaxHp = Mathf.RoundToInt(PlayerStats.Shared.GetStatValue(HeroStatType.Hp));
+        if (currentMaxHp > 0)
+            return currentMaxHp;
+
+        HeroData heroData = session != null ? session.ResolveHeroData() : null;
+        return heroData != null ? heroData.hp : 0;
+    }
     void SetGuessButtonsInteractable(bool interactable)
     {
         if (buttonLessThanThree != null)

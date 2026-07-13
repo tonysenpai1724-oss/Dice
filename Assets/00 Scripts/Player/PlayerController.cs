@@ -14,6 +14,7 @@ public class PlayerController : GameUnit
     public int comboAttackThreshold = 3;
 
     int consecutiveAttackCount;
+    bool suppressHpPersistence;
 
     public int RuntimeDamage => playerStats != null
         ? Mathf.RoundToInt(playerStats.GetStatValue(HeroStatType.Damage))
@@ -42,12 +43,19 @@ public class PlayerController : GameUnit
         if (resolvedData == null)
             return;
 
-        ChapterDiceSession.GetOrCreate().SetSelectedHero(resolvedData);
+        ChapterDiceSession session = ChapterDiceSession.GetOrCreate();
+        session.SetSelectedHero(resolvedData);
         EnsurePlayerStats();
         InitializeDiceDatas();
         playerStats.InitStats();
         playerStats.RebuildFromCurrentSources(data);
+        bool hasSavedCurrentHp = session.TryGetCurrentHp(out int savedCurrentHp);
+        suppressHpPersistence = true;
         RefreshStatsFromEquipment();
+        if (hasSavedCurrentHp)
+            SetHealth(hp, savedCurrentHp);
+        suppressHpPersistence = false;
+        session.SetCurrentHp(currentHp);
 
         if (skeletonGraphic != null)
         {
@@ -80,12 +88,14 @@ public class PlayerController : GameUnit
     {
         EventManager.StartListening(Constant.ON_PLAYER_EQUIPMENT_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
         EventManager.StartListening(Constant.ON_PLAYER_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
+        OnHpChanged += PersistCurrentHp;
     }
 
     void OnDisable()
     {
         EventManager.StopListening(Constant.ON_PLAYER_EQUIPMENT_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
         EventManager.StopListening(Constant.ON_PLAYER_STATS_CHANGED, RefreshStatsFromEquipmentEvent);
+        OnHpChanged -= PersistCurrentHp;
     }
 
     public void InitializeDiceDatas()
@@ -152,13 +162,30 @@ public class PlayerController : GameUnit
         Debug.Log($"[PlayerController] RefreshStatsFromEquipment before rebuild | currentHp={currentHp} hp={hp}");
         playerStats.RebuildFromCurrentSources(data);
 
+        int previousMaxHp = hp;
+        int previousCurrentHp = currentHp;
         HeroStatSnapshot finalStats = playerStats.ToHeroStatSnapshot(data);
-        int currentHpValue = currentHp > 0 ? Mathf.Min(currentHp, finalStats.hp) : finalStats.hp;
-        Debug.Log($"[PlayerController] RefreshStatsFromEquipment after rebuild | hp={finalStats.hp} dmg={finalStats.damage} def={finalStats.defense} critRate={finalStats.critRate} critDmg={finalStats.critDamage} luck={finalStats.luck} currentHpTarget={currentHpValue}");
+        int currentHpValue = CalculateCurrentHpAfterMaxHpChange(previousCurrentHp, previousMaxHp, finalStats.hp);
+        Debug.Log($"[PlayerController] RefreshStatsFromEquipment after rebuild | oldHp={previousMaxHp} oldCurrentHp={previousCurrentHp} hp={finalStats.hp} dmg={finalStats.damage} def={finalStats.defense} critRate={finalStats.critRate} critDmg={finalStats.critDamage} luck={finalStats.luck} currentHpTarget={currentHpValue}");
         SetHealth(finalStats.hp, currentHpValue);
     }
 
 
+    int CalculateCurrentHpAfterMaxHpChange(int previousCurrentHp, int previousMaxHp, int newMaxHp)
+    {
+        if (newMaxHp <= 0)
+            return 0;
+
+        if (previousMaxHp <= 0 || previousCurrentHp <= 0)
+            return newMaxHp;
+
+        if (previousMaxHp == newMaxHp)
+            return Mathf.Min(previousCurrentHp, newMaxHp);
+
+        float hpRatio = (float)newMaxHp / previousMaxHp;
+        int scaledCurrentHp = Mathf.RoundToInt(previousCurrentHp * hpRatio);
+        return Mathf.Clamp(Mathf.Max(1, scaledCurrentHp), 0, newMaxHp);
+    }
     public string GetNextAttackAnimation()
     {
         consecutiveAttackCount++;
@@ -180,6 +207,13 @@ public class PlayerController : GameUnit
         consecutiveAttackCount = 0;
     }
 
+    void PersistCurrentHp(GameUnit unit, int current, int max)
+    {
+        if (suppressHpPersistence)
+            return;
+
+        ChapterDiceSession.GetOrCreate().SetCurrentHp(current);
+    }
     void RefreshStatsFromEquipmentEvent()
     {
         RefreshStatsFromEquipment();

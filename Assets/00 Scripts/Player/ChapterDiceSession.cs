@@ -9,6 +9,7 @@ public class ChapterDiceSessionSaveData
     public string heroName;
     public int heroLevel;
     public bool heroStartDiceAdded;
+    public int currentHp = -1;
     public List<ChapterDiceSessionDiceSaveData> runtimeDices = new();
 }
 
@@ -30,6 +31,7 @@ public class ChapterDiceSession : MonoBehaviour
     [SerializeField] int heroLevel;
     [SerializeField] bool initializedFromHero;
     [SerializeField] bool heroStartDiceAdded;
+    [SerializeField] int currentHp = -1;
     [SerializeField] List<DiceData> runtimeDiceDatas = new();
     public DiceDatabaseSO diceDatabase;
 
@@ -74,6 +76,23 @@ public class ChapterDiceSession : MonoBehaviour
         return fallbackHeroData;
     }
 
+    public bool TryGetCurrentHp(out int savedCurrentHp)
+    {
+        savedCurrentHp = currentHp;
+        return currentHp >= 0;
+    }
+
+    public void SetCurrentHp(int value)
+    {
+        currentHp = Mathf.Max(0, value);
+        SaveSession();
+    }
+
+    public void ClearCurrentHp()
+    {
+        currentHp = -1;
+        SaveSession();
+    }
     public void StartRunFromHero(HeroData sourceHeroData)
     {
         sourceHeroData = ResolveHeroData(sourceHeroData);
@@ -119,6 +138,7 @@ public class ChapterDiceSession : MonoBehaviour
 
         heroLevel = saveData.heroLevel;
         heroStartDiceAdded = saveData.heroStartDiceAdded;
+        currentHp = saveData.currentHp;
 
         bool restored = RestoreRuntimeDiceFromSaveData(saveData);
         if (restored)
@@ -198,6 +218,7 @@ public class ChapterDiceSession : MonoBehaviour
             heroName = heroData != null ? heroData.name : string.Empty,
             heroLevel = heroLevel,
             heroStartDiceAdded = heroStartDiceAdded,
+            currentHp = currentHp,
             runtimeDices = new List<ChapterDiceSessionDiceSaveData>()
         };
 
@@ -233,6 +254,7 @@ public class ChapterDiceSession : MonoBehaviour
 
         heroLevel = saveData.heroLevel;
         heroStartDiceAdded = saveData.heroStartDiceAdded;
+        currentHp = saveData.currentHp;
 
         bool restored = RestoreRuntimeDiceFromSaveData(saveData);
         if (!restored)

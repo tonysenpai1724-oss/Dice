@@ -22,6 +22,7 @@ public class PopupRollDiceBuff : UIBase
 
     [Header("Reward")]
     public GameObject rewardRoot;
+
     [Header("Fail")]
     public GameObject failRoot;
 
@@ -60,18 +61,21 @@ public class PopupRollDiceBuff : UIBase
         {
             buttonDice8.onClick.RemoveAllListeners();
             buttonDice8.onClick.AddListener(() => OnChooseDice(RollDiceType.Dice8));
+            SetButtonText(buttonDice8, GetRewardText(RollDiceType.Dice8));
         }
 
         if (buttonDice12 != null)
         {
             buttonDice12.onClick.RemoveAllListeners();
             buttonDice12.onClick.AddListener(() => OnChooseDice(RollDiceType.Dice12));
+            SetButtonText(buttonDice12, GetRewardText(RollDiceType.Dice12));
         }
 
         if (buttonDice20 != null)
         {
             buttonDice20.onClick.RemoveAllListeners();
             buttonDice20.onClick.AddListener(() => OnChooseDice(RollDiceType.Dice20));
+            SetButtonText(buttonDice20, GetRewardText(RollDiceType.Dice20));
         }
     }
 
@@ -94,7 +98,7 @@ public class PopupRollDiceBuff : UIBase
             txtTitle.text = "Roll Dice Buff";
 
         if (txtResult != null)
-            txtResult.text = "Choose Dice 8, Dice 12, or Dice 20. Only max roll wins.";
+            txtResult.text = "Choose a risk reward. Roll max to apply its buff.";
 
         if (rewardRoot != null)
             rewardRoot.SetActive(false);
@@ -145,20 +149,92 @@ public class PopupRollDiceBuff : UIBase
         };
     }
 
-    void OnChooseReward(HeroStatType statType, float percentValue, string keyLocal)
+    float GetHpPenaltyPercent(RollDiceType diceType)
+    {
+        return diceType switch
+        {
+            RollDiceType.Dice8 => -20f,
+            RollDiceType.Dice12 => -30f,
+            RollDiceType.Dice20 => -50f,
+            _ => 0f,
+        };
+    }
+
+    float GetDamageBonusPercent(RollDiceType diceType)
+    {
+        return diceType switch
+        {
+            RollDiceType.Dice8 => 80f,
+            RollDiceType.Dice12 => 120f,
+            RollDiceType.Dice20 => 200f,
+            _ => 0f,
+        };
+    }
+
+    string GetRewardText(RollDiceType diceType)
+    {
+        return diceType switch
+        {
+            RollDiceType.Dice8 => "Max: -20% Max HP, +80% ATK",
+            RollDiceType.Dice12 => "Max: -30% HP, +120% ATK",
+            RollDiceType.Dice20 => "Max: -50% Max HP, +200% ATK",
+            _ => string.Empty,
+        };
+    }
+
+    void ApplyRollDiceBuff(RollDiceType diceType)
     {
         if (rewardGranted)
             return;
 
         rewardGranted = true;
-        PlayerStats.Shared.AddTemporaryChapterStat(statType, percentValue, keyLocal, false);
+        float hpPenaltyPercent = GetHpPenaltyPercent(diceType);
+        float damageBonusPercent = GetDamageBonusPercent(diceType);
+        string keyPrefix = $"RollDiceBuff{diceType}";
 
+        ChapterDiceSession session = ChapterDiceSession.GetOrCreate();
         PlayerController player = FindFirstObjectByType<PlayerController>();
+        int oldCurrentHp = GetCurrentHpForStatChange(player, session);
+
+        PlayerStats.Shared.AddTemporaryChapterStat(HeroStatType.Hp, hpPenaltyPercent, $"{keyPrefix}Hp", false);
+        PlayerStats.Shared.AddTemporaryChapterStat(HeroStatType.Damage, damageBonusPercent, $"{keyPrefix}Atk", false);
+
         if (player != null)
             player.RefreshStatsFromEquipment();
 
-        SetRewardButtonsInteractable(false);
-        Hide();
+        int scaledCurrentHp = Mathf.RoundToInt(oldCurrentHp * Mathf.Max(0f, 1f + hpPenaltyPercent / 100f));
+        if (oldCurrentHp > 0)
+            scaledCurrentHp = Mathf.Max(1, scaledCurrentHp);
+
+        session.SetCurrentHp(scaledCurrentHp);
+
+        if (player != null)
+            player.SetHealth(player.hp, scaledCurrentHp);
+    }
+
+    int GetCurrentHpForStatChange(PlayerController player, ChapterDiceSession session)
+    {
+        if (player != null)
+            return player.currentHp;
+
+        if (session != null && session.TryGetCurrentHp(out int savedCurrentHp))
+            return savedCurrentHp;
+
+        int currentMaxHp = Mathf.RoundToInt(PlayerStats.Shared.GetStatValue(HeroStatType.Hp));
+        if (currentMaxHp > 0)
+            return currentMaxHp;
+
+        HeroData heroData = session != null ? session.ResolveHeroData() : null;
+        return heroData != null ? heroData.hp : 0;
+    }
+    void SetButtonText(Button button, string text)
+    {
+        if (button == null)
+            return;
+
+        // TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>();
+        // if (label != null)
+        //     label.text = text;
     }
 
     void SetChooseButtonsInteractable(bool interactable)
@@ -186,7 +262,7 @@ public class PopupRollDiceBuff : UIBase
 
         if (txtResult != null)
             txtResult.text = isWin
-                ? $"Result: {finalRoll}. Max roll!"
+                ? $"Result: {finalRoll}. Max roll! {GetRewardText(selectedDiceType.Value)}"
                 : $"Result: {finalRoll}. Not max roll.";
 
 
@@ -207,11 +283,15 @@ public class PopupRollDiceBuff : UIBase
 
         if (isWin)
         {
+            if (selectedDiceType.HasValue)
+                ApplyRollDiceBuff(selectedDiceType.Value);
+
             if (rewardRoot != null)
                 rewardRoot.SetActive(true);
 
-            SetRewardButtonsInteractable(true);
+            SetRewardButtonsInteractable(false);
             rollRoutine = null;
+            Hide();
             yield break;
         }
         else
@@ -221,11 +301,12 @@ public class PopupRollDiceBuff : UIBase
 
             if (rewardRoot != null)
                 rewardRoot.SetActive(false);
+
+            rollRoutine = null;
             yield break;
 
         }
 
-        rollRoutine = null;
     }
 
     public override void AfterHideAction()

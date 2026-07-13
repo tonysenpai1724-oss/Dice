@@ -1854,7 +1854,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D6
+  m_text: "-20% Max HP,\nMax Value\n +80% ATK"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1e97b5eca7eee6d4e802cf9f5cbda9d0, type: 2}
   m_sharedMaterial: {fileID: 462660362403438393, guid: 1e97b5eca7eee6d4e802cf9f5cbda9d0, type: 2}
@@ -4229,7 +4229,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D6
+  m_text: " -50% HP,\nMax Value\n +200% ATK"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1e97b5eca7eee6d4e802cf9f5cbda9d0, type: 2}
   m_sharedMaterial: {fileID: 462660362403438393, guid: 1e97b5eca7eee6d4e802cf9f5cbda9d0, type: 2}
@@ -4807,7 +4807,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D6
+  m_text: " -30% HP,\nMax Value\n +120% ATK"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1e97b5eca7eee6d4e802cf9f5cbda9d0, type: 2}
   m_sharedMaterial: {fileID: 462660362403438393, guid: 1e97b5eca7eee6d4e802cf9f5cbda9d0, type: 2}

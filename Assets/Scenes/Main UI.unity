@@ -5487,6 +5487,7 @@ MonoBehaviour:
   heroLevel: 1
   initializedFromHero: 0
   heroStartDiceAdded: 0
+  currentHp: -1
   runtimeDiceDatas: []
   diceDatabase: {fileID: 11400000, guid: b7f2f8d9e8982064d9e13c46459422bd, type: 2}
 --- !u!114 &919764228
@@ -6836,8 +6837,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 12.669485, y: 9.515629, z: 1.3842952}
-  m_Center: {x: 0.58228964, y: 4.2578144, z: 0.19214763}
+  m_Size: {x: 12.669485, y: 19.899984, z: 1.3842952}
+  m_Center: {x: 0.5822895, y: 9.449992, z: 0.19214763}
 --- !u!1001 &1130872301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7465,8 +7466,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.599705, y: 8.875557, z: 1}
-  m_Center: {x: 0.47249824, y: 3.9377766, z: -5.334956e-15}
+  m_Size: {x: 10.599705, y: 16.030666, z: 1}
+  m_Center: {x: 0.47249815, y: 7.5153327, z: -0.000000016997168}
 --- !u!1 &1226273975
 GameObject:
   m_ObjectHideFlags: 0
@@ -8267,8 +8268,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.599705, y: 9.109805, z: 1}
-  m_Center: {x: 0.47249794, y: 4.0549026, z: 0}
+  m_Size: {x: 10.599705, y: 16.40812, z: 1}
+  m_Center: {x: 0.47249794, y: 7.7040596, z: 0}
 --- !u!1 &1329015302
 GameObject:
   m_ObjectHideFlags: 0
@@ -13170,8 +13171,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 12.77, y: 14.02, z: 1}
-  m_Center: {x: 0.47249794, y: 2.7507048, z: 0}
+  m_Size: {x: 12.770002, y: 18.11637, z: 1}
+  m_Center: {x: 0.4728849, y: 4.79894, z: 0.006014755}
 --- !u!1 &2042996022
 GameObject:
   m_ObjectHideFlags: 0
