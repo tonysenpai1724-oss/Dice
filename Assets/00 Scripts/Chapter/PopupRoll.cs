@@ -230,12 +230,55 @@ public class PopupRoll : UIBase
             buttonHpReward.interactable = interactable;
     }
 
+    public void RewriteFace()
+    {
+        if (!selectedGuess.HasValue)
+            return;
+
+        RewriteFaces(Random.Range(1, 7), Random.Range(1, 7));
+    }
+
+    public void RewriteDice1Face(int face)
+    {
+        RewriteFace(0, face);
+    }
+
+    public void RewriteDice2Face(int face)
+    {
+        RewriteFace(1, face);
+    }
+
+    public void RewriteFace(int diceIndex, int face)
+    {
+        if (!selectedGuess.HasValue)
+            return;
+
+        diceResults[diceIndex] = Mathf.Clamp(face, 1, 6);
+        TryResolveCurrentDiceResults();
+    }
+
+    public void RewriteFaces(int dice1Face, int dice2Face)
+    {
+        if (!selectedGuess.HasValue)
+            return;
+
+        diceResults[0] = Mathf.Clamp(dice1Face, 1, 6);
+        diceResults[1] = Mathf.Clamp(dice2Face, 1, 6);
+        TryResolveCurrentDiceResults();
+    }
     void OnDiceResultReceived(int diceIndex, int roll)
     {
         if (!selectedGuess.HasValue || rollResolved)
             return;
 
         diceResults[diceIndex] = roll;
+        TryResolveCurrentDiceResults();
+    }
+    void TryResolveCurrentDiceResults()
+    {
+        if (!selectedGuess.HasValue)
+            return;
+
         if (diceResults.Count < 2 || !diceResults.ContainsKey(0) || !diceResults.ContainsKey(1))
             return;
 
@@ -252,12 +295,10 @@ public class PopupRoll : UIBase
             StopCoroutine(rollRoutine);
             rollRoutine = null;
         }
+
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ON_ROLL_RESULT);
-
-
         rollRoutine = StartCoroutine(ResolveRollResult(isWin));
     }
-
     IEnumerator ResolveRollResult(bool isWin)
     {
         yield return new WaitForSecondsRealtime(resultResolveDelay);
@@ -265,6 +306,9 @@ public class PopupRoll : UIBase
 
         if (isWin)
         {
+            if (failRoot != null)
+                failRoot.SetActive(false);
+
             if (rewardRoot != null)
                 rewardRoot.SetActive(true);
 

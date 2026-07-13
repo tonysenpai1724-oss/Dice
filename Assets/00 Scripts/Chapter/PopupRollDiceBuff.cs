@@ -251,12 +251,37 @@ public class PopupRollDiceBuff : UIBase
     {
     }
 
+    public void RewriteFace()
+    {
+        if (!selectedDiceType.HasValue)
+            return;
+
+        RewriteFace(Random.Range(1, GetMaxRoll(selectedDiceType.Value) + 1));
+    }
+
+    public void RewriteFace(int face)
+    {
+        if (!selectedDiceType.HasValue)
+            return;
+
+        finalRoll = Mathf.Clamp(face, 1, GetMaxRoll(selectedDiceType.Value));
+        TryResolveCurrentRollResult();
+    }
     void OnDiceResultReceived(int diceIndex, int roll)
     {
         if (!selectedDiceType.HasValue || rollResolved || diceIndex != 0)
             return;
 
         finalRoll = roll;
+        TryResolveCurrentRollResult();
+
+    }
+
+    void TryResolveCurrentRollResult()
+    {
+        if (!selectedDiceType.HasValue)
+            return;
+
         rollResolved = true;
         bool isWin = finalRoll == GetMaxRoll(selectedDiceType.Value);
 
@@ -264,7 +289,6 @@ public class PopupRollDiceBuff : UIBase
             txtResult.text = isWin
                 ? $"Result: {finalRoll}. Max roll! {GetRewardText(selectedDiceType.Value)}"
                 : $"Result: {finalRoll}. Not max roll.";
-
 
         if (rollRoutine != null)
         {
@@ -275,7 +299,6 @@ public class PopupRollDiceBuff : UIBase
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ON_ROLL_RESULT);
         rollRoutine = StartCoroutine(ResolveRollResult(isWin));
     }
-
     IEnumerator ResolveRollResult(bool isWin)
     {
         yield return new WaitForSecondsRealtime(resultResolveDelay);

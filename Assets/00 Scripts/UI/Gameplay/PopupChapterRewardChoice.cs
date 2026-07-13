@@ -7,6 +7,7 @@ public class PopupChapterRewardChoice : UIBase
     public TextMeshProUGUI txtTitle;
     public ChapterRewardChoiceItem itemPrefab;
     public Transform itemParent;
+    public int skipCoinReward = 5;
 
     [Header("Dice Preview")]
     public InventoryUIController inventoryUIController;
@@ -22,6 +23,22 @@ public class PopupChapterRewardChoice : UIBase
         Show();
     }
 
+    public void RerollRewards()
+    {
+        if (GameplayManager.Instance == null || ChapterManager.Instance == null)
+            return;
+
+        Level currentLevel = ChapterManager.Instance.GetCurrentLevel();
+        if (currentLevel == null)
+            return;
+
+        List<ChapterRewardChoiceOption> rerolledOptions = GameplayManager.Instance.BuildChapterRewardChoices(currentLevel.leveltype);
+        if (rerolledOptions == null || rerolledOptions.Count == 0)
+            return;
+
+        currentOptions = rerolledOptions;
+        RefreshView();
+    }
     public override void Show()
     {
         base.Show();
@@ -51,6 +68,16 @@ public class PopupChapterRewardChoice : UIBase
         }
     }
 
+    public void SkipForCoin()
+    {
+        PackageResource skipReward = new PackageResource();
+        skipReward.AddResource(new CommonResource(ECommonResource.Coin, Mathf.Max(0, skipCoinReward)));
+        skipReward.ReceiveResource(EResourceFrom.GameDrop);
+
+        Hide();
+        if (UIManager.Instance != null)
+            UIManager.Instance.ShowPopupEndGame();
+    }
     void SetupRewardItem(ChapterRewardChoiceItem item, ChapterRewardChoiceOption option)
     {
         if (item == null)
