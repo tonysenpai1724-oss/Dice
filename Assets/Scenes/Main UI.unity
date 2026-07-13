@@ -11395,7 +11395,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1764901871}
   - component: {fileID: 1764901868}
-  - component: {fileID: 1764901873}
   - component: {fileID: 1764901872}
   - component: {fileID: 1764901874}
   m_Layer: 0
@@ -11532,20 +11531,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentUpgradeService
   equipmentDatabase: {fileID: 11400000, guid: 677041f7bdf74ba43b75c299a67e3e24, type: 2}
---- !u!114 &1764901873
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1764901867}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44f5d0a6869146c4f9a28be9d63f4f85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EquipmentSession
-  equipmentDatabase: {fileID: 11400000, guid: 677041f7bdf74ba43b75c299a67e3e24, type: 2}
-  equippedItems: []
 --- !u!114 &1764901874
 MonoBehaviour:
   m_ObjectHideFlags: 0

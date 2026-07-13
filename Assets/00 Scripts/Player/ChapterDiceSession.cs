@@ -4,13 +4,23 @@ using System.Text;
 using UnityEngine;
 
 [Serializable]
-public class ChapterDiceSessionSaveData
+public class ChapterDiceSessionCachedData : IControllerCachedData
 {
     public string heroName;
     public int heroLevel;
     public bool heroStartDiceAdded;
     public int currentHp = -1;
     public List<ChapterDiceSessionDiceSaveData> runtimeDices = new();
+
+    public void InitFirsTime()
+    {
+        if (runtimeDices == null)
+            runtimeDices = new List<ChapterDiceSessionDiceSaveData>();
+    }
+
+    public void OnNewData()
+    {
+    }
 }
 
 [Serializable]
@@ -128,19 +138,15 @@ public class ChapterDiceSession : MonoBehaviour
         if (runtimeDiceDatas.Count > 0)
             return true;
 
-        string json = CPlayerPrefs.GetString(SaveKey);
-        if (string.IsNullOrEmpty(json))
+        ChapterDiceSessionCachedData cachedData = BaseDataController.LoadLocalCachedData<ChapterDiceSessionCachedData>(SaveKey);
+        if (cachedData.runtimeDices.Count == 0)
             return false;
 
-        ChapterDiceSessionSaveData saveData = JsonUtility.FromJson<ChapterDiceSessionSaveData>(json);
-        if (saveData == null)
-            return false;
+        heroLevel = cachedData.heroLevel;
+        heroStartDiceAdded = cachedData.heroStartDiceAdded;
+        currentHp = cachedData.currentHp;
 
-        heroLevel = saveData.heroLevel;
-        heroStartDiceAdded = saveData.heroStartDiceAdded;
-        currentHp = saveData.currentHp;
-
-        bool restored = RestoreRuntimeDiceFromSaveData(saveData);
+        bool restored = RestoreRuntimeDiceFromCachedData(cachedData);
         if (restored)
         {
             DebugLogRuntimeDice("TryRestoreRuntimeDiceFromSave restored");
@@ -213,7 +219,7 @@ public class ChapterDiceSession : MonoBehaviour
     void SaveSession()
     {
 
-        ChapterDiceSessionSaveData saveData = new ChapterDiceSessionSaveData
+        ChapterDiceSessionCachedData cachedData = new ChapterDiceSessionCachedData
         {
             heroName = heroData != null ? heroData.name : string.Empty,
             heroLevel = heroLevel,
@@ -228,7 +234,7 @@ public class ChapterDiceSession : MonoBehaviour
             if (data == null)
                 continue;
 
-            saveData.runtimeDices.Add(new ChapterDiceSessionDiceSaveData
+            cachedData.runtimeDices.Add(new ChapterDiceSessionDiceSaveData
             {
                 diceName = data.diceName,
                 level = data.level,
@@ -236,38 +242,35 @@ public class ChapterDiceSession : MonoBehaviour
             });
         }
 
-        string json = JsonUtility.ToJson(saveData);
-        CPlayerPrefs.SetString(SaveKey, json);
+        string json = Newtonsoft.Json.JsonConvert.SerializeObject(cachedData);
+        GameManager.Instance.SaveLocalData(SaveKey, json);
+        // BaseDataController.SaveLocalCachedData(SaveKey, cachedData);
         DebugLogRuntimeDice("SaveSession");
-        Debug.Log($"[ChapterDiceSession] Saved json count={saveData.runtimeDices.Count} json={json}");
+        Debug.Log($"[ChapterDiceSession] Saved json count={cachedData.runtimeDices.Count} json={json}");
     }
 
     void LoadSession()
     {
-        string json = CPlayerPrefs.GetString(SaveKey);
-        if (string.IsNullOrEmpty(json))
+        ChapterDiceSessionCachedData cachedData = BaseDataController.LoadLocalCachedData<ChapterDiceSessionCachedData>(SaveKey);
+        if (cachedData.runtimeDices.Count == 0)
             return;
 
-        ChapterDiceSessionSaveData saveData = JsonUtility.FromJson<ChapterDiceSessionSaveData>(json);
-        if (saveData == null)
-            return;
+        heroLevel = cachedData.heroLevel;
+        heroStartDiceAdded = cachedData.heroStartDiceAdded;
+        currentHp = cachedData.currentHp;
 
-        heroLevel = saveData.heroLevel;
-        heroStartDiceAdded = saveData.heroStartDiceAdded;
-        currentHp = saveData.currentHp;
-
-        bool restored = RestoreRuntimeDiceFromSaveData(saveData);
+        bool restored = RestoreRuntimeDiceFromCachedData(cachedData);
         if (!restored)
-            Debug.Log($"[ChapterDiceSession] LoadSession restore returned empty. heroStartDiceAdded={heroStartDiceAdded} heroLevel={heroLevel} json={json}");
+            Debug.Log($"[ChapterDiceSession] LoadSession restore returned empty. heroStartDiceAdded={heroStartDiceAdded} heroLevel={heroLevel} json={Newtonsoft.Json.JsonConvert.SerializeObject(cachedData)}");
 
         DebugLogRuntimeDice("LoadSession");
     }
 
-    bool RestoreRuntimeDiceFromSaveData(ChapterDiceSessionSaveData saveData)
+    bool RestoreRuntimeDiceFromCachedData(ChapterDiceSessionCachedData cachedData)
     {
         runtimeDiceDatas.Clear();
 
-        if (saveData == null || saveData.runtimeDices == null || saveData.runtimeDices.Count == 0)
+        if (cachedData == null || cachedData.runtimeDices == null || cachedData.runtimeDices.Count == 0)
         {
             initializedFromHero = false;
             return false;
@@ -275,16 +278,16 @@ public class ChapterDiceSession : MonoBehaviour
         if (diceDatabase == null)
             return false;
 
-        for (int i = 0; i < saveData.runtimeDices.Count; i++)
+        for (int i = 0; i < cachedData.runtimeDices.Count; i++)
         {
-            ChapterDiceSessionDiceSaveData savedDice = saveData.runtimeDices[i];
+            ChapterDiceSessionDiceSaveData savedDice = cachedData.runtimeDices[i];
             DiceData data = FindDiceData(diceDatabase, savedDice);
             if (data != null)
                 runtimeDiceDatas.Add(data);
         }
 
         initializedFromHero = runtimeDiceDatas.Count > 0;
-        heroStartDiceAdded = saveData.heroStartDiceAdded || runtimeDiceDatas.Count > 0;
+        heroStartDiceAdded = cachedData.heroStartDiceAdded || runtimeDiceDatas.Count > 0;
         return runtimeDiceDatas.Count > 0;
     }
 
@@ -515,7 +518,9 @@ public class ChapterDiceSession : MonoBehaviour
         heroLevel = 0;
         initializedFromHero = false;
         heroStartDiceAdded = false;
-        CPlayerPrefs.SetString(SaveKey, string.Empty);
+        currentHp = -1;
+        GameManager.Instance.SaveLocalData(SaveKey, string.Empty);
+        // BaseDataController.ClearLocalCachedData(SaveKey);
     }
 
     void DebugLogRuntimeDice(string context)

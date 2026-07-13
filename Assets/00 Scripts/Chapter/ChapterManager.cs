@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class ChapterProgressSaveData
+public class ChapterProgressCachedData : IControllerCachedData
 {
     public int currentChapterId = 1;
     public int currentMode = 0;
     public int currentLevelIndex = 0;
+
+    public void InitFirsTime()
+    {
+    }
+
+    public void OnNewData()
+    {
+    }
 }
 
 public class ChapterManager : Singleton<ChapterManager>
@@ -182,28 +190,22 @@ public class ChapterManager : Singleton<ChapterManager>
 
     void SaveProgress()
     {
-        ChapterProgressSaveData saveData = new ChapterProgressSaveData
+        ChapterProgressCachedData cachedData = new ChapterProgressCachedData
         {
             currentChapterId = currentChapterId,
             currentMode = (int)currentMode,
             currentLevelIndex = currentLevelIndex
         };
-
-        CPlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(saveData));
+        string json = Newtonsoft.Json.JsonConvert.SerializeObject(cachedData);
+        GameManager.Instance.SaveLocalData(SaveKey, json);
+        //  BaseDataController.SaveLocalCachedData(SaveKey, cachedData);
     }
 
     void LoadProgress()
     {
-        string json = CPlayerPrefs.GetString(SaveKey);
-        if (string.IsNullOrEmpty(json))
-            return;
-
-        ChapterProgressSaveData saveData = JsonUtility.FromJson<ChapterProgressSaveData>(json);
-        if (saveData == null)
-            return;
-
-        currentChapterId = Mathf.Max(1, saveData.currentChapterId);
-        currentMode = (ChapterMode)Mathf.Clamp(saveData.currentMode, 0, Enum.GetValues(typeof(ChapterMode)).Length - 1);
-        currentLevelIndex = Mathf.Max(0, saveData.currentLevelIndex);
+        ChapterProgressCachedData cachedData = BaseDataController.LoadLocalCachedData<ChapterProgressCachedData>(SaveKey);
+        currentChapterId = Mathf.Max(1, cachedData.currentChapterId);
+        currentMode = (ChapterMode)Mathf.Clamp(cachedData.currentMode, 0, Enum.GetValues(typeof(ChapterMode)).Length - 1);
+        currentLevelIndex = Mathf.Max(0, cachedData.currentLevelIndex);
     }
 }

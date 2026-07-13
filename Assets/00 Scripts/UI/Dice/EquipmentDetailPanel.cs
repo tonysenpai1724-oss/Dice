@@ -39,7 +39,7 @@ public class EquipmentDetailPanel : MonoBehaviour
         if (currentEntry == null)
             return;
 
-        EquipmentSession.GetOrCreate().EquipEntry(currentEntry.entryId);
+        EquipmentSession.GetOrCreate().EquipEntry(currentEntry);
         RefreshView();
         Hide();
     }

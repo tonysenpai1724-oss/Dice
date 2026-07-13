@@ -19,9 +19,27 @@ public class EquipmentInventoryEntry
 }
 
 [Serializable]
-public class EquipmentInventorySaveData
+public class EquipmentInventoryCachedEntry
 {
-    public List<EquipmentInventoryEntry> entries = new();
+    public string entryId;
+    public string equipmentId;
+    public int quantity = 1;
+}
+
+[Serializable]
+public class EquipmentInventoryCachedData : IControllerCachedData
+{
+    public List<EquipmentInventoryCachedEntry> entries = new();
+
+    public void InitFirsTime()
+    {
+        if (entries == null)
+            entries = new List<EquipmentInventoryCachedEntry>();
+    }
+
+    public void OnNewData()
+    {
+    }
 }
 
 public class EquipmentInventoryManager : MonoBehaviour
@@ -34,6 +52,15 @@ public class EquipmentInventoryManager : MonoBehaviour
     [SerializeField] List<EquipmentInventoryEntry> ownedEquipments = new();
 
     public IReadOnlyList<EquipmentInventoryEntry> OwnedEquipments => ownedEquipments;
+    public EquipmentDatabaseSO EquipmentDatabase
+    {
+        get
+        {
+            EnsureDatabase();
+            return equipmentDatabase;
+        }
+    }
+
     [SerializeField] List<BaseEquiment> baseEquiments;
 
     void Awake()
@@ -248,9 +275,9 @@ public class EquipmentInventoryManager : MonoBehaviour
     void SaveToPrefs()
     {
         ResolveAllEquipmentRefs();
-        EquipmentInventorySaveData saveData = new EquipmentInventorySaveData
+        EquipmentInventoryCachedData cachedData = new EquipmentInventoryCachedData
         {
-            entries = new List<EquipmentInventoryEntry>()
+            entries = new List<EquipmentInventoryCachedEntry>()
         };
 
         for (int i = 0; i < ownedEquipments.Count; i++)
@@ -259,30 +286,37 @@ public class EquipmentInventoryManager : MonoBehaviour
             if (entry == null || entry.quantity <= 0)
                 continue;
 
-            saveData.entries.Add(new EquipmentInventoryEntry
+            cachedData.entries.Add(new EquipmentInventoryCachedEntry
             {
                 entryId = entry.entryId,
                 equipmentId = entry.equipmentId,
                 quantity = entry.quantity
             });
         }
+        string json = Newtonsoft.Json.JsonConvert.SerializeObject(cachedData);
+        GameManager.Instance.SaveLocalData(SaveKey, json);
 
-        CPlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(saveData));
+        //BaseDataController.SaveLocalCachedData(SaveKey, cachedData);
     }
 
     void LoadFromPrefs()
     {
         ownedEquipments.Clear();
 
-        string json = CPlayerPrefs.GetString(SaveKey);
-        if (string.IsNullOrEmpty(json))
-            return;
+        EquipmentInventoryCachedData cachedData = BaseDataController.LoadLocalCachedData<EquipmentInventoryCachedData>(SaveKey);
+        for (int i = 0; i < cachedData.entries.Count; i++)
+        {
+            EquipmentInventoryCachedEntry cachedEntry = cachedData.entries[i];
+            if (cachedEntry == null)
+                continue;
 
-        EquipmentInventorySaveData saveData = JsonUtility.FromJson<EquipmentInventorySaveData>(json);
-        if (saveData == null || saveData.entries == null)
-            return;
-
-        ownedEquipments.AddRange(saveData.entries);
+            ownedEquipments.Add(new EquipmentInventoryEntry
+            {
+                entryId = cachedEntry.entryId,
+                equipmentId = cachedEntry.equipmentId,
+                quantity = cachedEntry.quantity
+            });
+        }
     }
 
     void NotifyChanged()

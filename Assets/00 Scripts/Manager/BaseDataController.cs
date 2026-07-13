@@ -79,9 +79,50 @@ public abstract class BaseDataController
 
     protected abstract void SaveData();
 
+    public static D LoadLocalCachedData<D>(string keyData) where D : class, IControllerCachedData, new()
+    {
+        D loadedData;
+        string data = GameManager.Instance.GetLocalData(keyData);
+        if (string.IsNullOrEmpty(data))
+        {
+            loadedData = new D();
+            loadedData.OnNewData();
+        }
+        else
+        {
+            loadedData = Newtonsoft.Json.JsonConvert.DeserializeObject<D>(data);
+            if (loadedData == null)
+            {
+                loadedData = new D();
+                loadedData.OnNewData();
+            }
+        }
+        loadedData.InitFirsTime();
+        return loadedData;
+    }
+
+    public static void SaveLocalCachedData<D>(string keyData, D cachedData) where D : class, IControllerCachedData, new()
+    {
+        string json = Newtonsoft.Json.JsonConvert.SerializeObject(cachedData);
+        GameManager.Instance.SaveLocalData(keyData, json);
+    }
+
+    public static void ClearLocalCachedData(string keyData)
+    {
+        GameManager.Instance.SaveLocalData(keyData, string.Empty);
+    }
+
     public virtual void OnValueChange()
     {
         waitSaveData = true;
+        DebugCustom.LogColor($"keyEvent: {KeyEvent()}");
+        TigerForge.EventManager.EmitEvent(KeyEvent());
+    }
+
+    public virtual void OnValueChangeSaveImmediately()
+    {
+        SaveData();
+        waitSaveData = false;
         DebugCustom.LogColor($"keyEvent: {KeyEvent()}");
         TigerForge.EventManager.EmitEvent(KeyEvent());
     }
@@ -97,31 +138,18 @@ public abstract class BaseLocalController<D> : BaseDataController
         Debug.Log($"Loading {KeyData().Replace("_", " ")}");
         yield return GameManager.Instance.StartCoroutine(IEFetchData());
         yield return GameManager.Instance.StartCoroutine(IEFetchConfigs());
-        cachedData = null;
-        string data = GameManager.Instance.GetLocalData(KeyData());
-        if (string.IsNullOrEmpty(data))
-        {
-            cachedData = new D();
-            cachedData.OnNewData();
-        }
-        else
-        {
-            cachedData =
-                Newtonsoft.Json.JsonConvert.DeserializeObject<D>(data);
-        }
-        cachedData.InitFirsTime();
+        cachedData = LoadLocalCachedData<D>(KeyData());
         yield return null;
         OnInitSuccess();
     }
     public override IEnumerator IEClearData()
     {
-        CPlayerPrefs.SetString(KeyData(), "");
+        ClearLocalCachedData(KeyData());
         yield return null;
     }
     protected override void SaveData()
     {
-        string json = Newtonsoft.Json.JsonConvert.SerializeObject(cachedData);
-        GameManager.Instance.SaveLocalData(KeyData(), json);
+        SaveLocalCachedData(KeyData(), cachedData);
     }
 }
 public abstract class BaseServerController : BaseDataController

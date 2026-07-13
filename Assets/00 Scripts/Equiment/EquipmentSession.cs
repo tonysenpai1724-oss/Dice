@@ -1,20 +1,56 @@
 using System;
 using System.Collections.Generic;
-using TigerForge;
 using UnityEngine;
 
 [Serializable]
 public class EquipmentSessionEntry
 {
     public EquipmentType equipmentType;
+    public string equipmentId;
     public string inventoryEntryId;
     public BaseEquiment equipment;
 }
 
 [Serializable]
-public class EquipmentSessionSaveData
+public class EquipmentSessionCachedData : IControllerCachedData
 {
     public List<EquipmentSessionSaveEntry> equippedItems = new();
+
+    public void InitFirsTime()
+    {
+        if (equippedItems == null)
+            equippedItems = new List<EquipmentSessionSaveEntry>();
+
+        Array equipmentTypes = Enum.GetValues(typeof(EquipmentType));
+        for (int i = 0; i < equipmentTypes.Length; i++)
+        {
+            EquipmentType equipmentType = (EquipmentType)equipmentTypes.GetValue(i);
+            if (GetEntry(equipmentType) != null)
+                continue;
+
+            equippedItems.Add(new EquipmentSessionSaveEntry
+            {
+                equipmentType = equipmentType,
+                equipmentId = string.Empty,
+                inventoryEntryId = string.Empty
+            });
+        }
+    }
+
+    public void OnNewData()
+    {
+    }
+
+    public EquipmentSessionSaveEntry GetEntry(EquipmentType equipmentType)
+    {
+        for (int i = 0; i < equippedItems.Count; i++)
+        {
+            if (equippedItems[i].equipmentType == equipmentType)
+                return equippedItems[i];
+        }
+
+        return null;
+    }
 }
 
 [Serializable]
@@ -25,62 +61,33 @@ public class EquipmentSessionSaveEntry
     public string inventoryEntryId;
 }
 
-public class EquipmentSession : MonoBehaviour
+public interface IEquipmentSessionController : IController<EquipmentSession>
+{
+}
+
+public class EquipmentSession : BaseLocalController<EquipmentSessionCachedData>, IEquipmentSessionController
 {
     const string SaveKey = "equipment_session";
 
-    public static EquipmentSession Instance;
+    EquipmentDatabaseSO equipmentDatabase;
+    readonly List<EquipmentSessionEntry> runtimeEntries = new();
 
-    [SerializeField] EquipmentDatabaseSO equipmentDatabase;
-    [SerializeField] List<EquipmentSessionEntry> equippedItems = new();
-
-    public IReadOnlyList<EquipmentSessionEntry> EquippedItems => equippedItems;
-
-    void Awake()
-    {
-        Instance = this;
-        DontDestroyOnLoad(this);
-        InitializeSlots();
-        LoadFromPrefs();
-    }
-
-    void OnApplicationPause(bool pauseStatus)
-    {
-        if (pauseStatus)
-            SaveToPrefs();
-    }
-
-    void OnApplicationQuit()
-    {
-        SaveToPrefs();
-    }
+    public static EquipmentSession Instance => IEquipmentSessionController.Instance;
+    public IReadOnlyList<EquipmentSessionEntry> EquippedItems => GetRuntimeEntries();
 
     public static EquipmentSession GetOrCreate()
     {
-        if (Instance != null)
-            return Instance;
-
-        GameObject sessionObject = new GameObject("EquipmentSession");
-        return sessionObject.AddComponent<EquipmentSession>();
+        return Instance;
     }
 
-    public void InitializeSlots()
+    public override string KeyData()
     {
-        Array equipmentTypes = Enum.GetValues(typeof(EquipmentType));
+        return SaveKey;
+    }
 
-        for (int i = 0; i < equipmentTypes.Length; i++)
-        {
-            EquipmentType equipmentType = (EquipmentType)equipmentTypes.GetValue(i);
-            if (GetEntry(equipmentType) != null)
-                continue;
-
-            equippedItems.Add(new EquipmentSessionEntry
-            {
-                equipmentType = equipmentType,
-                inventoryEntryId = string.Empty,
-                equipment = null
-            });
-        }
+    public override string KeyEvent()
+    {
+        return Constant.ON_EQUIPMENT_SESSION_CHANGED;
     }
 
     public void Equip(BaseEquiment equipment)
@@ -96,7 +103,7 @@ public class EquipmentSession : MonoBehaviour
             if (entry == null || entry.equipment != equipment || entry.quantity <= 0)
                 continue;
 
-            EquipEntry(entry.entryId);
+            EquipEntry(entry);
             return;
         }
     }
@@ -104,40 +111,49 @@ public class EquipmentSession : MonoBehaviour
     public void EquipEntry(string inventoryEntryId)
     {
         EquipmentInventoryEntry inventoryEntry = EquipmentInventoryManager.GetOrCreate().GetEntryById(inventoryEntryId);
+        EquipEntry(inventoryEntry);
+    }
+
+    public void EquipEntry(EquipmentInventoryEntry inventoryEntry)
+    {
         if (inventoryEntry == null || inventoryEntry.equipment == null || inventoryEntry.quantity <= 0)
             return;
 
-        InitializeSlots();
+        EnsureCachedData();
 
-        EquipmentSessionEntry entry = GetEntry(inventoryEntry.equipment.equipmentType);
+        EquipmentSessionSaveEntry entry = GetCachedEntry(inventoryEntry.equipment.equipmentType);
         if (entry == null)
             return;
 
         entry.inventoryEntryId = inventoryEntry.entryId;
-        entry.equipment = inventoryEntry.equipment;
-        NotifyChanged();
+        entry.equipmentId = inventoryEntry.equipment.equipmentId;
+        RefreshRuntimeEntries();
+        OnValueChange();
     }
 
     public void Unequip(EquipmentType equipmentType)
     {
-        EquipmentSessionEntry entry = GetEntry(equipmentType);
+        EnsureCachedData();
+
+        EquipmentSessionSaveEntry entry = GetCachedEntry(equipmentType);
         if (entry == null)
             return;
 
         entry.inventoryEntryId = string.Empty;
-        entry.equipment = null;
-        NotifyChanged();
+        entry.equipmentId = string.Empty;
+        RefreshRuntimeEntries();
+        OnValueChange();
     }
 
     public void SetDatabase(EquipmentDatabaseSO database)
     {
         equipmentDatabase = database;
-        LoadFromPrefs();
+        RefreshRuntimeEntries();
     }
 
     public BaseEquiment GetEquipped(EquipmentType equipmentType)
     {
-        EquipmentSessionEntry entry = GetEntry(equipmentType);
+        EquipmentSessionEntry entry = GetRuntimeEntry(equipmentType);
         return entry != null ? entry.equipment : null;
     }
 
@@ -146,9 +162,10 @@ public class EquipmentSession : MonoBehaviour
         if (string.IsNullOrEmpty(inventoryEntryId))
             return false;
 
-        for (int i = 0; i < equippedItems.Count; i++)
+        EnsureCachedData();
+        for (int i = 0; i < cachedData.equippedItems.Count; i++)
         {
-            if (equippedItems[i].inventoryEntryId == inventoryEntryId)
+            if (cachedData.equippedItems[i].inventoryEntryId == inventoryEntryId)
                 return true;
         }
 
@@ -160,11 +177,11 @@ public class EquipmentSession : MonoBehaviour
         if (equipment == null)
             return 0;
 
+        List<EquipmentSessionEntry> entries = GetRuntimeEntries();
         int count = 0;
-
-        for (int i = 0; i < equippedItems.Count; i++)
+        for (int i = 0; i < entries.Count; i++)
         {
-            if (equippedItems[i].equipment == equipment)
+            if (entries[i].equipment == equipment)
                 count++;
         }
 
@@ -174,81 +191,73 @@ public class EquipmentSession : MonoBehaviour
     public List<BaseEquiment> GetAllEquipped()
     {
         List<BaseEquiment> result = new List<BaseEquiment>();
+        List<EquipmentSessionEntry> entries = GetRuntimeEntries();
 
-        for (int i = 0; i < equippedItems.Count; i++)
+        for (int i = 0; i < entries.Count; i++)
         {
-            if (equippedItems[i].equipment != null)
-                result.Add(equippedItems[i].equipment);
+            if (entries[i].equipment != null)
+                result.Add(entries[i].equipment);
         }
 
         return result;
     }
 
-    EquipmentSessionEntry GetEntry(EquipmentType equipmentType)
+    EquipmentSessionSaveEntry GetCachedEntry(EquipmentType equipmentType)
     {
-        for (int i = 0; i < equippedItems.Count; i++)
+        EnsureCachedData();
+        return cachedData.GetEntry(equipmentType);
+    }
+
+    EquipmentSessionEntry GetRuntimeEntry(EquipmentType equipmentType)
+    {
+        List<EquipmentSessionEntry> entries = GetRuntimeEntries();
+        for (int i = 0; i < entries.Count; i++)
         {
-            if (equippedItems[i].equipmentType == equipmentType)
-                return equippedItems[i];
+            if (entries[i].equipmentType == equipmentType)
+                return entries[i];
         }
 
         return null;
     }
 
-    void NotifyChanged()
+    List<EquipmentSessionEntry> GetRuntimeEntries()
     {
-        SaveToPrefs();
-        EventManager.EmitEventData(Constant.ON_EQUIPMENT_SESSION_CHANGED, this);
+        RefreshRuntimeEntries();
+        return runtimeEntries;
     }
 
-    void SaveToPrefs()
+    void RefreshRuntimeEntries()
     {
-        EquipmentSessionSaveData saveData = new EquipmentSessionSaveData();
+        EnsureCachedData();
+        runtimeEntries.Clear();
 
-        for (int i = 0; i < equippedItems.Count; i++)
+        for (int i = 0; i < cachedData.equippedItems.Count; i++)
         {
-            EquipmentSessionEntry entry = equippedItems[i];
-            if (entry == null)
+            EquipmentSessionSaveEntry cachedEntry = cachedData.equippedItems[i];
+            if (cachedEntry == null)
                 continue;
 
-            saveData.equippedItems.Add(new EquipmentSessionSaveEntry
+            runtimeEntries.Add(new EquipmentSessionEntry
             {
-                equipmentType = entry.equipmentType,
-                equipmentId = entry.equipment != null ? entry.equipment.equipmentId : string.Empty,
-                inventoryEntryId = entry.inventoryEntryId
+                equipmentType = cachedEntry.equipmentType,
+                equipmentId = cachedEntry.equipmentId,
+                inventoryEntryId = cachedEntry.inventoryEntryId,
+                equipment = ResolveEquipment(cachedEntry.equipmentId, cachedEntry.inventoryEntryId)
             });
         }
-
-        CPlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(saveData));
     }
 
-    void LoadFromPrefs()
+    void EnsureCachedData()
     {
-        InitializeSlots();
+        if (cachedData == null)
+            cachedData = LoadLocalCachedData<EquipmentSessionCachedData>(KeyData());
 
-        string json = CPlayerPrefs.GetString(SaveKey);
-        if (string.IsNullOrEmpty(json))
-            return;
-
-        EquipmentSessionSaveData saveData = JsonUtility.FromJson<EquipmentSessionSaveData>(json);
-        if (saveData == null || saveData.equippedItems == null)
-            return;
-
-        for (int i = 0; i < saveData.equippedItems.Count; i++)
-        {
-            EquipmentSessionSaveEntry saveEntry = saveData.equippedItems[i];
-            EquipmentSessionEntry entry = GetEntry(saveEntry.equipmentType);
-            if (entry == null)
-                continue;
-
-            entry.inventoryEntryId = saveEntry.inventoryEntryId;
-            entry.equipment = ResolveEquipment(saveEntry.equipmentId, saveEntry.inventoryEntryId);
-        }
+        cachedData.InitFirsTime();
     }
 
     BaseEquiment ResolveEquipment(string equipmentId, string inventoryEntryId)
     {
-        EquipmentInventoryEntry inventoryEntry = EquipmentInventoryManager.GetOrCreate().GetEntryById(inventoryEntryId);
+        EquipmentInventoryEntry inventoryEntry = EquipmentInventoryManager.Instance != null ? EquipmentInventoryManager.Instance.GetEntryById(inventoryEntryId) : null;
         if (inventoryEntry != null && inventoryEntry.equipment != null)
             return inventoryEntry.equipment;
 
@@ -256,7 +265,13 @@ public class EquipmentSession : MonoBehaviour
             return null;
 
         if (equipmentDatabase == null)
-            equipmentDatabase = Resources.Load<EquipmentDatabaseSO>("00 Scripts/SO/Equiment/Equipment Database SO");
+        {
+            if (EquipmentInventoryManager.Instance != null)
+                equipmentDatabase = EquipmentInventoryManager.Instance.EquipmentDatabase;
+
+            if (equipmentDatabase == null)
+                equipmentDatabase = Resources.Load<EquipmentDatabaseSO>("00 Scripts/SO/Equiment/Equipment Database SO");
+        }
 
         return equipmentDatabase != null ? equipmentDatabase.FindById(equipmentId) : null;
     }

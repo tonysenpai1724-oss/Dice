@@ -61,6 +61,7 @@ public class GameManager : Singleton<GameManager>
         Debug.Log("Get Config Done");
         yield return StartCoroutine(ITimerController.Instance.IEInit());
         yield return StartCoroutine(IPlayerResource.Instance.IEInit());
+        yield return StartCoroutine(IEquipmentSessionController.Instance.IEInit());
         yield return StartCoroutine(IGameSettingController.Instance.IEInit());
         yield return StartCoroutine(IAchievementController.Instance.IEInit());
         yield return StartCoroutine(IPlayerInfoController.Instance.IEInit());
@@ -129,6 +130,7 @@ public class GameManager : Singleton<GameManager>
         yield return StartCoroutine(SceneHelper.Instance.IEChangeSceneLoading());
         yield return StartCoroutine(ITimerController.Instance.IEClearData());
         yield return StartCoroutine(IPlayerResource.Instance.IEClearData());
+        yield return StartCoroutine(IEquipmentSessionController.Instance.IEClearData());
         yield return StartCoroutine(IGameSettingController.Instance.IEClearData());
         yield return StartCoroutine(IAchievementController.Instance.IEClearData());
         yield return StartCoroutine(IPlayerInfoController.Instance.IEClearData());
