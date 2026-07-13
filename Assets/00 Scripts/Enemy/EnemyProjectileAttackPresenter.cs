@@ -40,16 +40,17 @@ public class EnemyProjectileAttackPresenter
         this.decrementActiveProjectiles = decrementActiveProjectiles;
     }
 
-    public void PlayPlayerAttack(Enemy target, int damage)
+    public float PlayPlayerAttack(Enemy target, int damage)
     {
         PlayerController player = getPlayer?.Invoke();
         if (target == null || player == null)
-            return;
+            return 0f;
 
         incrementActiveProjectiles?.Invoke();
         string attackAnimation = player.GetNextAttackAnimation();
         bool useComboAttack = attackAnimation == player.comboAttackAnim;
         TrackEntry attackTrack = player.PlayAnimation(attackAnimation, false);
+        float attackDuration = GetTrackDuration(attackTrack);
 
         if (useComboAttack && attackTrack != null)
         {
@@ -73,6 +74,17 @@ public class EnemyProjectileAttackPresenter
                 0
             );
         }
+
+        return attackDuration;
+    }
+
+    float GetTrackDuration(TrackEntry trackEntry)
+    {
+        if (trackEntry == null)
+            return 0f;
+
+        float timeScale = Mathf.Max(0.01f, trackEntry.TimeScale);
+        return Mathf.Max(0f, trackEntry.AnimationEnd - trackEntry.AnimationStart) / timeScale;
     }
 
     IEnumerator SpawnProjectileOnAttackEvent(PlayerController player, TrackEntry attackTrack, Enemy target, int damage)

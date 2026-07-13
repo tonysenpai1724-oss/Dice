@@ -235,26 +235,29 @@ public class EnemyManager : Singleton<EnemyManager>
         return queryService != null ? queryService.GetRightmostAliveEnemy() : null;
     }
 
-    public void PlayerAttack(DiceData diceData)
+    public float PlayerAttack(DiceData diceData)
     {
         if (diceData == null)
-            return;
+            return 0f;
 
         int finalDamage = CombatSystem.CalculateFinalPlayerAttackDamage(player, diceData.damage);
-        PlayerAttack(finalDamage);
+        return PlayerAttack(finalDamage);
     }
 
-    public void PlayerAttack(int damage)
+    public float PlayerAttack(int damage)
     {
         Enemy target = GetNearestAliveEnemy();
         if (target == null)
         {
             CheckWinGame();
-            return;
+            return 0f;
         }
 
-        projectileAttackPresenter?.PlayPlayerAttack(target, damage);
+        float attackDuration = projectileAttackPresenter != null
+            ? projectileAttackPresenter.PlayPlayerAttack(target, damage)
+            : 0f;
         CheckWinGame();
+        return attackDuration;
     }
 
     public IEnumerator EnemyTurn()

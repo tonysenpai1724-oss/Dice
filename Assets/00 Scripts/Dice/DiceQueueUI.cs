@@ -36,6 +36,9 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     public float shiftMoveDuration = 0.2f;
     public float stepDelay = 0.05f;
     public float delayDestroyTime;
+
+    [Header("Combat")]
+    public float multiAttackDelay = 0.45f;
     public float fastFlushItemMoveDuration = 0.03f;
     public float fastFlushShiftMoveDuration = 0.03f;
     public float fastFlushStepDelay;
@@ -136,22 +139,26 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
                 diceData?.ExecuteSkill();
 
                 yield return MoveItem(first.transform as RectTransform, GetConsumeTargetPosition(), GetItemMoveDuration());
+                Destroy(first.gameObject);
 
                 if (enemyManager != null && gameplay != null && !gameplay.skillSkipAttack)
                 {
                     int attackCount = gameplay.GetAttackCount();
                     for (int attackIndex = 0; attackIndex < attackCount; attackIndex++)
-                        enemyManager.PlayerAttack(gameplay.skillDamage);
+                    {
+                        float attackDuration = enemyManager.PlayerAttack(gameplay.skillDamage);
+
+                        if (attackIndex < attackCount - 1)
+                        {
+                            float waitDuration = attackDuration > 0f ? attackDuration : multiAttackDelay;
+                            if (waitDuration > 0f)
+                                yield return new WaitForSeconds(waitDuration);
+                        }
+                    }
                 }
 
                 gameplay?.RunAfterAttackActions();
                 gameplay?.ClearDiceSkillState();
-
-                float destroyDelay = GetDestroyDelay();
-                if (destroyDelay > 0f)
-                    yield return new WaitForSeconds(destroyDelay);
-
-                Destroy(first.gameObject);
 
                 if (items.Count > 0)
                 {
