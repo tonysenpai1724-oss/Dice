@@ -10,6 +10,10 @@ public class PlayerController : GameUnit
     public List<DiceData> diceDatas = new();
     public EquipmentManager equipmentManager;
     public PlayerStats playerStats = PlayerStats.Shared;
+    public string comboAttackAnim = "Attack1";
+    public int comboAttackThreshold = 3;
+
+    int consecutiveAttackCount;
 
     public int RuntimeDamage => playerStats != null
         ? Mathf.RoundToInt(playerStats.GetStatValue(HeroStatType.Damage))
@@ -154,6 +158,28 @@ public class PlayerController : GameUnit
         SetHealth(finalStats.hp, currentHpValue);
     }
 
+
+    public string GetNextAttackAnimation()
+    {
+        consecutiveAttackCount++;
+
+        bool useComboAttack = !string.IsNullOrEmpty(comboAttackAnim) &&
+                              consecutiveAttackCount >= Mathf.Max(1, comboAttackThreshold);
+
+        if (useComboAttack)
+        {
+            consecutiveAttackCount = 0;
+            return comboAttackAnim;
+        }
+
+        return attackAnim;
+    }
+
+    public void ResetAttackCombo()
+    {
+        consecutiveAttackCount = 0;
+    }
+
     void RefreshStatsFromEquipmentEvent()
     {
         RefreshStatsFromEquipment();
@@ -216,6 +242,9 @@ public class PlayerController : GameUnit
         Debug.Log($"[PlayerController] {context} count={diceDatas.Count} list=[{builder}]");
     }
 }
+
+
+
 
 
 

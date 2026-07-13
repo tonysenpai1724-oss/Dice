@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using DG.Tweening;
+using Spine;
 using UnityEngine;
 
 public class EnemyProjectileAttackPresenter
 {
+    const string ComboAttackEventName = "Attack";
+
     readonly MonoBehaviour coroutineHost;
     readonly Func<PlayerController> getPlayer;
     readonly Func<RectTransform> getProjectilePrefab;
@@ -44,8 +47,19 @@ public class EnemyProjectileAttackPresenter
             return;
 
         incrementActiveProjectiles?.Invoke();
-        player.PlayAnimation(player.attackAnim, false);
-        coroutineHost.StartCoroutine(SpawnProjectileDelayed(target, damage));
+        string attackAnimation = player.GetNextAttackAnimation();
+        bool useComboAttack = attackAnimation == player.comboAttackAnim;
+        TrackEntry attackTrack = player.PlayAnimation(attackAnimation, false);
+
+        if (useComboAttack && attackTrack != null)
+        {
+            Debug.Log($"[EnemyProjectileAttackPresenter] Playing combo attack animation: {attackAnimation}");
+            coroutineHost.StartCoroutine(SpawnProjectileOnAttackEvent(player, attackTrack, target, damage));
+        }
+        else
+        {
+            coroutineHost.StartCoroutine(SpawnProjectileDelayed(target, damage));
+        }
 
         if (player.skeletonGraphic != null)
         {
@@ -58,6 +72,52 @@ public class EnemyProjectileAttackPresenter
                 true,
                 0
             );
+        }
+    }
+
+    IEnumerator SpawnProjectileOnAttackEvent(PlayerController player, TrackEntry attackTrack, Enemy target, int damage)
+    {
+        if (player == null || player.skeletonGraphic == null || player.skeletonGraphic.AnimationState == null)
+        {
+            Debug.Log("[EnemyProjectileAttackPresenter] Missing skeletonGraphic/AnimationState, fallback spawn");
+            SpawnProjectile(target, damage);
+            yield break;
+        }
+
+        bool eventTriggered = false;
+
+        void OnAttackTrackEvent(TrackEntry trackEntry, Spine.Event spineEvent)
+        {
+            string eventName = spineEvent != null && spineEvent.Data != null ? spineEvent.Data.Name : "null";
+            Debug.Log($"[EnemyProjectileAttackPresenter] Attack track event received name={eventName}");
+
+            if (eventTriggered || spineEvent == null || spineEvent.Data == null)
+                return;
+
+            if (!string.Equals(spineEvent.Data.Name, ComboAttackEventName, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            eventTriggered = true;
+            Debug.Log($"[EnemyProjectileAttackPresenter] Matched combo event {ComboAttackEventName}, spawning projectile");
+            SpawnProjectile(target, damage);
+        }
+
+        float fallbackDelay = Mathf.Max(attackTrack.AnimationEnd - attackTrack.AnimationStart, 0.5f) + 0.1f;
+        Debug.Log($"[EnemyProjectileAttackPresenter] Subscribed attack TrackEntry.Event waiting for {ComboAttackEventName}, fallbackDelay={fallbackDelay:0.###}");
+        attackTrack.Event += OnAttackTrackEvent;
+        float elapsed = 0f;
+        while (!eventTriggered && elapsed < fallbackDelay)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        attackTrack.Event -= OnAttackTrackEvent;
+
+        if (!eventTriggered)
+        {
+            Debug.Log($"[EnemyProjectileAttackPresenter] Combo event {ComboAttackEventName} not received in time, fallback spawn");
+            SpawnProjectile(target, damage);
         }
     }
 
