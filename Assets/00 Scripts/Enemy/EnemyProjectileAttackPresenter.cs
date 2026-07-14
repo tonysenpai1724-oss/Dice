@@ -101,7 +101,7 @@ public class EnemyProjectileAttackPresenter
         void OnAttackTrackEvent(TrackEntry trackEntry, Spine.Event spineEvent)
         {
             string eventName = spineEvent != null && spineEvent.Data != null ? spineEvent.Data.Name : "null";
-            Debug.Log($"[EnemyProjectileAttackPresenter] Attack track event received name={eventName}");
+            //  Debug.Log($"[EnemyProjectileAttackPresenter] Attack track event received name={eventName}");
 
             if (eventTriggered || spineEvent == null || spineEvent.Data == null)
                 return;
@@ -110,12 +110,12 @@ public class EnemyProjectileAttackPresenter
                 return;
 
             eventTriggered = true;
-            Debug.Log($"[EnemyProjectileAttackPresenter] Matched combo event {ComboAttackEventName}, spawning projectile");
+            //            Debug.Log($"[EnemyProjectileAttackPresenter] Matched combo event {ComboAttackEventName}, spawning projectile");
             SpawnProjectile(target, damage);
         }
 
         float fallbackDelay = Mathf.Max(attackTrack.AnimationEnd - attackTrack.AnimationStart, 0.5f) + 0.1f;
-        Debug.Log($"[EnemyProjectileAttackPresenter] Subscribed attack TrackEntry.Event waiting for {ComboAttackEventName}, fallbackDelay={fallbackDelay:0.###}");
+        //  Debug.Log($"[EnemyProjectileAttackPresenter] Subscribed attack TrackEntry.Event waiting for {ComboAttackEventName}, fallbackDelay={fallbackDelay:0.###}");
         attackTrack.Event += OnAttackTrackEvent;
         float elapsed = 0f;
         while (!eventTriggered && elapsed < fallbackDelay)

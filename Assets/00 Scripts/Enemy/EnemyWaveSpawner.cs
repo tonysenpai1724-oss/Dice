@@ -120,9 +120,11 @@ public class EnemyWaveSpawner
 
         if (placements != null && placements.Count > 0)
         {
-            for (int i = 0; i < placements.Count; i++)
+            List<IndexedEnemySpawnPlacement> spawnOrderedPlacements = BuildTopToBottomSpawnOrder(placements);
+
+            for (int i = 0; i < spawnOrderedPlacements.Count; i++)
             {
-                EnemySpawnPlacement placement = placements[i];
+                EnemySpawnPlacement placement = spawnOrderedPlacements[i].placement;
                 if (placement == null || placement.data == null)
                     continue;
 
@@ -134,8 +136,8 @@ public class EnemyWaveSpawner
                 {
                     if (placement.entryIndex >= 0 && placement.entryIndex < waveEntries.Count)
                         entry = waveEntries[placement.entryIndex];
-                    else if (i < waveEntries.Count)
-                        entry = waveEntries[i];
+                    else if (spawnOrderedPlacements[i].sourceIndex < waveEntries.Count)
+                        entry = waveEntries[spawnOrderedPlacements[i].sourceIndex];
                 }
 
                 if (entry != null && entry.Data == placement.data)
@@ -194,6 +196,57 @@ public class EnemyWaveSpawner
 
             snapEnemyToGridPosition?.Invoke(enemy);
         }
+    }
+
+    List<IndexedEnemySpawnPlacement> BuildTopToBottomSpawnOrder(List<EnemySpawnPlacement> placements)
+    {
+        List<IndexedEnemySpawnPlacement> orderedPlacements = new List<IndexedEnemySpawnPlacement>();
+        for (int i = 0; i < placements.Count; i++)
+        {
+            orderedPlacements.Add(new IndexedEnemySpawnPlacement
+            {
+                placement = placements[i],
+                sourceIndex = i
+            });
+        }
+
+        orderedPlacements.Sort(CompareSpawnPlacementTopToBottom);
+        return orderedPlacements;
+    }
+
+    int CompareSpawnPlacementTopToBottom(IndexedEnemySpawnPlacement a, IndexedEnemySpawnPlacement b)
+    {
+        EnemySpawnPlacement placementA = a != null ? a.placement : null;
+        EnemySpawnPlacement placementB = b != null ? b.placement : null;
+
+        if (placementA == null && placementB == null)
+            return 0;
+
+        if (placementA == null)
+            return 1;
+
+        if (placementB == null)
+            return -1;
+
+        int yCompare = placementB.position.y.CompareTo(placementA.position.y);
+        if (yCompare != 0)
+            return yCompare;
+
+        int rowCompare = placementA.gridRow.CompareTo(placementB.gridRow);
+        if (rowCompare != 0)
+            return rowCompare;
+
+        int columnCompare = placementA.gridColumn.CompareTo(placementB.gridColumn);
+        if (columnCompare != 0)
+            return columnCompare;
+
+        return a.sourceIndex.CompareTo(b.sourceIndex);
+    }
+
+    class IndexedEnemySpawnPlacement
+    {
+        public EnemySpawnPlacement placement;
+        public int sourceIndex;
     }
 
     public Enemy AddEnemy(EnemyData data)

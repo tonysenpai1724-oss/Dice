@@ -101,7 +101,7 @@ public class EquipmentInventoryManager : MonoBehaviour
         SaveToPrefs();
     }
     [Button]
-    void TestAdd()
+    public void TestAdd()
     {
         foreach (var e in baseEquiments)
         {

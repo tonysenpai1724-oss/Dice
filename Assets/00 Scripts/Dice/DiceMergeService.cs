@@ -95,11 +95,11 @@ public class DiceMergeService
             a.FreezeForMerge();
             b.FreezeForMerge();
 
-            Vector3 mergePos = (a.transform.position + b.transform.position) * 0.5f;
+            Vector3 visualMergePos = (a.transform.position + b.transform.position) * 0.5f;
+            Vector3 mergePos = visualMergePos;
             mergePos.y = boardService.GetBoardSurfaceY();
 
-            EnqueueDice(a.data, mergePos);
-            EnqueueDice(b.data, mergePos);
+            EnqueueMergedDice(a.data, b.data, a.transform.position, b.transform.position, visualMergePos);
 
             int chain = comboChainMap.TryGetValue(a, out int chainValue) ? chainValue : 1;
 
@@ -169,6 +169,46 @@ public class DiceMergeService
         }
 
         diceQueue?.AddDice(data, mergePosition);
+    }
+
+    void EnqueueMergedDice(DiceData firstData, DiceData secondData, Vector3 firstPosition, Vector3 secondPosition, Vector3 fallbackPosition)
+    {
+        DiceQueueUI diceQueueUI = getDiceQueueUI?.Invoke();
+        if (diceQueueUI != null)
+        {
+            Camera camera = diceQueueUI.worldCamera != null ? diceQueueUI.worldCamera : Camera.main;
+            if (camera == null)
+            {
+                diceQueueUI.AddDice(firstData, fallbackPosition);
+                diceQueueUI.AddDice(secondData, fallbackPosition);
+                return;
+            }
+
+            Vector2 firstScreenPosition = RectTransformUtility.WorldToScreenPoint(camera, firstPosition);
+            Vector2 secondScreenPosition = RectTransformUtility.WorldToScreenPoint(camera, secondPosition);
+            Vector2 mergeScreenPosition = (firstScreenPosition + secondScreenPosition) * 0.5f;
+
+            if (diceQueueUI.debugSpawnPosition)
+            {
+                Debug.Log(
+                    $"[DiceMergeService Spawn Debug] first={GetDebugName(firstData)} second={GetDebugName(secondData)} " +
+                    $"camera={camera.name} screenSize={Screen.width}x{Screen.height} " +
+                    $"firstWorld={firstPosition} secondWorld={secondPosition} fallbackWorld={fallbackPosition} " +
+                    $"firstScreen={firstScreenPosition} secondScreen={secondScreenPosition} mergeScreen={mergeScreenPosition}");
+            }
+
+            diceQueueUI.AddDiceFromScreenPosition(firstData, mergeScreenPosition);
+            diceQueueUI.AddDiceFromScreenPosition(secondData, mergeScreenPosition);
+            return;
+        }
+
+        diceQueue?.AddDice(firstData, fallbackPosition);
+        diceQueue?.AddDice(secondData, fallbackPosition);
+    }
+
+    string GetDebugName(UnityEngine.Object target)
+    {
+        return target != null ? target.name : "null";
     }
 
     void ExplodeBoardDice(Vector3 position, DiceData sourceData)

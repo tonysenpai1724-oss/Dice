@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonDataAsset
   atlasAssets:
   - {fileID: 11400000, guid: c167f3a396d05904e989003dd9dba2cb, type: 2}
-  scale: 0.004
+  scale: 0.005
   skeletonJSON: {fileID: 4900000, guid: 9a3eb622d0ed55b449acfcf019956d5f, type: 3}
   isUpgradingBlendModeMaterials: 0
   blendModeMaterials:
