@@ -11924,7 +11924,7 @@ MonoBehaviour:
   targetCamera: {fileID: 324585548}
   referenceResolution: {x: 1080, y: 1920}
   referenceScale: {x: 3.2, y: 3, z: 4.3}
-  fitMode: 0
+  fitMode: 2
   fitOnEnable: 1
   updateContinuously: 0
 --- !u!64 &1771714163

@@ -2055,7 +2055,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -4.4385, y: -795}
+  m_AnchoredPosition: {x: -0.00002336502, y: -796}
   m_SizeDelta: {x: 1432.4, y: 205.9663}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &230819040
@@ -24883,7 +24883,7 @@ MonoBehaviour:
   targetCamera: {fileID: 394230736}
   referenceResolution: {x: 1080, y: 1920}
   referenceScale: {x: 3.2, y: 3, z: 3.5}
-  fitMode: 0
+  fitMode: 3
   fitOnEnable: 1
   updateContinuously: 0
 --- !u!54 &1917797498

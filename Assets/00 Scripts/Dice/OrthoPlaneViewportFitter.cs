@@ -9,6 +9,7 @@ public class OrthoPlaneViewportFitter : MonoBehaviour
     {
         WidthOnly,
         HeightOnly,
+        WidthAndHeight,
         UniformMin,
         UniformMax
     }
@@ -78,6 +79,10 @@ public class OrthoPlaneViewportFitter : MonoBehaviour
                 break;
             case FitMode.HeightOnly:
                 scale.x = referenceScale.x;
+                scale.z = referenceScale.z * heightRatio;
+                break;
+            case FitMode.WidthAndHeight:
+                scale.x = referenceScale.x * widthRatio;
                 scale.z = referenceScale.z * heightRatio;
                 break;
             case FitMode.UniformMin:
