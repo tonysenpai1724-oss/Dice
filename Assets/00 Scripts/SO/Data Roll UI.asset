@@ -1,0 +1,254 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efed377f1c6e0d845a5299f7040ec979, type: 3}
+  m_Name: Data Roll UI
+  m_EditorClassIdentifier: Assembly-CSharp::DataRollUI
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 21300000, guid: fdf1fb70c8cc14c41b57d9b373995529, type: 3}
+    - {fileID: 21300000, guid: e6966721c908fbf4eb780adaca93f999, type: 3}
+    - {fileID: 21300000, guid: cd9fc1caf8703a64f9b54981cf8d1b4a, type: 3}
+    - {fileID: 21300000, guid: b3ff557674ded5744b5a3a780b028c34, type: 3}
+    - {fileID: 21300000, guid: 602af166176a10c4380e40447c4a98fb, type: 3}
+    - {fileID: 21300000, guid: bd0d26c9558b84e498f9dc581728973a, type: 3}
+    - {fileID: 21300000, guid: 6b58d22a01ee4f14ca9eac7d8c5c4c36, type: 3}
+    - {fileID: 21300000, guid: 10bd44bfbfdce424ca23f35a5b9d997c, type: 3}
+    - {fileID: 21300000, guid: dffd3963222d56f4eb378c424653d016, type: 3}
+    - {fileID: 21300000, guid: 6c43ce575739c2f4d9f93186f603b18d, type: 3}
+    - {fileID: 21300000, guid: 6120aa64d62133c44a078ea3d5f9fabb, type: 3}
+    - {fileID: 21300000, guid: c6627808b2c216a42aa84e50decf35df, type: 3}
+    - {fileID: 21300000, guid: 4de0ce17673583c41abbc33d893e6090, type: 3}
+    - {fileID: 21300000, guid: cad415bfb2e0b8b4e87a12f9dabe166e, type: 3}
+    - {fileID: 21300000, guid: f27da9c732c0af8409158163c55d4411, type: 3}
+    - {fileID: 21300000, guid: 4a9874a979059274db665a374a58b613, type: 3}
+    - {fileID: 21300000, guid: d32677e31d8466243a8f66e76a14170d, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: rollItemDatas
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[RollGuessType, Assembly-CSharp],[RollItemData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[RollGuessType, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: 2|RollItemData, Assembly-CSharp
+    - Name: bgSprite
+      Entry: 10
+      Data: 0
+    - Name: headerSprite
+      Entry: 10
+      Data: 1
+    - Name: iconDie1Sprite
+      Entry: 6
+      Data: 
+    - Name: iconDie2Sprite
+      Entry: 6
+      Data: 
+    - Name: typeIconSprite
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: 3|RollItemData, Assembly-CSharp
+    - Name: bgSprite
+      Entry: 10
+      Data: 3
+    - Name: headerSprite
+      Entry: 10
+      Data: 4
+    - Name: iconDie1Sprite
+      Entry: 6
+      Data: 
+    - Name: iconDie2Sprite
+      Entry: 6
+      Data: 
+    - Name: typeIconSprite
+      Entry: 10
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: 4|RollItemData, Assembly-CSharp
+    - Name: bgSprite
+      Entry: 10
+      Data: 6
+    - Name: headerSprite
+      Entry: 10
+      Data: 7
+    - Name: iconDie1Sprite
+      Entry: 6
+      Data: 
+    - Name: iconDie2Sprite
+      Entry: 6
+      Data: 
+    - Name: typeIconSprite
+      Entry: 10
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: rollItemBuffDatas
+      Entry: 7
+      Data: 5|System.Collections.Generic.Dictionary`2[[RollDiceType, Assembly-CSharp],[RollItemBuffData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 6|System.Collections.Generic.EnumEqualityComparer`1[[RollDiceType, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 7
+      Data: 7|RollItemBuffData, Assembly-CSharp
+    - Name: bgSprite
+      Entry: 10
+      Data: 6
+    - Name: headerSprite
+      Entry: 10
+      Data: 9
+    - Name: bgIcon
+      Entry: 10
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: 8|RollItemBuffData, Assembly-CSharp
+    - Name: bgSprite
+      Entry: 10
+      Data: 11
+    - Name: headerSprite
+      Entry: 10
+      Data: 12
+    - Name: bgIcon
+      Entry: 10
+      Data: 13
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: 9|RollItemBuffData, Assembly-CSharp
+    - Name: bgSprite
+      Entry: 10
+      Data: 14
+    - Name: headerSprite
+      Entry: 10
+      Data: 15
+    - Name: bgIcon
+      Entry: 10
+      Data: 16
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 

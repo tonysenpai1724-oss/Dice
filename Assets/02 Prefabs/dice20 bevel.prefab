@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4726810136855605717}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 13 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 4360870387642165688}
   - component: {fileID: 4666925060769176392}
   - component: {fileID: 6014792802365785681}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 03 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 5031624409457249074}
   - component: {fileID: 4215628693572642800}
   - component: {fileID: 8900219404190122493}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 16 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 3245483867830300708}
   - component: {fileID: 4831659891596575850}
   - component: {fileID: 386108929814324377}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 15 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -310,7 +310,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2714584822474703905}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face Markers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -361,7 +361,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5645326156614691298}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 19 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -392,7 +392,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2016149239444462785}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Auto Decals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -443,7 +443,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9013110459940556288}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 17 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -476,7 +476,7 @@ GameObject:
   - component: {fileID: 1315974271674767438}
   - component: {fileID: 8706891925473630942}
   - component: {fileID: 3703265439216493121}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 02 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -566,7 +566,7 @@ GameObject:
   - component: {fileID: 3638364890522902259}
   - component: {fileID: 3437064882986103323}
   - component: {fileID: 4533847939683585734}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 05 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -656,7 +656,7 @@ GameObject:
   - component: {fileID: 2268171258370292335}
   - component: {fileID: 9163761800398200021}
   - component: {fileID: 684189055865291536}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 10 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -746,7 +746,7 @@ GameObject:
   - component: {fileID: 931321882105948277}
   - component: {fileID: 8376619430942469217}
   - component: {fileID: 6211279718898161101}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 12 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -836,7 +836,7 @@ GameObject:
   - component: {fileID: 3787458180419925456}
   - component: {fileID: 7905249199255669234}
   - component: {fileID: 351051990585456530}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 20 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -924,7 +924,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4530513881640238560}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 06 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -957,7 +957,7 @@ GameObject:
   - component: {fileID: 4274189004303898783}
   - component: {fileID: 3652606983919719885}
   - component: {fileID: 2885468024986236575}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 18 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1045,7 +1045,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3980253076212094192}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 05 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1076,7 +1076,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7195159859081756814}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 03 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1109,7 +1109,7 @@ GameObject:
   - component: {fileID: 4104124184399496732}
   - component: {fileID: 8669596392426005502}
   - component: {fileID: 6511352956341705842}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 09 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1197,7 +1197,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7556981087737430004}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 01 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1228,7 +1228,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1050994088603609548}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 15 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1259,7 +1259,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6236540655858591205}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 20 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1290,7 +1290,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8483273062023899669}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 16 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1323,7 +1323,7 @@ GameObject:
   - component: {fileID: 5390446508230705991}
   - component: {fileID: 7181366223360633555}
   - component: {fileID: 2784268637639824955}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 17 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1413,7 +1413,7 @@ GameObject:
   - component: {fileID: 8718777553158760947}
   - component: {fileID: 6462918146869112131}
   - component: {fileID: 467781271333365595}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 19 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1501,7 +1501,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3312483570398589682}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 14 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1532,7 +1532,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6087032135531387518}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 09 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1565,7 +1565,7 @@ GameObject:
   - component: {fileID: 9108261044932654621}
   - component: {fileID: 366121815622738449}
   - component: {fileID: 4237466059017438327}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 06 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1653,7 +1653,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5276728741833846476}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 04 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1684,7 +1684,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9210059655412075583}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 08 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1717,7 +1717,7 @@ GameObject:
   - component: {fileID: 5749433127325964946}
   - component: {fileID: 4546679669554692355}
   - component: {fileID: 7795322156877901614}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 08 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1805,7 +1805,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3945539183636709054}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 07 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1838,7 +1838,7 @@ GameObject:
   - component: {fileID: 376205242516282619}
   - component: {fileID: 132051449058648754}
   - component: {fileID: 2354203741664098942}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 13 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1928,7 +1928,7 @@ GameObject:
   - component: {fileID: 6814531918216446709}
   - component: {fileID: 3115120029694845706}
   - component: {fileID: 6652716630931086866}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 07 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2018,7 +2018,7 @@ GameObject:
   - component: {fileID: 6753065441534323352}
   - component: {fileID: 7398854184145665518}
   - component: {fileID: 2167464332068700771}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 11 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2108,7 +2108,7 @@ GameObject:
   - component: {fileID: 8810937085397496548}
   - component: {fileID: 4134913966765146924}
   - component: {fileID: 1926229413389430547}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 14 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2196,7 +2196,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6285725062930153111}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 10 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2227,7 +2227,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7010574835100925900}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 18 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2258,7 +2258,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2099699415493245003}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 11 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2289,7 +2289,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5759371154913030939}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 02 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2322,7 +2322,7 @@ GameObject:
   - component: {fileID: 1360769064306155016}
   - component: {fileID: 1340235173753616183}
   - component: {fileID: 2778888028298179188}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 01 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2410,7 +2410,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3336444235048196216}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 12 Marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2446,7 +2446,7 @@ GameObject:
   - component: {fileID: 8429308166960039371}
   - component: {fileID: 1097136091410968893}
   - component: {fileID: 8488725515087928334}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: dice20 bevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2461,15 +2461,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8623504676428936610}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -3.34, y: 9.83, z: -12.29}
+  m_LocalRotation: {x: 0.1745292, y: -0.48409945, z: -0.8192856, w: 0.2529001}
+  m_LocalPosition: {x: 0, y: 0, z: -0.01}
   m_LocalScale: {x: 200, y: 200, z: 200}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2016149239444462785}
   - {fileID: 2714584822474703905}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -44.826, y: -48.456, z: -124.662}
 --- !u!33 &9053310264612450763
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2624,7 +2624,7 @@ GameObject:
   - component: {fileID: 4331483496990144726}
   - component: {fileID: 1301401750571221794}
   - component: {fileID: 7255412414545524142}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Face 04 Secondary Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

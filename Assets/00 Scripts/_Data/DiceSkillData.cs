@@ -129,13 +129,27 @@ public static class HealDiceSkillData
     public static void Execute(int stackApply, int valueApply)
     {
         GameplayManager gameplay = GameplayManager.Instance;
-        if (gameplay?.skillPlayer == null)
+        PlayerController player = gameplay?.skillPlayer;
+        if (gameplay == null || player == null)
             return;
 
-        int healAmount = Mathf.Max(0, gameplay.DiceDamage);
+        int percentPerDie = Mathf.Max(0, valueApply);
+        int dieNumber = Mathf.Max(1, gameplay.skillDiceData != null ? gameplay.skillDiceData.level : 1);
+        int healAmount = DiceSkillFormula.CalculatePercentOfValue(player.hp, percentPerDie, dieNumber);
+        if (healAmount <= 0)
+            return;
 
         gameplay.CancelAttack();
-        gameplay.skillPlayer.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
+        player.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
+    }
+}
+
+public static class DiceSkillFormula
+{
+    public static int CalculatePercentOfValue(int currentValue, int percentPerDie, int dieNumber)
+    {
+        float totalPercent = (Mathf.Max(0, percentPerDie) * Mathf.Max(1, dieNumber)) / 100f;
+        return Mathf.RoundToInt(Mathf.Max(0, currentValue) * totalPercent);
     }
 }
 
@@ -378,8 +392,7 @@ public static class DiceEvoSkillRuntime
             return false;
 
         int percentPerDie = Mathf.Max(0, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 10);
-        float totalPercent = (percentPerDie / 100f) * Mathf.Max(1, sourceDiceData.level);
-        int healAmount = Mathf.RoundToInt(player.hp * totalPercent);
+        int healAmount = DiceSkillFormula.CalculatePercentOfValue(player.hp, percentPerDie, sourceDiceData.level);
         if (healAmount <= 0)
             return false;
 
@@ -397,8 +410,7 @@ public static class DiceEvoSkillRuntime
             return false;
 
         int percentPerDie = Mathf.Max(0, sourceDiceData.skillData != null ? sourceDiceData.skillData.valueApply : 10);
-        float totalPercent = (percentPerDie / 100f) * Mathf.Max(1, sourceDiceData.level);
-        int armorAmount = Mathf.RoundToInt(Mathf.Max(0, player.RuntimeDefense) * totalPercent);
+        int armorAmount = DiceSkillFormula.CalculatePercentOfValue(player.RuntimeDefense, percentPerDie, sourceDiceData.level);
         if (armorAmount <= 0)
             return false;
 

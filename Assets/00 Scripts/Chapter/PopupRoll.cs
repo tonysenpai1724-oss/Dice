@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Sirenix.OdinInspector;
+using Sirenix.Utilities;
+public enum RollGuessType
+{
+    Dice1LessThanDice2,
+    Dice1GreaterThanDice2,
+    Dice1EqualDice2,
+}
 public class PopupRoll : UIBase
 {
-    public enum RollGuessType
-    {
-        Dice1LessThanDice2,
-        Dice1GreaterThanDice2,
-        Dice1EqualDice2,
-    }
+
 
     public static PopupRoll Instance;
 
@@ -29,6 +31,7 @@ public class PopupRoll : UIBase
     [Header("Fail")]
     public GameObject failRoot;
 
+
     [Header("Text")]
     public TextMeshProUGUI txtTitle;
     public TextMeshProUGUI txtResult;
@@ -36,6 +39,24 @@ public class PopupRoll : UIBase
     [Header("Roll")]
     public float closeDelayOnMiss = 0.55f;
     public float resultResolveDelay = 0.2f;
+    public List<RollItem> rollItems;
+    public RollItem rollItemPrefab;
+    public RectTransform rollItemParent;
+    public DataRollUI dataRollUI;
+    public DiceRoll dice1;
+    public DiceRoll dice2;
+    public ItemPreviewGenerator previewGenerator;
+    public RollItem rollItemChoosed;
+    [Header("Result")]
+    public Image iconDie1Result;
+    public Image iconDie2Result;
+    public Image typeIconResult;
+
+    Sprite ownedDice1IconSprite;
+    Sprite ownedDice2IconSprite;
+    Texture2D ownedDice1IconTexture;
+    Texture2D ownedDice2IconTexture;
+
 
     RollGuessType? selectedGuess;
     bool rollResolved;
@@ -47,6 +68,7 @@ public class PopupRoll : UIBase
     {
         Instance = this;
         BindButtons();
+        rollItemChoosed.gameObject.SetActive(false);
     }
 
     void OnEnable()
@@ -58,7 +80,181 @@ public class PopupRoll : UIBase
     {
         DiceRoll.OnDiceResult -= OnDiceResultReceived;
     }
+    public void SetupRollItems()
+    {
+        if (rollItems == null)
+            rollItems = new List<RollItem>();
 
+        foreach (RollItem rollItem in rollItems)
+        {
+            if (rollItem != null)
+                Destroy(rollItem.gameObject);
+        }
+
+        rollItems.Clear();
+
+        if (rollItemPrefab == null || rollItemParent == null || dataRollUI == null || dataRollUI.rollItemDatas == null)
+            return;
+
+        if (rollItemPrefab.transform.IsChildOf(rollItemParent))
+            rollItemPrefab.gameObject.SetActive(false);
+
+        ReleaseCapturedDiceIcons();
+        ownedDice1IconSprite = CaptureDiceIcon(dice1, out ownedDice1IconTexture);
+        ownedDice2IconSprite = CaptureDiceIcon(dice2, out ownedDice2IconTexture);
+
+        CreateRollItem(RollGuessType.Dice1LessThanDice2, ownedDice1IconSprite, ownedDice2IconSprite);
+        CreateRollItem(RollGuessType.Dice1GreaterThanDice2, ownedDice1IconSprite, ownedDice2IconSprite);
+        CreateRollItem(RollGuessType.Dice1EqualDice2, ownedDice1IconSprite, ownedDice2IconSprite);
+    }
+
+    void CreateRollItem(RollGuessType guessType, Sprite dice1IconSprite, Sprite dice2IconSprite)
+    {
+        if (!dataRollUI.rollItemDatas.TryGetValue(guessType, out RollItemData rollItemData) || rollItemData == null)
+            return;
+
+        RollItem rollItem = Instantiate(rollItemPrefab, rollItemParent);
+        rollItem.gameObject.SetActive(true);
+
+        RollGuessType selectedGuessType = guessType;
+        rollItem.SetupRollItem(
+            rollItemData.bgSprite,
+            rollItemData.headerSprite,
+            dice1IconSprite != null ? dice1IconSprite : rollItemData.iconDie1Sprite,
+            dice2IconSprite != null ? dice2IconSprite : rollItemData.iconDie2Sprite,
+            rollItemData.typeIconSprite,
+            selectedGuessType,
+            () => OnChooseGuess(selectedGuessType));
+
+        rollItems.Add(rollItem);
+
+    }
+
+    RollItemData GetRollItemData(RollGuessType guessType)
+    {
+        if (dataRollUI == null || dataRollUI.rollItemDatas == null)
+            return null;
+
+        dataRollUI.rollItemDatas.TryGetValue(guessType, out RollItemData rollItemData);
+        return rollItemData;
+    }
+
+    Sprite GetDice1IconSprite(RollItemData fallbackData)
+    {
+        return ownedDice1IconSprite != null ? ownedDice1IconSprite : fallbackData?.iconDie1Sprite;
+    }
+
+    Sprite GetDice2IconSprite(RollItemData fallbackData)
+    {
+        return ownedDice2IconSprite != null ? ownedDice2IconSprite : fallbackData?.iconDie2Sprite;
+    }
+
+    RollGuessType GetResultGuessType(int dice1Value, int dice2Value)
+    {
+        if (dice1Value < dice2Value)
+            return RollGuessType.Dice1LessThanDice2;
+
+        if (dice1Value > dice2Value)
+            return RollGuessType.Dice1GreaterThanDice2;
+
+        return RollGuessType.Dice1EqualDice2;
+    }
+
+    void ShowRollItemChoosed(RollGuessType guessType)
+    {
+        if (rollItemChoosed == null)
+            return;
+
+        RollItemData rollItemData = GetRollItemData(guessType);
+        if (rollItemData == null)
+            return;
+
+        rollItemChoosed.gameObject.SetActive(true);
+        rollItemChoosed.SetupRollItem(
+            rollItemData.bgSprite,
+            rollItemData.headerSprite,
+            GetDice1IconSprite(rollItemData),
+            GetDice2IconSprite(rollItemData),
+            rollItemData.typeIconSprite,
+            guessType,
+            null);
+        rollItemChoosed.SetInteractable(false);
+    }
+
+    void ShowRollResult(int dice1Value, int dice2Value)
+    {
+        RollGuessType resultGuessType = GetResultGuessType(dice1Value, dice2Value);
+        RollItemData rollItemData = GetRollItemData(resultGuessType);
+
+        SetResultImage(iconDie1Result, GetDice1IconSprite(rollItemData));
+        SetResultImage(iconDie2Result, GetDice2IconSprite(rollItemData));
+        SetResultImage(typeIconResult, rollItemData?.typeIconSprite);
+    }
+
+    void SetResultImage(Image image, Sprite sprite)
+    {
+        if (image == null)
+            return;
+
+        image.sprite = sprite;
+        image.enabled = sprite != null;
+    }
+
+    void ClearRollDisplays()
+    {
+        if (rollItemChoosed != null)
+            rollItemChoosed.gameObject.SetActive(false);
+
+        SetResultImage(iconDie1Result, null);
+        SetResultImage(iconDie2Result, null);
+        SetResultImage(typeIconResult, null);
+    }
+
+    Sprite CaptureDiceIcon(DiceRoll dicePrefab, out Texture2D ownedTexture)
+    {
+        ownedTexture = null;
+
+        if (dicePrefab == null)
+            return null;
+
+        if (previewGenerator == null)
+            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>(FindObjectsInactive.Include);
+
+        if (previewGenerator == null)
+            return null;
+
+        ownedTexture = previewGenerator.Capture(dicePrefab);
+        if (ownedTexture == null)
+            return null;
+
+        return Sprite.Create(
+            ownedTexture,
+            new Rect(0f, 0f, ownedTexture.width, ownedTexture.height),
+            new Vector2(0.5f, 0.5f),
+            100f);
+    }
+
+    void ReleaseCapturedDiceIcons()
+    {
+        if (ownedDice1IconSprite != null)
+            Destroy(ownedDice1IconSprite);
+        if (ownedDice2IconSprite != null)
+            Destroy(ownedDice2IconSprite);
+        if (ownedDice1IconTexture != null)
+            Destroy(ownedDice1IconTexture);
+        if (ownedDice2IconTexture != null)
+            Destroy(ownedDice2IconTexture);
+
+        ownedDice1IconSprite = null;
+        ownedDice2IconSprite = null;
+        ownedDice1IconTexture = null;
+        ownedDice2IconTexture = null;
+    }
+
+    void OnDestroy()
+    {
+        ReleaseCapturedDiceIcons();
+    }
     void BindButtons()
     {
         if (buttonLessThanThree != null)
@@ -113,11 +309,11 @@ public class PopupRoll : UIBase
         rewardGranted = false;
         diceResults.Clear();
 
-        if (txtTitle != null)
-            txtTitle.text = "Roll Guess";
+        // if (txtTitle != null)
+        //     txtTitle.text = "Roll Guess";
 
-        if (txtResult != null)
-            txtResult.text = "Choose Dice 1 < Dice 2, >, or =, then roll the dice.";
+        // if (txtResult != null)
+        //     txtResult.text = "Choose Dice 1 < Dice 2, >, or =, then roll the dice.";
 
         if (rewardRoot != null)
             rewardRoot.SetActive(false);
@@ -125,7 +321,10 @@ public class PopupRoll : UIBase
             failRoot.SetActive(false);
         if (guessRoot != null)
             guessRoot.SetActive(true);
+        rollItemChoosed.gameObject.SetActive(false);
 
+        SetupRollItems();
+        ClearRollDisplays();
         SetGuessButtonsInteractable(true);
         SetRewardButtonsInteractable(false);
     }
@@ -137,13 +336,14 @@ public class PopupRoll : UIBase
 
         selectedGuess = guess;
         diceResults.Clear();
+        ShowRollItemChoosed(guess);
         SetGuessButtonsInteractable(false);
 
-        if (txtResult != null)
-            txtResult.text = "Rolling 2 dice...";
+        // if (txtResult != null)
+        //     txtResult.text = "Rolling 2 dice...";
         if (guessRoot != null)
             guessRoot.SetActive(false);
-
+        rollItemChoosed.gameObject.SetActive(true);
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
     }
 
@@ -218,6 +418,15 @@ public class PopupRoll : UIBase
             buttonGreaterThanThree.interactable = interactable;
         if (buttonEqualThree != null)
             buttonEqualThree.interactable = interactable;
+
+        if (rollItems == null)
+            return;
+
+        foreach (RollItem rollItem in rollItems)
+        {
+            if (rollItem != null)
+                rollItem.SetInteractable(interactable);
+        }
     }
 
     void SetRewardButtonsInteractable(bool interactable)
@@ -286,9 +495,10 @@ public class PopupRoll : UIBase
         int dice2 = diceResults[1];
         bool isWin = EvaluateGuess(selectedGuess.Value, dice1, dice2);
         rollResolved = true;
+        ShowRollResult(dice1, dice2);
 
-        if (txtResult != null)
-            txtResult.text = $"Dice 1: {dice1} | Dice 2: {dice2}. " + (isWin ? "Correct! Pick a reward." : "Wrong guess.");
+        // if (txtResult != null)
+        //     txtResult.text = $"Dice 1: {dice1} | Dice 2: {dice2}. " + (isWin ? "Correct! Pick a reward." : "Wrong guess.");
 
         if (rollRoutine != null)
         {
@@ -332,6 +542,13 @@ public class PopupRoll : UIBase
         diceResults.Clear();
         UiHome.Instance?.ShowRollPlane(false);
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Roll);
+    }
+    public void Refuse()
+    {
+        if (rollResolved || rollRoutine != null)
+            return;
+
+        Hide();
     }
 }
 

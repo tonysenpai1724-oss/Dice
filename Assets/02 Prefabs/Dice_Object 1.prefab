@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4839815988230247976}
   - component: {fileID: 4862230111424506723}
   - component: {fileID: 9171327663425980733}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: dice1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 7005338857299212905}
   - component: {fileID: 2258737673950206692}
   - component: {fileID: 2757883070635479705}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 2205797987704313477}
   - component: {fileID: 3378376986347340519}
   - component: {fileID: 5079124531559030189}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,7 +288,7 @@ GameObject:
   - component: {fileID: 900074672457954146}
   - component: {fileID: 8663281700141046444}
   - component: {fileID: 520693340571359731}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Dice_Object 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -379,6 +379,8 @@ MonoBehaviour:
   - {fileID: 8602527353608744111}
   - {fileID: 6831118390532088210}
   rb: {fileID: 900074672457954146}
+  settleLinearVelocityThreshold: 0.01
+  settleAngularVelocityThreshold: 0.01
 --- !u!1 &5000762134476925425
 GameObject:
   m_ObjectHideFlags: 0
@@ -390,7 +392,7 @@ GameObject:
   - component: {fileID: 6831118390532088210}
   - component: {fileID: 5290027413132819482}
   - component: {fileID: 4406831898630443333}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -480,7 +482,7 @@ GameObject:
   - component: {fileID: 8636900379159569729}
   - component: {fileID: 5274060576554786064}
   - component: {fileID: 2432315309765459127}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -570,7 +572,7 @@ GameObject:
   - component: {fileID: 8602527353608744111}
   - component: {fileID: 7454392504629369612}
   - component: {fileID: 237385562120196987}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -660,7 +662,7 @@ GameObject:
   - component: {fileID: 9096170102921783351}
   - component: {fileID: 4156410249331769381}
   - component: {fileID: 4188367644663327373}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
