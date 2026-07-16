@@ -25,6 +25,16 @@ public class DiceManager : MonoBehaviour
     public int maxStartLevel = 3;
     public float diceSpacingRadius = 1.35f;
 
+    [Header("Hero Dice Spawn")]
+    public bool animateHeroStartDice = true;
+    public Transform heroDiceSpawnPoint;
+    public Vector3 heroDiceSpawnOffset = new Vector3(0f, 1.5f, 0f);
+    public float heroDiceSpawnStartDelay = 0.5f;
+    public float heroDiceFlyDuration = 0.45f;
+    public float heroDiceFlyArcHeight = 4f;
+    public float heroDiceSpawnStagger = 0.08f;
+    public Vector3 heroDiceFlySpin = new Vector3(540f, 720f, 360f);
+
     [Header("Combo")]
     [SerializeField] DiceComboConfig comboConfig = new DiceComboConfig();
     DiceComboService comboService;
@@ -573,6 +583,12 @@ public class DiceManager : MonoBehaviour
         if (player.diceDatas == null || boardService == null)
             return;
 
+        if (animateHeroStartDice)
+        {
+            StartCoroutine(SpawnPlayerStartDiceDatasRoutine(player, targetSpawnCount));
+            return;
+        }
+
         for (int i = 0; i < player.diceDatas.Count; i++)
         {
             DiceData data = player.diceDatas[i];
@@ -596,6 +612,115 @@ public class DiceManager : MonoBehaviour
         }
     }
 
+    IEnumerator SpawnPlayerStartDiceDatasRoutine(PlayerController player, int targetSpawnCount)
+    {
+        if (heroDiceSpawnStartDelay > 0f)
+            yield return new WaitForSeconds(heroDiceSpawnStartDelay);
+
+        for (int i = 0; i < player.diceDatas.Count; i++)
+        {
+            DiceData data = player.diceDatas[i];
+            if (data == null)
+                continue;
+
+            if (!TryGetHeroDiceBoardPosition(targetSpawnCount, out Vector3 targetPosition))
+                continue;
+
+            Dice dice = SpawnDice(data, targetPosition, false);
+            if (dice == null)
+                continue;
+
+            Vector3 startPosition = GetHeroDiceSpawnPosition(player, targetPosition);
+            yield return FlyHeroDiceToBoard(dice, startPosition, targetPosition);
+
+            RegisterBoardDice(dice);
+
+            if (heroDiceSpawnStagger > 0f)
+                yield return new WaitForSeconds(heroDiceSpawnStagger);
+        }
+    }
+
+    bool TryGetHeroDiceBoardPosition(int targetSpawnCount, out Vector3 clearPosition)
+    {
+        clearPosition = Vector3.zero;
+
+        if (boardService == null)
+            return false;
+
+        int attempts = 0;
+        int maxAttempts = Mathf.Max(12, targetSpawnCount * 12);
+        while (attempts < maxAttempts)
+        {
+            attempts++;
+            Vector3 position = boardService.GetRandomPositionOnBoard();
+            clearPosition = boardService.FindClearPosition(position, null, diceSpacingRadius);
+
+            if (!boardService.IsOccupied(clearPosition, null, diceSpacingRadius))
+                return true;
+        }
+
+        return false;
+    }
+
+    Vector3 GetHeroDiceSpawnPosition(PlayerController player, Vector3 targetPosition)
+    {
+        if (heroDiceSpawnPoint != null)
+            return heroDiceSpawnPoint.position;
+
+        if (player != null)
+            return player.transform.position + heroDiceSpawnOffset;
+
+        return targetPosition + Vector3.up * heroDiceFlyArcHeight;
+    }
+
+    IEnumerator FlyHeroDiceToBoard(Dice dice, Vector3 startPosition, Vector3 targetPosition)
+    {
+        if (dice == null)
+            yield break;
+
+        dice.state = DiceState.FlyingCombo;
+        dice.canMerge = false;
+        dice.SetCollisionEnabled(false);
+
+        if (dice.rb != null)
+        {
+            dice.rb.linearVelocity = Vector3.zero;
+            dice.rb.angularVelocity = Vector3.zero;
+            dice.rb.isKinematic = true;
+            dice.rb.position = startPosition;
+        }
+
+        dice.transform.position = startPosition;
+
+        Quaternion startRotation = dice.transform.rotation;
+        float duration = Mathf.Max(0.01f, heroDiceFlyDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            float easedT = 1f - Mathf.Pow(1f - t, 3f);
+
+            Vector3 position = Vector3.Lerp(startPosition, targetPosition, easedT);
+            position.y += Mathf.Sin(t * Mathf.PI) * heroDiceFlyArcHeight;
+
+            dice.transform.position = position;
+            dice.transform.rotation = startRotation * Quaternion.Euler(heroDiceFlySpin * t);
+
+            if (dice.rb != null)
+            {
+                dice.rb.position = position;
+                dice.rb.rotation = dice.transform.rotation;
+            }
+
+            yield return null;
+        }
+
+        dice.state = DiceState.Idle;
+        dice.PlaceUpright(targetPosition);
+        dice.SetCollisionEnabled(true);
+    }
     PlayerController GetPlayerController()
     {
         if (EnemyManager.Instance != null && EnemyManager.Instance.player != null)
