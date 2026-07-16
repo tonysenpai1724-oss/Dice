@@ -185,7 +185,7 @@ public class DiceComboService
             !target.isMerging;
 
         if (!canAimForTarget)
-            finalDestination = boardService.FindClearPosition(finalDestination, dice);
+            finalDestination = boardService.FindClearPosition(finalDestination, dice, config.diceSpacingRadius);
 
         Vector3 jumpDir = dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward;
         float comboCount = comboChainMap.TryGetValue(dice, out int currentChain)

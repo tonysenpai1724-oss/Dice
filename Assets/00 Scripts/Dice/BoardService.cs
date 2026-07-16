@@ -130,27 +130,36 @@ public class BoardService
 
     public bool IsOccupied(Vector3 position, Dice ignore = null, float radius = 1f)
     {
-        Vector3 halfExtents = new Vector3(radius, 0.45f, radius);
+        return CountDiceOccupants(position, ignore, radius) > 0;
+    }
+
+    int CountDiceOccupants(Vector3 position, Dice ignore = null, float radius = 1f)
+    {
+        Vector3 halfExtents = new Vector3(radius, Mathf.Max(0.75f, radius), radius);
 
         Collider[] hits = Physics.OverlapBox(
             position,
             halfExtents,
-            Quaternion.identity
+            Quaternion.identity,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Ignore
         );
+
+        int count = 0;
 
         foreach (Collider hit in hits)
         {
-            Dice d = hit.GetComponent<Dice>();
+            Dice d = hit.GetComponentInParent<Dice>();
             if (d == null)
                 continue;
             if (d == ignore)
                 continue;
             if (!d.gameObject.activeInHierarchy)
                 continue;
-            return true;
+            count++;
         }
 
-        return false;
+        return count;
     }
 
     public Vector3 FindClearPosition(Vector3 center, Dice ignore = null, float radius = 1f)
@@ -164,26 +173,44 @@ public class BoardService
             return center;
 
         Bounds b = boardCollider.bounds;
+        float boardWidth = Mathf.Max(0.1f, b.size.x - spawnPadding * 2f);
+        float boardDepth = Mathf.Max(0.1f, b.size.z - spawnPadding * 2f);
+        float maxSearchRadius = Mathf.Sqrt(boardWidth * boardWidth + boardDepth * boardDepth);
+        int maxRings = Mathf.Max(spawnSearchSteps, Mathf.CeilToInt(maxSearchRadius / Mathf.Max(0.1f, spawnSearchRadiusStep)));
+        Vector3 bestCandidate = center;
+        int bestOccupantCount = CountDiceOccupants(center, ignore, radius);
+        float bestDistanceScore = 0f;
 
-        for (int ring = 1; ring <= spawnSearchSteps; ring++)
+        for (int ring = 1; ring <= maxRings; ring++)
         {
             float searchRadius = ring * spawnSearchRadiusStep;
+            int angleSteps = Mathf.Max(16, ring * 8);
 
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < angleSteps; i++)
             {
-                float angle = i / 16f * Mathf.PI * 2f;
+                float angle = i / (float)angleSteps * Mathf.PI * 2f;
                 Vector3 candidate = center + new Vector3(Mathf.Cos(angle) * searchRadius, 0f, Mathf.Sin(angle) * searchRadius);
 
                 candidate.x = Mathf.Clamp(candidate.x, b.min.x + spawnPadding, b.max.x - spawnPadding);
                 candidate.z = Mathf.Clamp(candidate.z, b.min.z + spawnPadding, b.max.z - spawnPadding);
                 candidate.y = GetBoardSurfaceY();
 
-                if (!IsOccupied(candidate, ignore, radius))
+                int occupantCount = CountDiceOccupants(candidate, ignore, radius);
+                if (occupantCount <= 0)
                     return candidate;
+
+                float distanceScore = (candidate - center).sqrMagnitude;
+                if (occupantCount < bestOccupantCount ||
+                    occupantCount == bestOccupantCount && distanceScore > bestDistanceScore)
+                {
+                    bestCandidate = candidate;
+                    bestOccupantCount = occupantCount;
+                    bestDistanceScore = distanceScore;
+                }
             }
         }
 
-        return center;
+        return bestCandidate;
     }
 
     public Vector3 FindRandomClearPositionWithinRadius(Vector3 origin, float maxRadius, Dice ignore = null, float radius = 1f)
