@@ -50,10 +50,30 @@ public class DiceThrowController : MonoBehaviour
             return;
         }
 
-        SpawnCurrentDice();
+        HideThrowVisuals();
+        StartCoroutine(SpawnCurrentDiceAfterHeroStartDice());
         TigerForge.EventManager.StartListening(Constant.ON_DRAG_RUNE, OnRuneDragStarted);
         TigerForge.EventManager.StartListening(Constant.ON_DROP_RUNE, OnRuneDragEnded);
         TigerForge.EventManager.StartListening(Constant.ON_END_GAME, Clear);
+    }
+
+    IEnumerator SpawnCurrentDiceAfterHeroStartDice()
+    {
+        yield return null;
+
+        while (DiceManager.Instance != null && DiceManager.Instance.IsSpawningHeroStartDice)
+            yield return null;
+
+        SpawnCurrentDice();
+    }
+
+    void HideThrowVisuals()
+    {
+        if (diceHighlight != null)
+            diceHighlight.gameObject.SetActive(false);
+
+        if (hand != null)
+            hand.gameObject.SetActive(false);
     }
 
     void DisableThrowControllerForPopupOnlyLevel()
@@ -310,7 +330,10 @@ public class DiceThrowController : MonoBehaviour
         DiceManager.Instance.SetBoardMergeEnabled(false);
 
         if (!IsGameEnded())
-            SpawnCurrentDice();
+        {
+            HideThrowVisuals();
+            StartCoroutine(SpawnCurrentDiceAfterHeroStartDice());
+        }
     }
 
     bool IsGameEnded()
@@ -455,7 +478,7 @@ public class DiceThrowController : MonoBehaviour
 
         if (currentDice != null)
         {
-            //   hand.gameObject.SetActive(true);
+            hand.gameObject.SetActive(true);
             hand.transform.SetParent(currentDice.transform, true);
             hand.transform.localPosition = handLocalPosition;
             hand.transform.localRotation = Quaternion.Euler(handLocalEuler);

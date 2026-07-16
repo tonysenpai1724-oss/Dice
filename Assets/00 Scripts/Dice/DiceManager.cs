@@ -53,6 +53,8 @@ public class DiceManager : MonoBehaviour
 
     Dice currentHover;
 
+    public bool IsSpawningHeroStartDice { get; private set; }
+
     [SerializeField] GameObject floatingTextPrefab;
     [SerializeField] Vector3 floatingTextOffset = new Vector3(0f, 1.5f, 0f);
 
@@ -585,6 +587,7 @@ public class DiceManager : MonoBehaviour
 
         if (animateHeroStartDice)
         {
+            IsSpawningHeroStartDice = true;
             StartCoroutine(SpawnPlayerStartDiceDatasRoutine(player, targetSpawnCount));
             return;
         }
@@ -638,6 +641,8 @@ public class DiceManager : MonoBehaviour
             if (heroDiceSpawnStagger > 0f)
                 yield return new WaitForSeconds(heroDiceSpawnStagger);
         }
+
+        IsSpawningHeroStartDice = false;
     }
 
     bool TryGetHeroDiceBoardPosition(int targetSpawnCount, out Vector3 clearPosition)
@@ -681,6 +686,8 @@ public class DiceManager : MonoBehaviour
         dice.state = DiceState.FlyingCombo;
         dice.canMerge = false;
         dice.SetCollisionEnabled(false);
+        dice.transform.position = startPosition;
+        dice.transform.rotation = Random.rotation;
 
         if (dice.rb != null)
         {
@@ -688,12 +695,11 @@ public class DiceManager : MonoBehaviour
             dice.rb.angularVelocity = Vector3.zero;
             dice.rb.isKinematic = true;
             dice.rb.position = startPosition;
+            dice.rb.rotation = dice.transform.rotation;
         }
 
-        dice.transform.position = startPosition;
-
-        Quaternion startRotation = dice.transform.rotation;
         float duration = Mathf.Max(0.01f, heroDiceFlyDuration);
+        Quaternion startRotation = dice.transform.rotation;
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -809,6 +815,7 @@ public class DiceManager : MonoBehaviour
     public void ResetBoard()
     {
         StopAllCoroutines();
+        IsSpawningHeroStartDice = false;
 
         for (int i = boardDices.Count - 1; i >= 0; i--)
         {
@@ -957,6 +964,8 @@ public class DiceManager : MonoBehaviour
 
     public void ClearBoard()
     {
+        IsSpawningHeroStartDice = false;
+
         foreach (Dice dice in boardDices)
         {
             ObjectPooler.Despawn(dice);
