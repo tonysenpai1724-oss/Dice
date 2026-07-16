@@ -169,12 +169,6 @@ public class GameManager : Singleton<GameManager>
                     case LevelType.Shop:
                         UIManager.Instance?.ShowPopupShop();
                         return;
-                    case LevelType.Roll:
-                        UIManager.Instance?.ShowPopupRoll();
-                        return;
-                    case LevelType.Jester:
-                        UIManager.Instance?.ShowPopupRollBuff();
-                        return;
                 }
             }
 
@@ -191,11 +185,22 @@ public class GameManager : Singleton<GameManager>
         if (currentLevel == null || currentLevel.leveltype != expectedLevelType)
             return;
 
-        if (ChapterManager.Instance.IsAtFinalPlayableLevel())
-            return;
+        bool shouldReturnHome = GameState == EGameState.Gameplay;
 
-        ChapterManager.Instance.AdvanceAfterWin();
-        UIManager.Instance?.RefreshHomeUI();
+        if (!ChapterManager.Instance.IsAtFinalPlayableLevel())
+            ChapterManager.Instance.AdvanceAfterWin();
+
+        if (shouldReturnHome)
+            GoSceneHome();
+        else
+            UIManager.Instance?.RefreshHomeUI();
+    }
+
+    public bool IsCurrentLevelPopupOnlyGameplay()
+    {
+        Level currentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : null;
+        return currentLevel != null &&
+            (currentLevel.leveltype == LevelType.Roll || currentLevel.leveltype == LevelType.Jester);
     }
 
     public void GoSceneHome()

@@ -63,10 +63,15 @@ public class PopupRoll : UIBase
     bool rewardGranted;
     Coroutine rollRoutine;
     readonly Dictionary<int, int> diceResults = new Dictionary<int, int>();
+    public Image bg;
+    public float chooseBgBottom = 1236;
+    float defaultBgBottom;
+    bool hasDefaultBgBottom;
 
     void Awake()
     {
         Instance = this;
+        CacheDefaultBgBottom();
         BindButtons();
         rollItemChoosed.gameObject.SetActive(false);
     }
@@ -255,6 +260,36 @@ public class PopupRoll : UIBase
     {
         ReleaseCapturedDiceIcons();
     }
+
+    void CacheDefaultBgBottom()
+    {
+        if (bg == null)
+            return;
+
+        defaultBgBottom = bg.rectTransform.offsetMin.y;
+        hasDefaultBgBottom = true;
+    }
+
+    void SetBgBottom(float bottom)
+    {
+        if (bg == null)
+            return;
+
+        RectTransform bgRect = bg.rectTransform;
+        Vector2 offsetMin = bgRect.offsetMin;
+        offsetMin.y = bottom;
+        bgRect.offsetMin = offsetMin;
+    }
+
+    void ResetBgBottom()
+    {
+        if (!hasDefaultBgBottom)
+            CacheDefaultBgBottom();
+
+        if (hasDefaultBgBottom)
+            SetBgBottom(defaultBgBottom);
+    }
+
     void BindButtons()
     {
         if (buttonLessThanThree != null)
@@ -323,6 +358,7 @@ public class PopupRoll : UIBase
             guessRoot.SetActive(true);
         rollItemChoosed.gameObject.SetActive(false);
 
+        ResetBgBottom();
         SetupRollItems();
         ClearRollDisplays();
         SetGuessButtonsInteractable(true);
@@ -344,7 +380,9 @@ public class PopupRoll : UIBase
         if (guessRoot != null)
             guessRoot.SetActive(false);
         rollItemChoosed.gameObject.SetActive(true);
+        SetBgBottom(chooseBgBottom);
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
+        Time.timeScale = 1;
     }
 
     bool EvaluateGuess(RollGuessType guess, int dice1, int dice2)
@@ -513,6 +551,7 @@ public class PopupRoll : UIBase
     {
         yield return new WaitForSecondsRealtime(resultResolveDelay);
         UiHome.Instance?.ShowRollPlane(false);
+        SetBgBottom(defaultBgBottom);
 
         if (isWin)
         {

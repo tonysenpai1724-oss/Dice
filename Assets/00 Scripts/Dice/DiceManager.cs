@@ -79,7 +79,8 @@ public class DiceManager : MonoBehaviour
         if (boardCollider != null)
             SetBoardCollider(boardCollider);
 
-        SpawnStartBoard();
+        if (GameManager.Instance == null || !GameManager.Instance.IsCurrentLevelPopupOnlyGameplay())
+            SpawnStartBoard();
         TigerForge.EventManager.StartListening(Constant.ON_END_GAME, ClearBoard);
     }
 
@@ -697,7 +698,8 @@ public class DiceManager : MonoBehaviour
             );
         }
 
-        SpawnStartBoard();
+        if (GameManager.Instance == null || !GameManager.Instance.IsCurrentLevelPopupOnlyGameplay())
+            SpawnStartBoard();
     }
     public DiceData GetRandomDiceDataByLevel(int level)
     {

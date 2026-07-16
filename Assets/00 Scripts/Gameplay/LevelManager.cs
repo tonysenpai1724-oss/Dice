@@ -34,11 +34,8 @@ public class LevelManager : Singleton<LevelManager>
             return;
         }
 
-        if (level.leveltype == LevelType.Roll)
-        {
-            UIManager.Instance?.ShowPopupRoll();
+        if (level.leveltype == LevelType.Roll || level.leveltype == LevelType.Jester)
             return;
-        }
 
         if (EnemyManager.Instance != null)
             EnemyManager.Instance.StartLevel(level);

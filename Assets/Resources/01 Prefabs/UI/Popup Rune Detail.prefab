@@ -33,11 +33,11 @@ RectTransform:
   - {fileID: 6593972826311475111}
   m_Father: {fileID: 2306505374554592976}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 7.2108154, y: 78}
-  m_SizeDelta: {x: 341.05, y: 100}
-  m_Pivot: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 7.2108, y: 281}
+  m_SizeDelta: {x: 250, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7641063393713983165
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -168,7 +168,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60.25
+  m_fontSize: 44.15
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -384,7 +384,6 @@ MonoBehaviour:
   buttonClose: {fileID: 0}
   blockPanel: {fileID: 0}
   hackObj: {fileID: 0}
-  popupRoot: {fileID: 8395883642810155149}
   runeNameText: {fileID: 7652392288224504411}
   runeDescriptionText: {fileID: 1901908043419959748}
   runeImage: {fileID: 1378523052381277096}
@@ -561,8 +560,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.4381714, y: 155}
-  m_SizeDelta: {x: 250, y: 250}
+  m_AnchoredPosition: {x: -0.4381714, y: 108}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3983200011246967868
 CanvasRenderer:
@@ -637,8 +636,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -2.1140137, y: 13.101898}
-  m_SizeDelta: {x: 322.3988, y: 302.3985}
+  m_AnchoredPosition: {x: -0.0011845, y: -8}
+  m_SizeDelta: {x: 300, y: 236.436}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &2631213697467046910
 CanvasRenderer:

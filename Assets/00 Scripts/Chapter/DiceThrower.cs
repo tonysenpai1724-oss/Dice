@@ -56,8 +56,12 @@ public class DiceThrower : MonoBehaviour
     public async void RollAllDice()
     {
         DestroyAllDice();
-        UiHome.Instance.rollPlane.SetActive(true);
-        UiHome.Instance.wall.SetActive(false);
+        if (UiHome.Instance != null && UiHome.Instance.wall != null)
+        {
+
+            UiHome.Instance.rollPlane.SetActive(true);
+            UiHome.Instance.wall.SetActive(false);
+        }
 
         switch (CurrentRollMode)
         {

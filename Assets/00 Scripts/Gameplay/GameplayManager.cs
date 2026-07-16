@@ -184,12 +184,34 @@ public class GameplayManager : MonoBehaviour
         if (GameManager.Instance.GameType == EGameType.Endless)
             IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.EndlessPlay);
         UIManager.Instance.uIGameplay.Initialize();
-        StartGame();
         IsGameEnded = false;
+        if (TryShowSpecialLevelPopup())
+            yield break;
+
+        StartGame();
         TigerForge.EventManager.StartListening(Constant.EVENT_TIMER_TICK, OnTick);
         TigerForge.EventManager.StartListening(Constant.ON_DICE_AFTER_ATTACK, OnDiceAfterAttack);
         TigerForge.EventManager.EmitEvent(Constant.EVENT_LEVEL_INITED);
 
+    }
+
+    bool TryShowSpecialLevelPopup()
+    {
+        Level currentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : null;
+        if (currentLevel == null)
+            return false;
+
+        switch (currentLevel.leveltype)
+        {
+            case LevelType.Roll:
+                UIManager.Instance?.ShowPopupRoll();
+                return true;
+            case LevelType.Jester:
+                UIManager.Instance?.ShowPopupRollBuff();
+                return true;
+        }
+
+        return false;
     }
 
     void OnDestroy()

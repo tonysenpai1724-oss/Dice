@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 8663281700141046444}
   - component: {fileID: 520693340571359731}
   m_Layer: 9
-  m_Name: Dice_Object
+  m_Name: Dice_Object_Preview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

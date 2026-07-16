@@ -8,6 +8,9 @@ public class UiGameplay : MonoBehaviour
 {
     public TextMeshProUGUI txtLevel, txtTimer, txtTut, txtScore, txtSpeed;
     public GameObject tutBox;
+    [SerializeField] private Transform popupRoot;
+
+    public Transform PopupRoot => popupRoot != null ? popupRoot : transform;
 
     private void Start()
     {

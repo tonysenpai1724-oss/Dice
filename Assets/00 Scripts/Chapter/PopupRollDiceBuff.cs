@@ -28,6 +28,10 @@ public class PopupRollDiceBuff : UIBase
     public Image iconDice20;
     public GameObject chooseRoot;
 
+    [Header("Background")]
+    public RectTransform bg;
+    public float chooseBgBottom = 1236f;
+
     [Header("Reward")]
     public GameObject rewardRoot;
     public GameObject RewriteButton;
@@ -65,10 +69,13 @@ public class PopupRollDiceBuff : UIBase
     int finalRoll;
     float pendingHpRewardPercent;
     float pendingDamageRewardPercent;
+    float defaultBgBottom;
+    bool hasDefaultBgBottom;
 
     void Awake()
     {
         Instance = this;
+        CacheDefaultBgBottom();
         BindButtons();
     }
 
@@ -176,6 +183,34 @@ public class PopupRollDiceBuff : UIBase
 
         image.sprite = sprite;
         image.enabled = sprite != null;
+    }
+
+    void CacheDefaultBgBottom()
+    {
+        if (bg == null)
+            return;
+
+        defaultBgBottom = bg.offsetMin.y;
+        hasDefaultBgBottom = true;
+    }
+
+    void SetBgBottom(float bottom)
+    {
+        if (bg == null)
+            return;
+
+        Vector2 offsetMin = bg.offsetMin;
+        offsetMin.y = bottom;
+        bg.offsetMin = offsetMin;
+    }
+
+    void ResetBgBottom()
+    {
+        if (!hasDefaultBgBottom)
+            CacheDefaultBgBottom();
+
+        if (hasDefaultBgBottom)
+            SetBgBottom(defaultBgBottom);
     }
 
     void ClearResultDisplay()
@@ -308,6 +343,7 @@ public class PopupRollDiceBuff : UIBase
         if (resultRoot != null)
             resultRoot.SetActive(false);
 
+        ResetBgBottom();
         SetupDiceIcons();
         ClearResultDisplay();
         SetChooseButtonsInteractable(true);
@@ -334,9 +370,12 @@ public class PopupRollDiceBuff : UIBase
         if (chooseRoot != null)
             chooseRoot.SetActive(false);
 
+        SetBgBottom(chooseBgBottom);
+
         ShowRollingDisplay(diceType, "Your fate is rolling...");
 
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
+        Time.timeScale = 1;
     }
 
     int GetMaxRoll(RollDiceType diceType)
@@ -522,7 +561,7 @@ public class PopupRollDiceBuff : UIBase
             resultRoot.SetActive(true);
         if (rewardRoot != null)
             rewardRoot.SetActive(true);
-
+        SetBgBottom(defaultBgBottom);
         if (isWin)
         {
             if (RewriteButton != null)
@@ -549,6 +588,7 @@ public class PopupRollDiceBuff : UIBase
             yield break;
 
         }
+
 
     }
 

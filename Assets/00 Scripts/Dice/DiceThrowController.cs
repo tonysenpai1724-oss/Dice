@@ -44,10 +44,29 @@ public class DiceThrowController : MonoBehaviour
 
     void Start()
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsCurrentLevelPopupOnlyGameplay())
+        {
+            DisableThrowControllerForPopupOnlyLevel();
+            return;
+        }
+
         SpawnCurrentDice();
         TigerForge.EventManager.StartListening(Constant.ON_DRAG_RUNE, OnRuneDragStarted);
         TigerForge.EventManager.StartListening(Constant.ON_DROP_RUNE, OnRuneDragEnded);
         TigerForge.EventManager.StartListening(Constant.ON_END_GAME, Clear);
+    }
+
+    void DisableThrowControllerForPopupOnlyLevel()
+    {
+        Clear();
+
+        if (diceHighlight != null)
+            diceHighlight.gameObject.SetActive(false);
+
+        if (hand != null)
+            hand.gameObject.SetActive(false);
+
+        enabled = false;
     }
 
     void OnDestroy()

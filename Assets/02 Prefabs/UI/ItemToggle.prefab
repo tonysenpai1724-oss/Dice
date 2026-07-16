@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -165,7 +165,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b4e29daeb82c7d4ab7346b4ea79ce93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemToggle
+  itemType: 0
   data: {fileID: 0}
+  runeData: {fileID: 0}
   btn: {fileID: 8863554628022039569}
   previewRawImage: {fileID: 0}
   previewImage: {fileID: 2419520206335447782}
