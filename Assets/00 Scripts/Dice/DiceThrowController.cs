@@ -27,7 +27,7 @@ public class DiceThrowController : MonoBehaviour
     public float maxStableWaitTime = 5f;
 
     [Header("Queue")]
-    public DiceQueue diceQueue;
+    public DiceQueueManager diceQueue;
     public DiceQueueUI diceQueueUI;
 
     Dice currentDice;
@@ -285,7 +285,7 @@ public class DiceThrowController : MonoBehaviour
         }
         else
         {
-            DiceQueue queue =
+            DiceQueueManager queue =
                 diceQueue != null
                 ? diceQueue
                 : DiceManager.Instance != null

@@ -21,7 +21,7 @@ public class GameplayManager : MonoBehaviour
 
     [Header("Dice Skill Runtime")]
     public DiceData skillDiceData;
-    public DiceQueue skillQueue;
+    public DiceQueueManager skillQueue;
     public EnemyManager skillEnemyManager;
     public PlayerController skillPlayer;
     public Dice skillDice;
@@ -51,7 +51,7 @@ public class GameplayManager : MonoBehaviour
 
     public void BeginDiceSkill(
         DiceData diceData,
-        DiceQueue queue,
+        DiceQueueManager queue,
         Dice dice,
         EnemyManager enemyManager,
         PlayerController player,

@@ -41,7 +41,7 @@ public class EnemyWinCoordinator
             return;
         }
 
-        DiceQueue queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueue : null;
+        DiceQueueManager queue = DiceManager.Instance != null ? DiceManager.Instance.diceQueue : null;
         if (queue != null && queue.IsBusy)
         {
             queue.RequestFastFlush();

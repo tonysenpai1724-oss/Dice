@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
-public class DiceQueue : Singleton<DiceQueue>
+public class DiceQueueManager : Singleton<DiceQueueManager>
 {
     [Header("Prefab")]
     public DiceQueueItem itemPrefab;
@@ -64,6 +64,44 @@ public class DiceQueue : Singleton<DiceQueue>
 
     public bool IsBusy => processing || flushingPendingItems || items.Count > 0 || pendingItems.Count > 0;
 
+    public int GetQueuedAttackDamage(PlayerController player)
+    {
+        int totalDamage = 0;
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            DiceData diceData = items[i] != null ? items[i].data : null;
+            totalDamage += GetDiceAttackDamage(diceData, player);
+        }
+
+        for (int i = 0; i < pendingItems.Count; i++)
+        {
+            totalDamage += GetDiceAttackDamage(pendingItems[i].data, player);
+        }
+
+        return totalDamage;
+    }
+
+    int GetDiceAttackDamage(DiceData diceData, PlayerController player)
+    {
+        if (diceData == null || !CanDiceDealAttackDamage(diceData))
+            return 0;
+
+        return Mathf.Max(0, diceData.damage);
+    }
+
+    bool CanDiceDealAttackDamage(DiceData diceData)
+    {
+        switch (diceData.type)
+        {
+            case DiceType.Poison:
+            case DiceType.Heal:
+            case DiceType.Coin:
+                return false;
+            default:
+                return true;
+        }
+    }
     public void RequestFastFlush()
     {
         fastFlushRequested = true;

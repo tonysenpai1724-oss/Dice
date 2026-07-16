@@ -36,7 +36,7 @@ public class DiceManager : MonoBehaviour
     [Header("Stack")]
     List<Dice> boardDices = new List<Dice>();
 
-    public DiceQueue diceQueue;
+    public DiceQueueManager diceQueue;
     public DiceQueueUI diceQueueUI;
 
     Dictionary<Dice, int> bindTurnsMap = new Dictionary<Dice, int>();

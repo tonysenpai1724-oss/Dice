@@ -81,7 +81,7 @@ public static class BombRuneSkillData
         DiceQueueUI diceQueueUI = diceManager != null && diceManager.diceQueueUI != null
             ? diceManager.diceQueueUI
             : DiceQueueUI.Instance;
-        DiceQueue diceQueue = diceManager != null ? diceManager.diceQueue : null;
+        DiceQueueManager diceQueue = diceManager != null ? diceManager.diceQueue : null;
         DiceData bombDiceData = diceManager != null ? diceManager.GetDiceData(5, DiceType.Bomb) : null;
 
         if (bombDiceData == null)

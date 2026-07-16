@@ -16,7 +16,7 @@ public class DiceMergeService
 {
     readonly BoardService boardService;
     readonly DiceMergeConfig config;
-    readonly DiceQueue diceQueue;
+    readonly DiceQueueManager diceQueue;
     readonly Func<DiceQueueUI> getDiceQueueUI;
     readonly Func<List<Dice>> getBoardDices;
     readonly Func<int, DiceType, DiceData> getDiceData;
@@ -31,7 +31,7 @@ public class DiceMergeService
     public DiceMergeService(
         BoardService boardService,
         DiceMergeConfig config,
-        DiceQueue diceQueue,
+        DiceQueueManager diceQueue,
         Func<DiceQueueUI> getDiceQueueUI,
         Func<List<Dice>> getBoardDices,
         Func<int, DiceType, DiceData> getDiceData,

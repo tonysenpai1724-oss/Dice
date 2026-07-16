@@ -13,7 +13,7 @@ public class TurnManager : MonoBehaviour
     public TextMeshProUGUI resetText;
 
     [Header("Refs")]
-    public DiceQueue diceQueue;
+    public DiceQueueManager diceQueue;
 
     public bool IsResettingBoard { get; private set; }
     public bool IsResetPending { get; private set; }
