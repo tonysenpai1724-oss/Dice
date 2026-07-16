@@ -620,32 +620,44 @@ public class DiceManager : MonoBehaviour
         if (heroDiceSpawnStartDelay > 0f)
             yield return new WaitForSeconds(heroDiceSpawnStartDelay);
 
+        List<Coroutine> flyRoutines = new List<Coroutine>();
+        List<Vector3> reservedPositions = new List<Vector3>();
+
         for (int i = 0; i < player.diceDatas.Count; i++)
         {
             DiceData data = player.diceDatas[i];
             if (data == null)
                 continue;
 
-            if (!TryGetHeroDiceBoardPosition(targetSpawnCount, out Vector3 targetPosition))
+            if (!TryGetHeroDiceBoardPosition(targetSpawnCount, reservedPositions, out Vector3 targetPosition))
                 continue;
+
+            reservedPositions.Add(targetPosition);
 
             Dice dice = SpawnDice(data, targetPosition, false);
             if (dice == null)
                 continue;
 
             Vector3 startPosition = GetHeroDiceSpawnPosition(player, targetPosition);
-            yield return FlyHeroDiceToBoard(dice, startPosition, targetPosition);
+            flyRoutines.Add(StartCoroutine(FlyAndRegisterHeroDice(dice, startPosition, targetPosition)));
+        }
 
-            RegisterBoardDice(dice);
-
-            if (heroDiceSpawnStagger > 0f)
-                yield return new WaitForSeconds(heroDiceSpawnStagger);
+        for (int i = 0; i < flyRoutines.Count; i++)
+        {
+            if (flyRoutines[i] != null)
+                yield return flyRoutines[i];
         }
 
         IsSpawningHeroStartDice = false;
     }
 
-    bool TryGetHeroDiceBoardPosition(int targetSpawnCount, out Vector3 clearPosition)
+    IEnumerator FlyAndRegisterHeroDice(Dice dice, Vector3 startPosition, Vector3 targetPosition)
+    {
+        yield return FlyHeroDiceToBoard(dice, startPosition, targetPosition);
+        RegisterBoardDice(dice);
+    }
+
+    bool TryGetHeroDiceBoardPosition(int targetSpawnCount, List<Vector3> reservedPositions, out Vector3 clearPosition)
     {
         clearPosition = Vector3.zero;
 
@@ -660,13 +672,33 @@ public class DiceManager : MonoBehaviour
             Vector3 position = boardService.GetRandomPositionOnBoard();
             clearPosition = boardService.FindClearPosition(position, null, diceSpacingRadius);
 
-            if (!boardService.IsOccupied(clearPosition, null, diceSpacingRadius))
+            if (!boardService.IsOccupied(clearPosition, null, diceSpacingRadius) &&
+                !IsReservedHeroDicePosition(clearPosition, reservedPositions))
                 return true;
         }
 
         return false;
     }
 
+    bool IsReservedHeroDicePosition(Vector3 position, List<Vector3> reservedPositions)
+    {
+        if (reservedPositions == null)
+            return false;
+
+        float minDistance = diceSpacingRadius * 2f;
+        float minDistanceSqr = minDistance * minDistance;
+
+        for (int i = 0; i < reservedPositions.Count; i++)
+        {
+            Vector3 offset = position - reservedPositions[i];
+            offset.y = 0f;
+
+            if (offset.sqrMagnitude < minDistanceSqr)
+                return true;
+        }
+
+        return false;
+    }
     Vector3 GetHeroDiceSpawnPosition(PlayerController player, Vector3 targetPosition)
     {
         if (heroDiceSpawnPoint != null)
