@@ -112,7 +112,7 @@ MonoBehaviour:
   iconDice20: {fileID: 6543455830667633030}
   chooseRoot: {fileID: 5315642962984966257}
   bg: {fileID: 5683592666575059178}
-  chooseBgBottom: 1236
+  chooseBgBottom: 1276
   rewardRoot: {fileID: 5867243782699658802}
   RewriteButton: {fileID: 2706399616156528081}
   claimBtn: {fileID: 3082111053399367555}

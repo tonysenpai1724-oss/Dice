@@ -16,7 +16,7 @@ MonoBehaviour:
   deleteDllAfterBuilds: 1
   AutomateForAllAOTPlatforms: 1
   automateForPlatforms: 0900000014000000
-  lastScan: 639196255615573294
+  lastScan: 639197926716014742
   supportSerializedTypes:
   - TypeName: UnityEngine.AudioClip, UnityEngine.AudioModule
     IsCustom: 0
@@ -133,6 +133,14 @@ MonoBehaviour:
       mscorlib]], mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[RollDiceType, Assembly-CSharp],[RollItemBuffData,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.Dictionary`2[[RollGuessType, Assembly-CSharp],[RollItemData,
+      Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.Dictionary`2[[RuneType, Assembly-CSharp],[UnityEngine.Sprite,
       UnityEngine.CoreModule]], mscorlib
     IsCustom: 0
@@ -223,6 +231,14 @@ MonoBehaviour:
     Emit: 1
   - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[EVirtualResource,
       Assembly-CSharp]], mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[RollDiceType, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[RollGuessType, Assembly-CSharp]],
+      mscorlib
     IsCustom: 0
     Emit: 1
   - TypeName: System.Collections.Generic.EnumEqualityComparer`1[[RuneType, Assembly-CSharp]],
@@ -328,6 +344,14 @@ MonoBehaviour:
       mscorlib
     IsCustom: 0
     Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[RollDiceType, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
+  - TypeName: System.Collections.Generic.IEqualityComparer`1[[RollGuessType, Assembly-CSharp]],
+      mscorlib
+    IsCustom: 0
+    Emit: 1
   - TypeName: System.Collections.Generic.IEqualityComparer`1[[RuneType, Assembly-CSharp]],
       mscorlib
     IsCustom: 0
@@ -360,6 +384,18 @@ MonoBehaviour:
     IsCustom: 0
     Emit: 1
   - TypeName: PartnerReferalConfig, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
+  - TypeName: RollDiceType, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
+  - TypeName: RollGuessType, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
+  - TypeName: RollItemBuffData, Assembly-CSharp
+    IsCustom: 0
+    Emit: 1
+  - TypeName: RollItemData, Assembly-CSharp
     IsCustom: 0
     Emit: 1
   - TypeName: RuneType, Assembly-CSharp

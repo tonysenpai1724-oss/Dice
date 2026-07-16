@@ -7143,7 +7143,7 @@ MonoBehaviour:
   iconDie2Result: {fileID: 674458367853532269}
   typeIconResult: {fileID: 7944241623354077507}
   bg: {fileID: 983988913151209196}
-  chooseBgBottom: 1236
+  chooseBgBottom: 1276
 --- !u!1 &9096428379861596923
 GameObject:
   m_ObjectHideFlags: 0
