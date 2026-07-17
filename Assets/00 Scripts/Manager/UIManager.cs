@@ -190,6 +190,26 @@ public class UIManager : Singleton<UIManager>
         dicUsedUI.Add(name, _uiBase);
         return _uiBase;
     }
+    public virtual UIBase GetUINew(string name)
+    {
+        if (dicUsedUI.ContainsKey(name))
+        {
+            UIBase cachedUI = dicUsedUI[name];
+            if (cachedUI != null)
+                return cachedUI;
+
+            dicUsedUI.Remove(name);
+        }
+
+        UIBase _uiBase = null;
+
+        _uiBase = Instantiate(GetUIByPath(name), uISafeZone.transform);
+        //_uiBase.transform.localPosition = Vector3.zero;
+        // _uiBase.transform.localScale = Vector3.one;
+        _uiBase.gameObject.SetActive(false);
+        dicUsedUI.Add(name, _uiBase);
+        return _uiBase;
+    }
     public virtual UIBase GetUIByPath(string name)
     {
         string resourcePath = $"01 Prefabs/UI/{name}";
@@ -294,6 +314,30 @@ public class UIManager : Singleton<UIManager>
     {
         PopupRoll ui = GetUI("Popup Roll Dice") as PopupRoll;
         ui?.Show();
+    }
+    public void ShowPopupDiceDetailTarget(DiceData data, Sprite sprite)
+    {
+        if (data == null)
+            return;
+
+        PopupDiceDetailTarget ui = GetUINew("Popup Dice Detail Target") as PopupDiceDetailTarget;
+        if (ui == null)
+            return;
+        ui.SetDiceDetails(data, sprite);
+        ui.StopAllCoroutines();
+        ui.Show();
+    }
+
+    public void HidePopupDiceDetailTarget()
+    {
+        if (dicUsedUI == null || !dicUsedUI.TryGetValue("Popup Dice Detail Target", out UIBase ui))
+            return;
+
+        if (ui == null || !ui.gameObject.activeSelf)
+            return;
+
+        ui.StopAllCoroutines();
+        ui.Hide();
     }
     public void ShowPopupRollBuff()
     {

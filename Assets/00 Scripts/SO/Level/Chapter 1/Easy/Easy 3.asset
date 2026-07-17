@@ -25,7 +25,7 @@ MonoBehaviour:
   waves:
   - waveName: Wave
     enemyEntries:
-    - enemyData: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - enemyData: {fileID: 11400000, guid: b6e088e2a6f577643be3ec9759bf40f7, type: 2}
       config:
         hpOverride: 32
         damageOverride: 2
@@ -50,7 +50,7 @@ MonoBehaviour:
         hpMultiplier: 1
         damageMultiplier: 1
     enemyDatas:
-    - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - {fileID: 11400000, guid: b6e088e2a6f577643be3ec9759bf40f7, type: 2}
     - {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
     - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
     - {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}

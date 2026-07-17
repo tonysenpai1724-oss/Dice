@@ -25,7 +25,7 @@ MonoBehaviour:
   waves:
   - waveName: Wave
     enemyEntries:
-    - enemyData: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - enemyData: {fileID: 11400000, guid: b6e088e2a6f577643be3ec9759bf40f7, type: 2}
       config:
         hpOverride: 46
         damageOverride: 2
@@ -39,12 +39,12 @@ MonoBehaviour:
         damageMultiplier: 1
     - enemyData: {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
       config:
-        hpOverride: 58
+        hpOverride: 85
         damageOverride: 3
         hpMultiplier: 1
         damageMultiplier: 1
     enemyDatas:
-    - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - {fileID: 11400000, guid: b6e088e2a6f577643be3ec9759bf40f7, type: 2}
     - {fileID: 11400000, guid: 5030cf9c8216e3149b0fe130fcf8723c, type: 2}
     - {fileID: 11400000, guid: 9bda05e41bbdd4948b7777399bd9e48a, type: 2}
     enemySpawnPlacements:
@@ -74,7 +74,7 @@ MonoBehaviour:
       entryIndex: 0
   - waveName: Wave
     enemyEntries:
-    - enemyData: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - enemyData: {fileID: 11400000, guid: b6e088e2a6f577643be3ec9759bf40f7, type: 2}
       config:
         hpOverride: 50
         damageOverride: 2
@@ -93,7 +93,7 @@ MonoBehaviour:
         hpMultiplier: 1
         damageMultiplier: 1
     enemyDatas:
-    - {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - {fileID: 11400000, guid: b6e088e2a6f577643be3ec9759bf40f7, type: 2}
     - {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
     - {fileID: 11400000, guid: 62886e47d926e2442bee8f19fee32e7e, type: 2}
     enemySpawnPlacements:
@@ -113,7 +113,7 @@ MonoBehaviour:
       gridRow: 0
       gridColumn: 4
       entryIndex: 1
-    - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - data: {fileID: 11400000, guid: b6e088e2a6f577643be3ec9759bf40f7, type: 2}
       position: {x: 440.32, y: -40, z: 0}
       useUIPosition: 1
       useWorldPosition: 0

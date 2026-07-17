@@ -156,7 +156,10 @@ public class DiceManager : MonoBehaviour
     void HandleHover()
     {
         if (Mouse.current == null || Camera.main == null)
+        {
+            ClearCurrentHover();
             return;
+        }
 
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         Dice hitDice = null;
@@ -181,16 +184,34 @@ public class DiceManager : MonoBehaviour
             nearestDistance = hit.distance;
         }
 
-        if (currentHover != hitDice)
+        if (currentHover == hitDice)
+            return;
+
+        if (currentHover != null)
+            currentHover.SetHovered(false);
+
+        currentHover = hitDice;
+
+        if (currentHover != null)
         {
-            if (currentHover != null)
-                currentHover.SetHovered(false);
-
-            currentHover = hitDice;
-
-            if (currentHover != null)
-                currentHover.SetHovered(true);
+            currentHover.SetHovered(true);
+            UIManager.Instance?.ShowPopupDiceDetailTarget(currentHover.data, null);
         }
+        else
+        {
+            UIManager.Instance?.HidePopupDiceDetailTarget();
+        }
+    }
+
+    void ClearCurrentHover()
+    {
+        if (currentHover != null)
+        {
+            currentHover.SetHovered(false);
+            currentHover = null;
+        }
+
+        UIManager.Instance?.HidePopupDiceDetailTarget();
     }
 
     public DiceData GetDiceDataByLevel(int level)
