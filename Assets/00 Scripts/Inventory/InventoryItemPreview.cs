@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
-public class InventoryItem : MonoBehaviour
+public class InventoryItemPreview : MonoBehaviour
 {
     public DiceData dice;
 

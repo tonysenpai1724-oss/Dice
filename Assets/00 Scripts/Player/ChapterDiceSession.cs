@@ -366,6 +366,49 @@ public class ChapterDiceSession : MonoBehaviour
         return false;
     }
 
+    public bool CloneDiceDataAt(int index)
+    {
+        if (index < 0 || index >= runtimeDiceDatas.Count || runtimeDiceDatas[index] == null)
+            return false;
+
+        DiceData sourceDiceData = runtimeDiceDatas[index];
+        runtimeDiceDatas.Insert(index + 1, sourceDiceData);
+        initializedFromHero = true;
+        DebugLogRuntimeDice($"CloneDiceDataAt before save cloned={sourceDiceData.diceName}");
+        TigerForge.EventManager.EmitEvent(Constant.ON_EQUIMENT_DICE_CHANGED);
+        SaveSession();
+        return true;
+    }
+
+    public bool RemoveDiceDataAt(int index)
+    {
+        if (index < 0 || index >= runtimeDiceDatas.Count || runtimeDiceDatas[index] == null)
+            return false;
+
+        DiceData diceData = runtimeDiceDatas[index];
+        runtimeDiceDatas.RemoveAt(index);
+        DebugLogRuntimeDice($"RemoveDiceDataAt before save removed={diceData.diceName}");
+        TigerForge.EventManager.EmitEvent(Constant.ON_EQUIMENT_DICE_CHANGED);
+        SaveSession();
+        return true;
+    }
+
+    public bool UpgradeDiceDataAt(int index, DiceData upgradedDiceData)
+    {
+        if (index < 0 || index >= runtimeDiceDatas.Count || upgradedDiceData == null)
+            return false;
+
+        DiceData currentDiceData = runtimeDiceDatas[index];
+        if (currentDiceData == null)
+            return false;
+
+        runtimeDiceDatas[index] = upgradedDiceData;
+        DebugLogRuntimeDice($"UpgradeDiceDataAt before save source={currentDiceData.diceName} target={upgradedDiceData.diceName}");
+        TigerForge.EventManager.EmitEvent(Constant.ON_EQUIMENT_DICE_CHANGED);
+        SaveSession();
+        return true;
+    }
+
     public int GetTotalDiceLevelByType(DiceType type)
     {
         int totalLevel = 0;

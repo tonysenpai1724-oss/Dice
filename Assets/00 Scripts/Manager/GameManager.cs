@@ -162,10 +162,10 @@ public class GameManager : Singleton<GameManager>
                     case LevelType.MagicAltar:
                         UIManager.Instance?.ShowPopupClonePanel();
                         return;
-                    case LevelType.Upgrade:
-                        UIManager.Instance?.ShowPopupUpgradeDice();
+                    // case LevelType.Upgrade:
+                    //     UIManager.Instance?.ShowPopupUpgradeDice();
 
-                        return;
+                    // return;
                     case LevelType.Shop:
                         UIManager.Instance?.ShowPopupShop();
                         return;
@@ -200,7 +200,8 @@ public class GameManager : Singleton<GameManager>
     {
         Level currentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : null;
         return currentLevel != null &&
-            (currentLevel.leveltype == LevelType.Roll || currentLevel.leveltype == LevelType.Jester);
+            (currentLevel.leveltype == LevelType.Roll || currentLevel.leveltype == LevelType.RollBuff
+            || currentLevel.leveltype == LevelType.Upgrade);
     }
 
     public void GoSceneHome()

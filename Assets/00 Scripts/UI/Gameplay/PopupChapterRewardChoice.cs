@@ -11,7 +11,7 @@ public class PopupChapterRewardChoice : UIBase
 
     [Header("Dice Preview")]
     public InventoryUIController inventoryUIController;
-    public InventoryItem dicePreviewPrefab;
+    public InventoryItemPreview dicePreviewPrefab;
     public ItemPreviewGenerator previewGenerator;
 
     readonly List<ChapterRewardChoiceItem> spawnedItems = new();

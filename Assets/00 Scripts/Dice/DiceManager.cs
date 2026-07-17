@@ -155,6 +155,8 @@ public class DiceManager : MonoBehaviour
 
     void HandleHover()
     {
+        if (GameplayManager.Instance.State == EGamePlayState.Pause)
+            return;
         if (Mouse.current == null || Camera.main == null)
         {
             ClearCurrentHover();

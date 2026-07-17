@@ -112,6 +112,8 @@ public enum LevelType
     Upgrade,
     FinalBoss,
     ChestReward,
-    Roll
+    Roll,
+    RollBuff,
+
 }
 

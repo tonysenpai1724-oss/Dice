@@ -206,9 +206,13 @@ public class GameplayManager : MonoBehaviour
             case LevelType.Roll:
                 UIManager.Instance?.ShowPopupRoll();
                 return true;
-            case LevelType.Jester:
+            case LevelType.RollBuff:
                 UIManager.Instance?.ShowPopupRollBuff();
                 return true;
+            case LevelType.Upgrade:
+                UIManager.Instance?.ShowPopupUpgradeClone();
+                return true;
+
         }
 
         return false;

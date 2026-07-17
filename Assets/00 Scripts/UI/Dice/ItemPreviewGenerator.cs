@@ -14,8 +14,8 @@ public class ItemPreviewGenerator : MonoBehaviour
     [Range(0f, 0.5f)] public float cropPaddingPercent = 0.08f;
     [Range(0f, 1f)] public float alphaThreshold = 0.02f;
 
-    InventoryItem pooledPreviewItem;
-    InventoryItem pooledPreviewPrefab;
+    InventoryItemPreview pooledPreviewItem;
+    InventoryItemPreview pooledPreviewPrefab;
 
     public Texture2D Capture(GameObject previewPrefab)
     {
@@ -122,12 +122,12 @@ public class ItemPreviewGenerator : MonoBehaviour
         return hasBounds;
     }
 
-    public Texture2D Capture(InventoryItem itemPrefab, DiceData diceData)
+    public Texture2D Capture(InventoryItemPreview itemPrefab, DiceData diceData)
     {
         if (itemPrefab == null || diceData == null || previewCamera == null || renderTexture == null)
             return null;
 
-        InventoryItem item = GetOrCreatePreviewItem(itemPrefab);
+        InventoryItemPreview item = GetOrCreatePreviewItem(itemPrefab);
         if (item == null)
             return null;
 
@@ -225,7 +225,7 @@ public class ItemPreviewGenerator : MonoBehaviour
         texture.Apply();
     }
 
-    InventoryItem GetOrCreatePreviewItem(InventoryItem itemPrefab)
+    InventoryItemPreview GetOrCreatePreviewItem(InventoryItemPreview itemPrefab)
     {
         if (pooledPreviewItem != null && pooledPreviewPrefab == itemPrefab)
             return pooledPreviewItem;
@@ -238,7 +238,7 @@ public class ItemPreviewGenerator : MonoBehaviour
         return pooledPreviewItem;
     }
 
-    void PreparePreviewItem(InventoryItem item, DiceData diceData)
+    void PreparePreviewItem(InventoryItemPreview item, DiceData diceData)
     {
         if (item == null)
             return;

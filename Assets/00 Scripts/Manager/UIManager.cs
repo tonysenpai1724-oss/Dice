@@ -344,6 +344,12 @@ public class UIManager : Singleton<UIManager>
         PopupRollDiceBuff ui = GetUI("Popup Roll Dice Buff") as PopupRollDiceBuff;
         ui?.Show();
     }
+    public void ShowPopupUpgradeClone()
+    {
+        PopupUpgradeCloneDice ui = GetUI("Popup Upgrade Clone Dice") as PopupUpgradeCloneDice;
+        ui?.Show();
+
+    }
     public void ShowPopupReward(PackageResource resource)
     {
         PopupShowReward ui = GetUI("Popup Show Reward") as PopupShowReward;

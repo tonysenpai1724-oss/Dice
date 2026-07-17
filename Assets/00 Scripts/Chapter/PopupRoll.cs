@@ -382,7 +382,7 @@ public class PopupRoll : UIBase
         rollItemChoosed.gameObject.SetActive(true);
         SetBgBottom(chooseBgBottom);
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
-        Time.timeScale = 1;
+        GameplayManager.Instance.SetState(EGamePlayState.Running);
     }
 
     bool EvaluateGuess(RollGuessType guess, int dice1, int dice2)
@@ -482,7 +482,31 @@ public class PopupRoll : UIBase
         if (!selectedGuess.HasValue)
             return;
 
-        RewriteFaces(Random.Range(1, 7), Random.Range(1, 7));
+        if (rollRoutine != null)
+        {
+            StopCoroutine(rollRoutine);
+            rollRoutine = null;
+        }
+
+        rollResolved = false;
+        diceResults.Clear();
+
+        if (failRoot != null)
+            failRoot.SetActive(false);
+        if (rewardRoot != null)
+            rewardRoot.SetActive(false);
+        if (guessRoot != null)
+            guessRoot.SetActive(false);
+
+        SetBgBottom(chooseBgBottom);
+        ClearRollDisplays();
+        ShowRollItemChoosed(selectedGuess.Value);
+        if (rollItemChoosed != null)
+            rollItemChoosed.gameObject.SetActive(true);
+        SetRewardButtonsInteractable(false);
+        DiceThrower.CurrentRollMode = DiceThrower.RollMode.TwoDice;
+        TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
+        GameplayManager.Instance.SetState(EGamePlayState.Running);
     }
 
     public void RewriteDice1Face(int face)

@@ -16,7 +16,7 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     public bool debugSpawnPosition = true;
 
     [Header("Preview")]
-    public InventoryItem itemPreviewPrefab;
+    public InventoryItemPreview itemPreviewPrefab;
     public ItemPreviewGenerator previewGenerator;
 
     [Header("Layout")]

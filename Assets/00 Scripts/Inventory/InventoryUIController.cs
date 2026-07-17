@@ -18,7 +18,7 @@ public enum InventoryViewTab
 
 public class InventoryUIController : UIBase
 {
-    public InventoryItem itemPrefab;
+    public InventoryItemPreview itemPrefab;
     public Transform itemParent;
     public ItemToggle itemTogglePrefab;
     public ItemPreviewGenerator previewGenerator;
@@ -38,7 +38,7 @@ public class InventoryUIController : UIBase
     public Vector2 itemOffset = new Vector2(4.3f, 4.3f);
     [Min(1)] public int itemsPerRow = 5;
 
-    readonly List<InventoryItem> spawnedItems = new();
+    readonly List<InventoryItemPreview> spawnedItems = new();
     readonly List<ItemToggle> spawnedToggles = new();
     InventoryViewTab currentTab = InventoryViewTab.Dice;
 
@@ -292,7 +292,7 @@ public class InventoryUIController : UIBase
 
         for (int i = spawnedItems.Count - 1; i >= 0; i--)
         {
-            InventoryItem item = spawnedItems[i];
+            InventoryItemPreview item = spawnedItems[i];
             if (item == null)
                 continue;
 

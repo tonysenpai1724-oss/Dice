@@ -375,7 +375,7 @@ public class PopupRollDiceBuff : UIBase
         ShowRollingDisplay(diceType, "Your fate is rolling...");
 
         TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
-        Time.timeScale = 1;
+        GameplayManager.Instance.SetState(EGamePlayState.Running);
     }
 
     int GetMaxRoll(RollDiceType diceType)
@@ -508,7 +508,43 @@ public class PopupRollDiceBuff : UIBase
         if (!selectedDiceType.HasValue)
             return;
 
-        RewriteFace(Random.Range(1, GetMaxRoll(selectedDiceType.Value) + 1));
+        if (rollRoutine != null)
+        {
+            StopCoroutine(rollRoutine);
+            rollRoutine = null;
+        }
+
+        RollDiceType diceType = selectedDiceType.Value;
+        rollResolved = false;
+        finalRoll = 0;
+        pendingRewardDiceType = null;
+        pendingHpRewardPercent = 0f;
+        pendingDamageRewardPercent = 0f;
+
+        if (rewardRoot != null)
+            rewardRoot.SetActive(false);
+        if (chooseRoot != null)
+            chooseRoot.SetActive(false);
+        if (RewriteButton != null)
+            RewriteButton.SetActive(false);
+        if (claimBtn != null)
+            claimBtn.SetActive(false);
+        if (resultRoot != null)
+            resultRoot.SetActive(false);
+
+        SetBgBottom(chooseBgBottom);
+        ClearResultDisplay();
+        SetRewardButtonsInteractable(false);
+        DiceThrower.CurrentRollMode = diceType switch
+        {
+            RollDiceType.Dice8 => DiceThrower.RollMode.Dice8,
+            RollDiceType.Dice12 => DiceThrower.RollMode.Dice12,
+            RollDiceType.Dice20 => DiceThrower.RollMode.Dice20,
+            _ => DiceThrower.RollMode.TwoDice,
+        };
+        ShowRollingDisplay(diceType, "Your fate is rolling...");
+        TigerForge.EventManager.EmitEvent(Constant.EVENT_ROLL_DICE);
+        GameplayManager.Instance.SetState(EGamePlayState.Running);
     }
 
     public void RewriteFace(int face)
@@ -597,6 +633,6 @@ public class PopupRollDiceBuff : UIBase
         rollRoutine = null;
         DiceThrower.CurrentRollMode = DiceThrower.RollMode.TwoDice;
         UiHome.Instance?.ShowRollPlane(false);
-        GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.Jester);
+        GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.RollBuff);
     }
 }

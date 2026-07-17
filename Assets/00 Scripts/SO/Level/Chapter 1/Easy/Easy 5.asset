@@ -28,4 +28,4 @@ MonoBehaviour:
     enemyDatas:
     - {fileID: 0}
     enemySpawnPlacements: []
-  leveltype: 5
+  leveltype: 7

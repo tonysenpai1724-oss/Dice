@@ -10,7 +10,7 @@ public class PopupShop : UIBase
 
     [Header("Dice Preview")]
     public InventoryUIController inventoryUIController;
-    public InventoryItem itemPrefab;
+    public InventoryItemPreview itemPrefab;
     public ItemPreviewGenerator previewGenerator;
 
     readonly List<GameObject> spawnedItems = new List<GameObject>();
