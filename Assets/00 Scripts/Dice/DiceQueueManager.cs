@@ -97,6 +97,11 @@ public class DiceQueueManager : Singleton<DiceQueueManager>
             case DiceType.Poison:
             case DiceType.Heal:
             case DiceType.Coin:
+            case DiceType.Stun:
+            case DiceType.Vulnerable:
+            case DiceType.Exhaust:
+            case DiceType.MagicCoin:
+            case DiceType.Cure:
                 return false;
             default:
                 return true;

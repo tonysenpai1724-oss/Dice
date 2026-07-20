@@ -36,7 +36,12 @@ public class EnemyAttackRoutineService
             if (!attackCompleted && (attackTrack.TrackTime >= halfTime || timer >= halfTime))
             {
                 attackCompleted = true;
-                int finalDamage = CombatSystem.ApplyDefenseToPlayer(player, enemy.damage);
+                int attackDamage = enemy.damage;
+                ExhaustEffect exhaustEffect = enemy.effectManager?.GetEffect<ExhaustEffect>();
+                if (exhaustEffect != null)
+                    attackDamage = exhaustEffect.ApplyToDamage(attackDamage);
+
+                int finalDamage = CombatSystem.ApplyDefenseToPlayer(player, attackDamage);
                 player.OnTakeDamage(finalDamage);
             }
 

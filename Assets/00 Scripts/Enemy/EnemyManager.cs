@@ -235,6 +235,11 @@ public class EnemyManager : Singleton<EnemyManager>
         return queryService != null ? queryService.GetRightmostAliveEnemy() : null;
     }
 
+    public Enemy GetRandomAliveEnemy()
+    {
+        return queryService != null ? queryService.GetRandomAliveEnemy() : null;
+    }
+
     public float PlayerAttack(DiceData diceData)
     {
         if (diceData == null)

@@ -74,6 +74,27 @@ public class EnemyQueryService
         return rightmostEnemy;
     }
 
+    public Enemy GetRandomAliveEnemy()
+    {
+        cleanupEnemies?.Invoke();
+        List<Enemy> enemies = getEnemies?.Invoke();
+        if (enemies == null)
+            return null;
+
+        List<Enemy> aliveEnemies = new();
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy enemy = enemies[i];
+            if (enemy != null && enemy.IsAlive())
+                aliveEnemies.Add(enemy);
+        }
+
+        if (aliveEnemies.Count <= 0)
+            return null;
+
+        return aliveEnemies[UnityEngine.Random.Range(0, aliveEnemies.Count)];
+    }
+
     public bool HasAliveEnemies()
     {
         List<Enemy> enemies = getEnemies?.Invoke();

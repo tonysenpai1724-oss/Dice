@@ -73,6 +73,10 @@ public class EnemyTurnService
             if (attacker == null || !attacker.IsAlive())
                 continue;
 
+            EnemyTurnSkipEffect attackerTurnSkipEffect = attacker.effectManager?.GetEffect<EnemyTurnSkipEffect>();
+            if (attackerTurnSkipEffect != null && attackerTurnSkipEffect.ConsumeTurnSkip())
+                continue;
+
             if (attacker.type == EnemyType.Melee && canMeleeAttack != null && !canMeleeAttack(attacker))
                 continue;
 

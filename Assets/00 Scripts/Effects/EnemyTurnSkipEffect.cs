@@ -1,25 +1,26 @@
-﻿public class EnemyTurnSkipEffect : GameEffect
+public class EnemyTurnSkipEffect : GameEffect
 {
-    public int turnsRemaining;
+    public override EffectType EffectType => EffectType.Debuff;
 
+    public int turnsRemaining;
     public void AddTurns(int amount)
     {
         if (amount <= 0)
             return;
 
-        turnsRemaining += amount;
+        AddStacks(amount);
+        turnsRemaining = Stacks;
     }
 
     public bool ConsumeTurnSkip()
     {
-        if (turnsRemaining <= 0)
+        if (Stacks <= 0 && turnsRemaining > 0)
+            Stacks = turnsRemaining;
+
+        if (!ConsumeStack())
             return false;
 
-        turnsRemaining--;
-
-        if (turnsRemaining <= 0)
-            RemoveSelf();
-
+        turnsRemaining = Stacks;
         return true;
     }
 }

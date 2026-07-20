@@ -33,7 +33,6 @@ public class DiceData : SerializedScriptableObject
     public Color diceColor;
     public GameObject hitEffectPrefab;
     public DiceType type;
-    public DiceEvoType evol;
     [Header("Skill")]
     public DiceSkillData skillData;
 
@@ -91,18 +90,7 @@ public class DiceData : SerializedScriptableObject
 
     void OnValidate()
     {
-        if (skillData != null &&
-            skillData.TargetType != type)
-        {
-            Debug.LogWarning(
-                $"{name}: skill {skillData.name} targets {skillData.TargetType} but dice type is {type}",
-                this
-            );
-        }
-
         if (useVisualPreset && visualPresetDatabase != null && !allowManualOverride)
             ApplyVisualPreset();
     }
 }
-
-

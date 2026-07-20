@@ -26,20 +26,17 @@ public enum DiceType
     Enemy,
     MultiAttack,
     BonusAtk,
-
-
-}
-public enum DiceEvoType
-{
-    None,
     TripleAttack,
     Ambush,
     X2BonusAtk,
     MagicCoin,
     Cure,
-    Armor
-}
+    Armor,
+    Vulnerable,
+    Exhaust,
 
+
+}
 public class Dice : PoolingObject
 {
     [Header("Data")]
