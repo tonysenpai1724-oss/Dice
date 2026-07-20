@@ -104,10 +104,10 @@ public class EquipmentManager : MonoBehaviour
         if (heroDataOverride != null)
             return heroDataOverride;
 
-        if (player != null)
+        if (player != null && player.data != null)
             return player.data;
 
-        return null;
+        return HeroDataResolver.Resolve(null, false);
     }
 
     public BaseEquiment GetEquippedItem(EquipmentType equipmentType)

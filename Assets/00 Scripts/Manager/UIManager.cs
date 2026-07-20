@@ -262,6 +262,7 @@ public class UIManager : Singleton<UIManager>
     {
         lstPendingUI.Add(action);
     }
+    #region Show Popup
     public void ShowPopupClonePanel()
     {
         ClonePanel ui = GetUI("Popup Clone Panel") as ClonePanel;
@@ -342,6 +343,11 @@ public class UIManager : Singleton<UIManager>
     public void ShowPopupRollBuff()
     {
         PopupRollDiceBuff ui = GetUI("Popup Roll Dice Buff") as PopupRollDiceBuff;
+        ui?.Show();
+    }
+    public void ShowPopupHeroStat()
+    {
+        PopupHeroStat ui = GetUI("Popup Hero Stat") as PopupHeroStat;
         ui?.Show();
     }
     public void ShowPopupUpgradeClone()
@@ -550,6 +556,7 @@ public class UIManager : Singleton<UIManager>
 
         ui.ShowChoices(options);
     }
+    #endregion
     #endregion
 }
 

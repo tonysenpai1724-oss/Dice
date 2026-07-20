@@ -14,6 +14,7 @@ public class PlayerInventoryUI : MonoBehaviour
     public TextMeshProUGUI txtCritRate;
     public TextMeshProUGUI txtCritDamage;
     public TextMeshProUGUI txtLuck;
+    public TextMeshProUGUI txtName;
 
     [Header("Base Hero Stats")]
     public HeroData heroData;
@@ -42,28 +43,30 @@ public class PlayerInventoryUI : MonoBehaviour
     {
         HeroStatSnapshot stats = GetDisplayedStats();
 
-        SetText(txtHp, "HP:" + stats.hp);
-        SetText(txtDamage, "Dmg:" + stats.damage);
-        SetText(txtDefense, "Defense:" + stats.defense);
-        SetText(txtCritRate, "CritRate:" + $"{stats.critRate:0.##}");
-        SetText(txtCritDamage, "CritDmg:" + $"{stats.critDamage:0.##}");
-        SetText(txtLuck, "Luck:" + $"{stats.luck:0.##}");
+        SetText(txtHp, GetDisplayCurrentHp(stats.hp) + "/" + stats.hp);
+        SetText(txtDamage, stats.damage.ToString());
+        SetText(txtDefense, stats.defense.ToString());
+        SetText(txtCritRate, $"{stats.critRate:0.##}");
+        SetText(txtCritDamage, $"{stats.critDamage:0.##}");
+        SetText(txtLuck, $"{stats.luck:0.##}");
+        SetText(txtName, heroData.name);
     }
 
     HeroStatSnapshot GetDisplayedStats()
     {
-        PlayerStats previewStats = BuildPreviewStats();
-        return previewStats.ToHeroStatSnapshot(heroData);
+        HeroData currentHeroData = ResolveHeroData();
+        PlayerStats previewStats = BuildPreviewStats(currentHeroData);
+        return previewStats.ToHeroStatSnapshot(currentHeroData);
     }
 
-    PlayerStats BuildPreviewStats()
+    PlayerStats BuildPreviewStats(HeroData currentHeroData)
     {
         PlayerStats stats = new PlayerStats();
         stats.InitStats();
         stats.ClearStats(PlayerStats.HeroBaseKey);
         stats.ClearStats(PlayerStats.EquipmentKey);
         stats.ClearTemporaryStats();
-        stats.ApplyHeroBaseStats(heroData);
+        stats.ApplyHeroBaseStats(currentHeroData);
 
         EquipmentSession session = EquipmentSession.GetOrCreate();
         if (session != null)
@@ -83,6 +86,24 @@ public class PlayerInventoryUI : MonoBehaviour
 
         ApplyTemporaryStats(stats);
         return stats;
+    }
+
+    HeroData ResolveHeroData()
+    {
+        return HeroDataResolver.Resolve(heroData);
+    }
+
+    int GetDisplayCurrentHp(int maxHp)
+    {
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        if (player != null)
+            return Mathf.Clamp(player.currentHp, 0, maxHp);
+
+        ChapterDiceSession chapterDiceSession = ChapterDiceSession.Instance;
+        if (chapterDiceSession != null && chapterDiceSession.TryGetCurrentHp(out int savedCurrentHp))
+            return Mathf.Clamp(savedCurrentHp, 0, maxHp);
+
+        return maxHp;
     }
 
     void ApplyTemporaryStats(PlayerStats stats)

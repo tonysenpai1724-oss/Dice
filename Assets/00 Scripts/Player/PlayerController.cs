@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using TigerForge;
 using UnityEngine;
+using UnityEngine.UI;
+
+
 
 public class PlayerController : GameUnit
 {
@@ -12,6 +15,7 @@ public class PlayerController : GameUnit
     public PlayerStats playerStats = PlayerStats.Shared;
     public string comboAttackAnim = "Attack1";
     public int comboAttackThreshold = 3;
+    public Button playerStatBtn;
 
     int consecutiveAttackCount;
     bool suppressHpPersistence;
@@ -63,6 +67,8 @@ public class PlayerController : GameUnit
             skeletonGraphic.Initialize(true);
             PlayAnimation(idleAnim, true);
         }
+        playerStatBtn.onClick.RemoveAllListeners();
+        playerStatBtn.onClick.AddListener(OnPlayerClick);
     }
 
     HeroData ResolveHeroData(HeroData fallbackData)
@@ -274,6 +280,11 @@ public class PlayerController : GameUnit
         }
 
         Debug.Log($"[PlayerController] {context} count={diceDatas.Count} list=[{builder}]");
+    }
+
+    public void OnPlayerClick()
+    {
+        UIManager.Instance.ShowPopupHeroStat();
     }
 }
 
