@@ -101,7 +101,6 @@ public class DiceQueueManager : Singleton<DiceQueueManager>
             case DiceType.Vulnerable:
             case DiceType.Exhaust:
             case DiceType.MagicCoin:
-            case DiceType.Cure:
                 return false;
             default:
                 return true;
@@ -174,6 +173,8 @@ public class DiceQueueManager : Singleton<DiceQueueManager>
             if (first != null)
             {
                 DiceData diceData = first.data;
+                RelicManager relicManager = RelicManager.GetOrCreate();
+                diceData = relicManager.ResolveDiceDataBeforeSkill(diceData);
                 EnemyManager enemyManager = EnemyManager.Instance;
                 PlayerController player =
                     enemyManager != null
@@ -201,6 +202,7 @@ public class DiceQueueManager : Singleton<DiceQueueManager>
                 if (diceData == null)
                     gameplay?.CancelAttack();
 
+                relicManager.ApplyBeforeDiceSkill(diceData, gameplay);
                 diceData?.ExecuteSkill();
 
                 yield return MoveItem(
@@ -218,7 +220,7 @@ public class DiceQueueManager : Singleton<DiceQueueManager>
 
                     for (int attackIndex = 0; attackIndex < attackCount; attackIndex++)
                     {
-                        float attackDuration = enemyManager.PlayerAttack(gameplay.skillDamage);
+                        float attackDuration = enemyManager.PlayerAttack(gameplay.skillDamage, gameplay.skillDiceData);
 
                         if (fastFlushRequested || !enemyManager.HasAliveEnemies())
                             break;

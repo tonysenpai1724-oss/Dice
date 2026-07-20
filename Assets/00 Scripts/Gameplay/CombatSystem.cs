@@ -10,9 +10,15 @@ public static class CombatSystem
 
     public static int CalculateCriticalDamage(PlayerController player, int baseDamage)
     {
-        int resolvedDamage = Mathf.Max(0, baseDamage);
+        return CalculateCriticalDamage(player, baseDamage, out _);
+    }
 
-        if (!RollCriticalHit(player))
+    public static int CalculateCriticalDamage(PlayerController player, int baseDamage, out bool isCritical)
+    {
+        int resolvedDamage = Mathf.Max(0, baseDamage);
+        isCritical = RollCriticalHit(player);
+
+        if (!isCritical)
             return resolvedDamage;
 
         float critMultiplier = player != null ? Mathf.Max(1f, player.RuntimeCritDamage) : 1f;
@@ -21,8 +27,13 @@ public static class CombatSystem
 
     public static int CalculateFinalPlayerAttackDamage(PlayerController player, int sourceDamage)
     {
+        return CalculateFinalPlayerAttackDamage(player, sourceDamage, out _);
+    }
+
+    public static int CalculateFinalPlayerAttackDamage(PlayerController player, int sourceDamage, out bool isCritical)
+    {
         int baseDamage = CalculatePlayerBaseAttackDamage(player, sourceDamage);
-        return CalculateCriticalDamage(player, baseDamage);
+        return CalculateCriticalDamage(player, baseDamage, out isCritical);
     }
 
     public static int ApplyDefenseToPlayer(PlayerController player, int incomingDamage)

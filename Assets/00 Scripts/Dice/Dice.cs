@@ -30,7 +30,7 @@ public enum DiceType
     Ambush,
     X2BonusAtk,
     MagicCoin,
-    Cure,
+    Counter,
     Armor,
     Vulnerable,
     Exhaust,

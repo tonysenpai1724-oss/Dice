@@ -172,7 +172,10 @@ public class EnemyProjectileAttackPresenter
             .OnComplete(() =>
             {
                 if (target != null)
+                {
                     target.OnTakeDamage(damage);
+                    RelicManager.Instance?.NotifyPlayerDealtDamage(player, damage);
+                }
 
                 UnityEngine.Object.Destroy(projectile.gameObject);
                 decrementActiveProjectiles?.Invoke();

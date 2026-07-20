@@ -39,5 +39,7 @@ public class LevelManager : Singleton<LevelManager>
 
         if (EnemyManager.Instance != null)
             EnemyManager.Instance.StartLevel(level);
+
+        RelicManager.GetOrCreate().OnLevelStarted(level);
     }
 }

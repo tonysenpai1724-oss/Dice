@@ -93,8 +93,8 @@ public class DiceSkillData : SerializedScriptableObject
             case DiceType.MagicCoin:
                 MagicCoinDiceSkillData.Execute(sourceDiceData, stackApply, valueApply);
                 break;
-            case DiceType.Cure:
-                CureDiceSkillData.Execute(sourceDiceData, stackApply, valueApply);
+            case DiceType.Counter:
+                CounterDiceSkillData.Execute(sourceDiceData, stackApply, valueApply);
                 break;
             case DiceType.Armor:
                 ArmorDiceSkillData.Execute(sourceDiceData, stackApply, valueApply);
@@ -380,7 +380,7 @@ public static class MagicCoinDiceSkillData
     }
 }
 
-public static class CureDiceSkillData
+public static class CounterDiceSkillData
 {
     public static void Execute(DiceData sourceDiceData, int stackApply, int valueApply)
     {
@@ -395,8 +395,7 @@ public static class CureDiceSkillData
         if (healAmount <= 0)
             return;
 
-        gameplay.CancelAttack();
-        player.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
+        //  player.effectManager?.AddEffect<HealEffect>()?.Apply(healAmount);
         player.effectManager?.RemoveEffectsByType(EffectType.Debuff);
     }
 }
@@ -491,8 +490,6 @@ public static class DiceSkillFactory
         return skill;
     }
 }
-
-
 
 
 

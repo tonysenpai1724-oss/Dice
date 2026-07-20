@@ -245,11 +245,16 @@ public class EnemyManager : Singleton<EnemyManager>
         if (diceData == null)
             return 0f;
 
-        int finalDamage = CombatSystem.CalculateFinalPlayerAttackDamage(player, diceData.damage);
-        return PlayerAttack(finalDamage);
+        int baseDamage = CombatSystem.CalculatePlayerBaseAttackDamage(player, diceData.damage);
+        return PlayerAttack(baseDamage, diceData);
     }
 
     public float PlayerAttack(int damage)
+    {
+        return PlayerAttack(damage, GameplayManager.Instance != null ? GameplayManager.Instance.skillDiceData : null);
+    }
+
+    public float PlayerAttack(int damage, DiceData diceData, bool isCounter = false)
     {
         Enemy target = GetNearestAliveEnemy();
         if (target == null)
@@ -258,8 +263,19 @@ public class EnemyManager : Singleton<EnemyManager>
             return 0f;
         }
 
+        int finalDamage = CombatSystem.CalculateCriticalDamage(player, damage, out bool isCritical);
+        PlayerAttackDamageContext damageContext = new(
+            player,
+            target,
+            diceData,
+            finalDamage,
+            isCritical,
+            isCounter
+        );
+        RelicManager.GetOrCreate().ModifyPlayerAttackDamage(damageContext);
+
         float attackDuration = projectileAttackPresenter != null
-            ? projectileAttackPresenter.PlayPlayerAttack(target, damage)
+            ? projectileAttackPresenter.PlayPlayerAttack(target, damageContext.Damage)
             : 0f;
         CheckWinGame();
         return attackDuration;
