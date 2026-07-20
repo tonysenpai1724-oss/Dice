@@ -6,6 +6,7 @@ public class PlayerInventoryUI : MonoBehaviour
 {
     [Header("Refs")]
     public EquipmentDatabaseSO equipmentDatabase;
+    public HeroDatabaseSO heroDatabase;
 
     [Header("Texts")]
     public TextMeshProUGUI txtHp;
@@ -41,7 +42,8 @@ public class PlayerInventoryUI : MonoBehaviour
 
     public void Refresh()
     {
-        HeroStatSnapshot stats = GetDisplayedStats();
+        HeroData currentHeroData = ResolveHeroData();
+        HeroStatSnapshot stats = GetDisplayedStats(currentHeroData);
 
         SetText(txtHp, GetDisplayCurrentHp(stats.hp) + "/" + stats.hp);
         SetText(txtDamage, stats.damage.ToString());
@@ -49,12 +51,11 @@ public class PlayerInventoryUI : MonoBehaviour
         SetText(txtCritRate, $"{stats.critRate:0.##}");
         SetText(txtCritDamage, $"{stats.critDamage:0.##}");
         SetText(txtLuck, $"{stats.luck:0.##}");
-        SetText(txtName, heroData.name);
+        SetText(txtName, currentHeroData != null ? currentHeroData.name : string.Empty);
     }
 
-    HeroStatSnapshot GetDisplayedStats()
+    HeroStatSnapshot GetDisplayedStats(HeroData currentHeroData)
     {
-        HeroData currentHeroData = ResolveHeroData();
         PlayerStats previewStats = BuildPreviewStats(currentHeroData);
         return previewStats.ToHeroStatSnapshot(currentHeroData);
     }
@@ -90,7 +91,7 @@ public class PlayerInventoryUI : MonoBehaviour
 
     HeroData ResolveHeroData()
     {
-        return HeroDataResolver.Resolve(heroData);
+        return HeroDataResolver.Resolve(heroData, true, heroDatabase);
     }
 
     int GetDisplayCurrentHp(int maxHp)
@@ -173,4 +174,3 @@ public class PlayerInventoryUI : MonoBehaviour
             textComponent.text = value;
     }
 }
-

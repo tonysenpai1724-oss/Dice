@@ -6,6 +6,7 @@ public class PopupHeroStat : UIBase
 {
     [Header("Hero")]
     public HeroData heroData;
+    public HeroDatabaseSO heroDatabase;
 
     [Header("Start Dice")]
     public ItemToggle itemTogglePrefab;
@@ -73,7 +74,7 @@ public class PopupHeroStat : UIBase
 
     HeroData ResolveHeroData()
     {
-        return HeroDataResolver.Resolve(heroData);
+        return HeroDataResolver.Resolve(heroData, true, heroDatabase);
     }
 
     ItemPreviewGenerator ResolvePreviewGenerator()

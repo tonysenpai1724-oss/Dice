@@ -41,6 +41,7 @@ public class EquipmentManager : MonoBehaviour
     [Header("Refs")]
     public PlayerController player;
     public HeroData heroDataOverride;
+    public HeroDatabaseSO heroDatabase;
     public EquipmentDatabaseSO equipmentDatabase;
 
     [Header("Equipped Items")]
@@ -54,6 +55,8 @@ public class EquipmentManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        if (heroDatabase != null)
+            HeroDataResolver.SetDatabase(heroDatabase);
         InitializeSlots();
         EquipmentSession.GetOrCreate().SetDatabase(equipmentDatabase);
         ApplySessionLoadout();
@@ -107,7 +110,7 @@ public class EquipmentManager : MonoBehaviour
         if (player != null && player.data != null)
             return player.data;
 
-        return HeroDataResolver.Resolve(null, false);
+        return HeroDataResolver.Resolve(null, false, heroDatabase);
     }
 
     public BaseEquiment GetEquippedItem(EquipmentType equipmentType)

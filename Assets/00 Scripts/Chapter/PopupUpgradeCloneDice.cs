@@ -18,7 +18,13 @@ public class PopupUpgradeCloneDice : UIBase
     public GameObject upgradePanel;
 
     [Header("Selected Dice")]
+    public Image bgImg;
     public Image diceImg;
+
+    [Header("Character Image")]
+    public Image charImg;
+    public Sprite rollCharImg;
+    public Sprite resultCharImg;
 
     [Header("Clone Panel")]
     public TextMeshProUGUI txtCloneChance;
@@ -30,13 +36,16 @@ public class PopupUpgradeCloneDice : UIBase
 
     [Header("Actions")]
     public Button buttonExit;
+    public Button offerBtn;
 
     readonly List<DiceData> currentDiceDatas = new();
     readonly List<ItemToggle> spawnedItems = new();
+    readonly List<Image> clonedBgImages = new();
 
     DiceData selectedDiceData;
     int selectedDiceIndex = -1;
     Sprite selectedDiceSprite;
+    bool isShowingResult;
 
     void Awake()
     {
@@ -46,6 +55,7 @@ public class PopupUpgradeCloneDice : UIBase
 
     void OnDestroy()
     {
+        ClearClonedBgImages();
         ClearItems();
     }
 
@@ -79,10 +89,20 @@ public class PopupUpgradeCloneDice : UIBase
             buttonExit.onClick.RemoveAllListeners();
             buttonExit.onClick.AddListener(Hide);
         }
+
+        if (offerBtn != null)
+        {
+            offerBtn.onClick.RemoveAllListeners();
+            offerBtn.onClick.AddListener(OnClickAnother);
+        }
     }
 
     void RefreshView()
     {
+        isShowingResult = false;
+        SetOfferButtonVisible(false);
+        SetCharRollImage();
+        ClearClonedBgImages();
         BuildDiceList();
         RebuildItems();
 
@@ -147,6 +167,9 @@ public class PopupUpgradeCloneDice : UIBase
 
     void OnSelectDice(int diceIndex)
     {
+        if (isShowingResult)
+            return;
+
         selectedDiceIndex = diceIndex;
         selectedDiceData = diceIndex >= 0 && diceIndex < currentDiceDatas.Count ? currentDiceDatas[diceIndex] : null;
         RefreshSelectedView();
@@ -166,6 +189,7 @@ public class PopupUpgradeCloneDice : UIBase
         {
             ClearRateTexts();
             SetDiceImage(null, null);
+            SetBgImageVisible(false);
             SetActionButtons(false, false);
             return;
         }
@@ -175,6 +199,7 @@ public class PopupUpgradeCloneDice : UIBase
 
         SetRateTexts(chancePercent);
         SetDiceImage(GetSelectedDiceSprite(), GetSelectedDiceTexture());
+        SetBgImageVisible(true);
         SetActionButtons(true, upgradeTarget != null);
     }
 
@@ -202,7 +227,7 @@ public class PopupUpgradeCloneDice : UIBase
             if (item == null || item.btn == null)
                 continue;
 
-            item.btn.interactable = i != selectedDiceIndex;
+            item.btn.interactable = !isShowingResult && i != selectedDiceIndex;
         }
     }
 
@@ -216,6 +241,9 @@ public class PopupUpgradeCloneDice : UIBase
 
     void OnClickClone()
     {
+        if (isShowingResult)
+            return;
+
         if (selectedDiceData == null)
             return;
 
@@ -223,33 +251,49 @@ public class PopupUpgradeCloneDice : UIBase
         if (session == null)
             return;
 
+        PrepareRollVisuals();
+
         DiceData attemptedDice = selectedDiceData;
         int chancePercent = GetSuccessChancePercent(attemptedDice);
-        bool success = RollSuccess(chancePercent);
+        bool rollSuccess = RollSuccess(chancePercent);
+        bool actionSuccess = false;
 
-        if (success)
+        if (rollSuccess)
         {
             if (session.CloneDiceDataAt(selectedDiceIndex))
+            {
+                actionSuccess = true;
                 Debug.Log("Clone success");
+            }
             else
+            {
                 Debug.Log("Clone failed");
+            }
         }
         else
         {
             RemoveFailedDice(session, attemptedDice, "Clone failed");
         }
 
-        RefreshAfterAction(attemptedDice, success);
+        RefreshAfterAction(attemptedDice, actionSuccess);
+        ApplyCloneResultVisual(actionSuccess);
+        ShowResultState();
+        SetCharResultImage();
     }
 
     void OnClickUpgrade()
     {
+        if (isShowingResult)
+            return;
+
         if (selectedDiceData == null)
             return;
 
         ChapterDiceSession session = ChapterDiceSession.GetOrCreate();
         if (session == null)
             return;
+
+        PrepareRollVisuals();
 
         DiceData attemptedDice = selectedDiceData;
         DiceData upgradeTarget = attemptedDice.GetUpgradeData();
@@ -261,13 +305,15 @@ public class PopupUpgradeCloneDice : UIBase
         }
 
         int chancePercent = GetSuccessChancePercent(attemptedDice);
-        bool success = RollSuccess(chancePercent);
+        bool rollSuccess = RollSuccess(chancePercent);
+        bool actionSuccess = false;
 
-        if (success)
+        if (rollSuccess)
         {
             if (session.UpgradeDiceDataAt(selectedDiceIndex, upgradeTarget))
             {
                 selectedDiceData = upgradeTarget;
+                actionSuccess = true;
                 Debug.Log("Upgrade success");
             }
             else
@@ -280,7 +326,23 @@ public class PopupUpgradeCloneDice : UIBase
             RemoveFailedDice(session, attemptedDice, "Upgrade failed");
         }
 
-        RefreshAfterAction(attemptedDice, success);
+        RefreshAfterAction(attemptedDice, actionSuccess);
+        ApplyUpgradeResultVisual(actionSuccess);
+        ShowResultState();
+        SetCharResultImage();
+    }
+
+    void OnClickAnother()
+    {
+        isShowingResult = false;
+        SetOfferButtonVisible(false);
+        SetCharRollImage();
+        ClearClonedBgImages();
+        ClearSelection();
+        BuildDiceList();
+        RebuildItems();
+        RefreshSelectedView();
+        RefreshItemSelection();
     }
 
     void RemoveFailedDice(ChapterDiceSession session, DiceData attemptedDice, string message)
@@ -393,6 +455,143 @@ public class PopupUpgradeCloneDice : UIBase
         diceImg.sprite = sprite;
         diceImg.enabled = sprite != null;
         diceImg.preserveAspect = true;
+    }
+
+    void PrepareRollVisuals()
+    {
+        SetOfferButtonVisible(false);
+        SetActionPanelsVisible(false);
+        SetActionButtons(false, false);
+        SetItemSelectionEnabled(false);
+        ClearClonedBgImages();
+        SetBgImageVisible(selectedDiceData != null);
+        SetBgImageImageEnabled(selectedDiceData != null);
+        SetDiceImage(GetSelectedDiceSprite(), GetSelectedDiceTexture());
+        SetCharRollImage();
+    }
+
+    void ShowResultState()
+    {
+        isShowingResult = true;
+        SetActionPanelsVisible(false);
+        SetActionButtons(false, false);
+        SetItemSelectionEnabled(false);
+        SetOfferButtonVisible(true);
+        SetBgImageImageEnabled(false);
+    }
+
+    void ApplyCloneResultVisual(bool success)
+    {
+        if (success)
+        {
+            SetBgImageVisible(true);
+            DuplicateBgImage();
+            return;
+        }
+
+        SetBgImageVisible(false);
+    }
+
+    void ApplyUpgradeResultVisual(bool success)
+    {
+        if (success)
+        {
+            SetBgImageVisible(true);
+            SetDiceImage(GetSelectedDiceSprite(), GetSelectedDiceTexture());
+            return;
+        }
+
+        SetDiceImage(null, null);
+    }
+
+    void DuplicateBgImage()
+    {
+        if (bgImg == null)
+            return;
+
+
+        Image clonedBgImage = Instantiate(bgImg, bgImg.transform.parent);
+        clonedBgImage.transform.SetSiblingIndex(bgImg.transform.GetSiblingIndex() + 1);
+        clonedBgImage.gameObject.SetActive(true);
+        clonedBgImage.enabled = false;
+        clonedBgImages.Add(clonedBgImage);
+    }
+
+    void SetBgImageVisible(bool visible)
+    {
+        if (bgImg == null)
+            return;
+
+        bgImg.gameObject.SetActive(visible);
+        bgImg.enabled = visible;
+    }
+
+    void SetBgImageImageEnabled(bool enabled)
+    {
+        if (bgImg == null)
+            return;
+
+        bgImg.enabled = enabled;
+    }
+
+    void ClearClonedBgImages()
+    {
+        for (int i = 0; i < clonedBgImages.Count; i++)
+        {
+            if (clonedBgImages[i] != null)
+                Destroy(clonedBgImages[i].gameObject);
+        }
+
+        clonedBgImages.Clear();
+    }
+
+    void SetActionPanelsVisible(bool visible)
+    {
+        if (clonePanel != null)
+            clonePanel.SetActive(visible);
+        if (upgradePanel != null)
+            upgradePanel.SetActive(visible);
+    }
+
+    void SetItemSelectionEnabled(bool enabled)
+    {
+        for (int i = 0; i < spawnedItems.Count; i++)
+        {
+            ItemToggle item = spawnedItems[i];
+            if (item == null || item.btn == null)
+                continue;
+
+            item.btn.interactable = enabled && i != selectedDiceIndex;
+        }
+    }
+
+    void SetOfferButtonVisible(bool visible)
+    {
+        if (offerBtn == null)
+            return;
+
+        offerBtn.gameObject.SetActive(visible);
+        offerBtn.interactable = visible;
+    }
+
+    void SetCharRollImage()
+    {
+        SetCharImage(rollCharImg);
+    }
+
+    void SetCharResultImage()
+    {
+        SetCharImage(resultCharImg);
+    }
+
+    void SetCharImage(Sprite sprite)
+    {
+        if (charImg == null)
+            return;
+
+        charImg.sprite = sprite;
+        charImg.enabled = sprite != null;
+        charImg.preserveAspect = true;
     }
 
     void ReleaseSelectedDiceSprite()

@@ -6133,6 +6133,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentManager
   player: {fileID: 470231344}
   heroDataOverride: {fileID: 0}
+  heroDatabase: {fileID: 11400000, guid: 9a9539d8983473f469ecc4d6b12a9552, type: 2}
   equipmentDatabase: {fileID: 11400000, guid: 677041f7bdf74ba43b75c299a67e3e24, type: 2}
   equippedSlots:
   - equipmentType: 0
@@ -34535,6 +34536,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1038947976}
     m_Modifications:
+    - target: {fileID: 112385683157244673, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 112385683157244673, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 112385683157244673, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 167.79178
+      objectReference: {fileID: 0}
+    - target: {fileID: 112385683157244673, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -82.45555
+      objectReference: {fileID: 0}
     - target: {fileID: 207383039935493158, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
       propertyPath: m_Name
       value: Popup Upgrade Clone Dice
@@ -34542,6 +34559,22 @@ PrefabInstance:
     - target: {fileID: 207383039935493158, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6141835356350423932, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6141835356350423932, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6141835356350423932, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 162.93
+      objectReference: {fileID: 0}
+    - target: {fileID: 6141835356350423932, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -75
       objectReference: {fileID: 0}
     - target: {fileID: 6484308457979024822, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
       propertyPath: m_Pivot.x
@@ -34623,9 +34656,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7179682364200340176, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
+    - target: {fileID: 8672116121257081366, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8672116121257081366, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8672116121257081366, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 503.3753
+      objectReference: {fileID: 0}
+    - target: {fileID: 8672116121257081366, guid: 30eaa53e3d976c549a77c3d73778cd12, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -82.45555
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -218,7 +218,7 @@ public class PopupRollDiceBuff : UIBase
         SetImageSprite(icon, null);
         SetImageSprite(rollingBg, null);
         SetImageSprite(rollingHeader, null);
-        SetImageSprite(statRewardImage, null);
+        //  SetImageSprite(statRewardImage, null);
 
         if (rollingHeaderTxt != null)
             rollingHeaderTxt.text = string.Empty;
@@ -261,7 +261,7 @@ public class PopupRollDiceBuff : UIBase
         pendingHpRewardPercent = isWin ? GetHpPenaltyPercent(diceType) : 0f;
         pendingDamageRewardPercent = isWin ? GetDamageBonusPercent(diceType) : 5f;
 
-        SetImageSprite(statRewardImage, rollItemData?.bgSprite);
+        //    SetImageSprite(statRewardImage, rollItemData?.bgSprite);
 
         if (statRewardTxt != null)
             statRewardTxt.text = $"+{pendingDamageRewardPercent:0.#}%";

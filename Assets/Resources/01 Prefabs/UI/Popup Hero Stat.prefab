@@ -305,6 +305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInventoryUI
   equipmentDatabase: {fileID: 11400000, guid: 677041f7bdf74ba43b75c299a67e3e24, type: 2}
+  heroDatabase: {fileID: 11400000, guid: 9a9539d8983473f469ecc4d6b12a9552, type: 2}
   txtHp: {fileID: 6141193870104785655}
   txtDamage: {fileID: 2698596320979988614}
   txtDefense: {fileID: 7566172778580565575}
@@ -331,6 +332,7 @@ MonoBehaviour:
   blockPanel: {fileID: 0}
   hackObj: {fileID: 0}
   heroData: {fileID: 0}
+  heroDatabase: {fileID: 11400000, guid: 9a9539d8983473f469ecc4d6b12a9552, type: 2}
   itemTogglePrefab: {fileID: 7080924738948861388, guid: 5ddcac5f16ce4f04fa61e25d60afcb12, type: 3}
   diceParent: {fileID: 1244394728713428954}
   itemPreviewPrefab: {fileID: 1527963037788498919, guid: 6160549e183956843a8ea2dc5fdb48cd, type: 3}

@@ -38,15 +38,18 @@ public class ChapterDiceSession : MonoBehaviour
     public static ChapterDiceSession Instance;
 
     [SerializeField] HeroData heroData;
+    [SerializeField] string heroName;
     [SerializeField] int heroLevel;
     [SerializeField] bool initializedFromHero;
     [SerializeField] bool heroStartDiceAdded;
     [SerializeField] int currentHp = -1;
     [SerializeField] List<DiceData> runtimeDiceDatas = new();
     public DiceDatabaseSO diceDatabase;
+    public HeroDatabaseSO heroDatabase;
 
     public IReadOnlyList<DiceData> RuntimeDiceDatas => runtimeDiceDatas;
     public HeroData CurrentHeroData => heroData;
+    public string CurrentHeroName => heroData != null ? heroData.name : heroName;
 
     void Awake()
     {
@@ -70,6 +73,7 @@ public class ChapterDiceSession : MonoBehaviour
             return;
 
         heroData = sourceHeroData;
+        heroName = sourceHeroData.name;
         heroLevel = sourceHeroData.level;
         HeroSelectionSession.GetOrCreate().SetSelectedHero(sourceHeroData);
     }
@@ -143,6 +147,7 @@ public class ChapterDiceSession : MonoBehaviour
             return false;
 
         heroLevel = cachedData.heroLevel;
+        heroName = cachedData.heroName;
         heroStartDiceAdded = cachedData.heroStartDiceAdded;
         currentHp = cachedData.currentHp;
 
@@ -221,7 +226,7 @@ public class ChapterDiceSession : MonoBehaviour
 
         ChapterDiceSessionCachedData cachedData = new ChapterDiceSessionCachedData
         {
-            heroName = heroData != null ? heroData.name : string.Empty,
+            heroName = CurrentHeroName,
             heroLevel = heroLevel,
             heroStartDiceAdded = heroStartDiceAdded,
             currentHp = currentHp,
@@ -256,6 +261,7 @@ public class ChapterDiceSession : MonoBehaviour
             return;
 
         heroLevel = cachedData.heroLevel;
+        heroName = cachedData.heroName;
         heroStartDiceAdded = cachedData.heroStartDiceAdded;
         currentHp = cachedData.currentHp;
 
@@ -558,6 +564,7 @@ public class ChapterDiceSession : MonoBehaviour
     {
         runtimeDiceDatas.Clear();
         heroData = null;
+        heroName = string.Empty;
         heroLevel = 0;
         initializedFromHero = false;
         heroStartDiceAdded = false;

@@ -16,21 +16,17 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 21300000, guid: fdf1fb70c8cc14c41b57d9b373995529, type: 3}
+    - {fileID: 21300000, guid: 67ea52c41ac14764b9f4a5cc063c16a6, type: 3}
     - {fileID: 21300000, guid: e6966721c908fbf4eb780adaca93f999, type: 3}
     - {fileID: 21300000, guid: cd9fc1caf8703a64f9b54981cf8d1b4a, type: 3}
-    - {fileID: 21300000, guid: b3ff557674ded5744b5a3a780b028c34, type: 3}
     - {fileID: 21300000, guid: 602af166176a10c4380e40447c4a98fb, type: 3}
     - {fileID: 21300000, guid: bd0d26c9558b84e498f9dc581728973a, type: 3}
-    - {fileID: 21300000, guid: 6b58d22a01ee4f14ca9eac7d8c5c4c36, type: 3}
     - {fileID: 21300000, guid: 10bd44bfbfdce424ca23f35a5b9d997c, type: 3}
     - {fileID: 21300000, guid: dffd3963222d56f4eb378c424653d016, type: 3}
     - {fileID: 21300000, guid: 6c43ce575739c2f4d9f93186f603b18d, type: 3}
     - {fileID: 21300000, guid: 6120aa64d62133c44a078ea3d5f9fabb, type: 3}
-    - {fileID: 21300000, guid: c6627808b2c216a42aa84e50decf35df, type: 3}
     - {fileID: 21300000, guid: 4de0ce17673583c41abbc33d893e6090, type: 3}
     - {fileID: 21300000, guid: cad415bfb2e0b8b4e87a12f9dabe166e, type: 3}
-    - {fileID: 21300000, guid: f27da9c732c0af8409158163c55d4411, type: 3}
     - {fileID: 21300000, guid: 4a9874a979059274db665a374a58b613, type: 3}
     - {fileID: 21300000, guid: d32677e31d8466243a8f66e76a14170d, type: 3}
     SerializedBytesString: 
@@ -99,10 +95,10 @@ MonoBehaviour:
       Data: 3|RollItemData, Assembly-CSharp
     - Name: bgSprite
       Entry: 10
-      Data: 3
+      Data: 0
     - Name: headerSprite
       Entry: 10
-      Data: 4
+      Data: 3
     - Name: iconDie1Sprite
       Entry: 6
       Data: 
@@ -111,7 +107,7 @@ MonoBehaviour:
       Data: 
     - Name: typeIconSprite
       Entry: 10
-      Data: 5
+      Data: 4
     - Name: 
       Entry: 8
       Data: 
@@ -129,10 +125,10 @@ MonoBehaviour:
       Data: 4|RollItemData, Assembly-CSharp
     - Name: bgSprite
       Entry: 10
-      Data: 6
+      Data: 0
     - Name: headerSprite
       Entry: 10
-      Data: 7
+      Data: 5
     - Name: iconDie1Sprite
       Entry: 6
       Data: 
@@ -141,7 +137,7 @@ MonoBehaviour:
       Data: 
     - Name: typeIconSprite
       Entry: 10
-      Data: 8
+      Data: 6
     - Name: 
       Entry: 8
       Data: 
@@ -185,13 +181,13 @@ MonoBehaviour:
       Data: 7|RollItemBuffData, Assembly-CSharp
     - Name: bgSprite
       Entry: 10
-      Data: 6
+      Data: 0
     - Name: headerSprite
       Entry: 10
-      Data: 9
+      Data: 7
     - Name: bgIcon
       Entry: 10
-      Data: 10
+      Data: 8
     - Name: 
       Entry: 8
       Data: 
@@ -209,13 +205,13 @@ MonoBehaviour:
       Data: 8|RollItemBuffData, Assembly-CSharp
     - Name: bgSprite
       Entry: 10
-      Data: 11
+      Data: 0
     - Name: headerSprite
       Entry: 10
-      Data: 12
+      Data: 9
     - Name: bgIcon
       Entry: 10
-      Data: 13
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -233,13 +229,13 @@ MonoBehaviour:
       Data: 9|RollItemBuffData, Assembly-CSharp
     - Name: bgSprite
       Entry: 10
-      Data: 14
+      Data: 0
     - Name: headerSprite
       Entry: 10
-      Data: 15
+      Data: 11
     - Name: bgIcon
       Entry: 10
-      Data: 16
+      Data: 12
     - Name: 
       Entry: 8
       Data: 
