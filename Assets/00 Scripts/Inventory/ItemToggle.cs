@@ -17,6 +17,7 @@ public class ItemToggle : MonoBehaviour
     public Button btn;
     public RawImage previewRawImage;
     public Image previewImage;
+    public Image selectedImg;
 
     Texture2D previewTexture;
     Sprite previewSprite;
@@ -40,6 +41,10 @@ public class ItemToggle : MonoBehaviour
             btn.onClick.AddListener(OnClick);
         }
     }
+    public void SetSelect(bool isSelect)
+    {
+        selectedImg.enabled = isSelect;
+    }
 
     public void Setup(DiceData diceData, Texture2D texture, Action<ItemToggle> onSelectedCallback = null)
     {
@@ -48,6 +53,7 @@ public class ItemToggle : MonoBehaviour
         runeData = null;
         onSelected = onSelectedCallback;
         SetPreview(texture);
+        SetSelect(false);
 
         if (btn != null)
             btn.interactable = data != null;
@@ -60,11 +66,11 @@ public class ItemToggle : MonoBehaviour
         runeData = runeSkillData;
         onSelected = onSelectedCallback;
         SetPreview(sprite);
+        SetSelect(false);
 
         if (btn != null)
             btn.interactable = runeData != null;
     }
-
     public void Clear()
     {
         itemType = ItemToggleType.None;

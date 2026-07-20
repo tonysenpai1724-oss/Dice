@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,6 +41,7 @@ public class InventoryUIController : UIBase
     readonly List<InventoryItemPreview> spawnedItems = new();
     readonly List<ItemToggle> spawnedToggles = new();
     InventoryViewTab currentTab = InventoryViewTab.Dice;
+    bool itemToggleCanClick = true;
 
     void Start()
     {
@@ -92,7 +93,7 @@ public class InventoryUIController : UIBase
             return;
 
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>();
+            previewGenerator = ItemPreviewGenerator.Resolve();
 
         if (previewGenerator == null)
         {
@@ -112,11 +113,23 @@ public class InventoryUIController : UIBase
             Texture2D previewTexture = previewGenerator.Capture(itemPrefab, diceData);
             ItemToggle itemToggle = Instantiate(itemTogglePrefab, parent);
             itemToggle.Setup(diceData, previewTexture, OnItemToggleSelected);
+            if (itemToggle.btn != null)
+                itemToggle.btn.interactable = itemToggleCanClick;
             itemToggles.Add(itemToggle);
             spawnedToggles.Add(itemToggle);
         }
     }
+    public void SetItemToggleButton(bool canClick)
+    {
+        itemToggleCanClick = canClick;
+        foreach (var item in itemToggles)
+        {
+            if (item == null || item.btn == null)
+                continue;
 
+            item.btn.interactable = canClick;
+        }
+    }
     public void RefreshRunes()
     {
         ClearItems();
@@ -145,6 +158,8 @@ public class InventoryUIController : UIBase
             Sprite runeSprite = runeData.runeSprite;
             ItemToggle itemToggle = Instantiate(itemTogglePrefab, parent);
             itemToggle.Setup(runeData, runeSprite, OnItemToggleSelected);
+            if (itemToggle.btn != null)
+                itemToggle.btn.interactable = itemToggleCanClick;
             itemToggles.Add(itemToggle);
             spawnedToggles.Add(itemToggle);
         }
@@ -167,10 +182,24 @@ public class InventoryUIController : UIBase
 
     void OnItemToggleSelected(ItemToggle itemToggle)
     {
+        if (!itemToggleCanClick)
+            return;
+
         if (itemToggle == null)
             return;
 
         ItemSelected?.Invoke(itemToggle);
+        foreach (var item in itemToggles)
+        {
+            if (item != itemToggle)
+            {
+                item.SetSelect(false);
+            }
+            else
+            {
+                item.SetSelect(true);
+            }
+        }
 
         if (UIManager.Instance == null)
             return;

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PopupShop : UIBase
@@ -118,7 +118,7 @@ public class PopupShop : UIBase
         }
 
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>();
+            previewGenerator = ItemPreviewGenerator.Resolve();
     }
 
     void SpawnRuneItems()
@@ -150,3 +150,4 @@ public class PopupShop : UIBase
         spawnedItems.Clear();
     }
 }
+

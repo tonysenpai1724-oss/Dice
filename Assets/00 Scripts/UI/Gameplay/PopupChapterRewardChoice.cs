@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -66,6 +66,7 @@ public class PopupChapterRewardChoice : UIBase
             SetupRewardItem(item, option);
             spawnedItems.Add(item);
         }
+        inventoryUIController.SetItemToggleButton(false);
     }
 
     public void SkipForCoin()
@@ -168,7 +169,7 @@ public class PopupChapterRewardChoice : UIBase
         }
 
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>();
+            previewGenerator = ItemPreviewGenerator.Resolve();
     }
 
     void OnSelectOption(ChapterRewardChoiceOption option)
@@ -192,3 +193,4 @@ public class PopupChapterRewardChoice : UIBase
         spawnedItems.Clear();
     }
 }
+

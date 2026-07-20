@@ -53,6 +53,7 @@ public class EquipmentStatBonus
 public class HeroStatSnapshot
 {
     public int hp;
+    public int currentHp;
     public int damage;
     public int defense;
     public float critDamage;
@@ -69,6 +70,7 @@ public class HeroStatSnapshot
             return;
 
         hp = heroData.hp;
+        currentHp = hp;
         damage = heroData.damage;
         defense = heroData.def;
         critDamage = heroData.critDmg;

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -197,6 +197,9 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
                     {
                         float attackDuration = enemyManager.PlayerAttack(gameplay.skillDamage);
 
+                        if (fastFlushRequested || !enemyManager.HasAliveEnemies())
+                            break;
+
                         if (attackIndex < attackCount - 1)
                         {
                             float waitDuration = attackDuration > 0f ? attackDuration : multiAttackDelay;
@@ -320,7 +323,7 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
     void CachePreviewRefs()
     {
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>();
+            previewGenerator = ItemPreviewGenerator.Resolve();
     }
 
     Vector2 WorldToQueuePosition(Vector3 worldPosition)
@@ -667,6 +670,7 @@ public class DiceQueueUI : Singleton<DiceQueueUI>
 
 
 }
+
 
 
 

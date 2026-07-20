@@ -141,7 +141,7 @@ public class EquipmentManager : MonoBehaviour
     public HeroStatSnapshot GetCurrentTotalStats()
     {
         if (player != null && player.playerStats != null)
-            return player.playerStats.ToHeroStatSnapshot(GetHeroData());
+            return player.playerStats.ToHeroStatSnapshot(GetHeroData(), player.currentHp);
 
         return new HeroStatSnapshot(GetHeroData());
     }

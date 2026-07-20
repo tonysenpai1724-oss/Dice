@@ -170,8 +170,9 @@ public class PlayerController : GameUnit
 
         int previousMaxHp = hp;
         int previousCurrentHp = currentHp;
-        HeroStatSnapshot finalStats = playerStats.ToHeroStatSnapshot(data);
+        HeroStatSnapshot finalStats = playerStats.ToHeroStatSnapshot(data, previousCurrentHp);
         int currentHpValue = CalculateCurrentHpAfterMaxHpChange(previousCurrentHp, previousMaxHp, finalStats.hp);
+        finalStats.currentHp = currentHpValue;
         Debug.Log($"[PlayerController] RefreshStatsFromEquipment after rebuild | oldHp={previousMaxHp} oldCurrentHp={previousCurrentHp} hp={finalStats.hp} dmg={finalStats.damage} def={finalStats.defense} critRate={finalStats.critRate} critDmg={finalStats.critDamage} luck={finalStats.luck} currentHpTarget={currentHpValue}");
         SetHealth(finalStats.hp, currentHpValue);
     }

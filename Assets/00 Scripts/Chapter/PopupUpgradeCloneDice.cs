@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -174,6 +174,7 @@ public class PopupUpgradeCloneDice : UIBase
         selectedDiceData = diceIndex >= 0 && diceIndex < currentDiceDatas.Count ? currentDiceDatas[diceIndex] : null;
         RefreshSelectedView();
         RefreshItemSelection();
+
     }
 
     void RefreshSelectedView()
@@ -432,7 +433,7 @@ public class PopupUpgradeCloneDice : UIBase
     void EnsurePreviewGenerator()
     {
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>(FindObjectsInactive.Include);
+            previewGenerator = ItemPreviewGenerator.Resolve();
     }
 
     void SetDiceImage(Sprite sprite, Texture2D texture)
@@ -603,3 +604,4 @@ public class PopupUpgradeCloneDice : UIBase
         selectedDiceSprite = null;
     }
 }
+

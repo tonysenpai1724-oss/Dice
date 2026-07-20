@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -80,7 +80,7 @@ public class PopupHeroStat : UIBase
     ItemPreviewGenerator ResolvePreviewGenerator()
     {
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>();
+            previewGenerator = ItemPreviewGenerator.Resolve();
 
         return previewGenerator;
     }
@@ -104,3 +104,4 @@ public class PopupHeroStat : UIBase
         spawnedDiceToggles.Clear();
     }
 }
+

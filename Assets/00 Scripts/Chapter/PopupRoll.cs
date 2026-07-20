@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -223,7 +223,7 @@ public class PopupRoll : UIBase
             return null;
 
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>(FindObjectsInactive.Include);
+            previewGenerator = ItemPreviewGenerator.Resolve();
 
         if (previewGenerator == null)
             return null;
@@ -614,6 +614,7 @@ public class PopupRoll : UIBase
         Hide();
     }
 }
+
 
 
 

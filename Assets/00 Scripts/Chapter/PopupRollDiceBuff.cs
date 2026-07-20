@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -116,7 +116,7 @@ public class PopupRollDiceBuff : UIBase
         }
 
         if (previewGenerator == null)
-            previewGenerator = FindFirstObjectByType<ItemPreviewGenerator>(FindObjectsInactive.Include);
+            previewGenerator = ItemPreviewGenerator.Resolve();
 
         if (previewGenerator == null)
         {
@@ -636,3 +636,4 @@ public class PopupRollDiceBuff : UIBase
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.RollBuff);
     }
 }
+

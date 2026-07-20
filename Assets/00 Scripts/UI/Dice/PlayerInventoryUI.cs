@@ -45,7 +45,7 @@ public class PlayerInventoryUI : MonoBehaviour
         HeroData currentHeroData = ResolveHeroData();
         HeroStatSnapshot stats = GetDisplayedStats(currentHeroData);
 
-        SetText(txtHp, GetDisplayCurrentHp(stats.hp) + "/" + stats.hp);
+        SetText(txtHp, stats.currentHp + "/" + stats.hp);
         SetText(txtDamage, stats.damage.ToString());
         SetText(txtDefense, stats.defense.ToString());
         SetText(txtCritRate, $"{stats.critRate:0.##}");
@@ -57,6 +57,14 @@ public class PlayerInventoryUI : MonoBehaviour
     HeroStatSnapshot GetDisplayedStats(HeroData currentHeroData)
     {
         PlayerStats previewStats = BuildPreviewStats(currentHeroData);
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        if (player != null)
+            return previewStats.ToHeroStatSnapshot(currentHeroData, player.currentHp);
+
+        ChapterDiceSession chapterDiceSession = ChapterDiceSession.Instance;
+        if (chapterDiceSession != null && chapterDiceSession.TryGetCurrentHp(out int savedCurrentHp))
+            return previewStats.ToHeroStatSnapshot(currentHeroData, savedCurrentHp);
+
         return previewStats.ToHeroStatSnapshot(currentHeroData);
     }
 
@@ -92,19 +100,6 @@ public class PlayerInventoryUI : MonoBehaviour
     HeroData ResolveHeroData()
     {
         return HeroDataResolver.Resolve(heroData, true, heroDatabase);
-    }
-
-    int GetDisplayCurrentHp(int maxHp)
-    {
-        PlayerController player = FindFirstObjectByType<PlayerController>();
-        if (player != null)
-            return Mathf.Clamp(player.currentHp, 0, maxHp);
-
-        ChapterDiceSession chapterDiceSession = ChapterDiceSession.Instance;
-        if (chapterDiceSession != null && chapterDiceSession.TryGetCurrentHp(out int savedCurrentHp))
-            return Mathf.Clamp(savedCurrentHp, 0, maxHp);
-
-        return maxHp;
     }
 
     void ApplyTemporaryStats(PlayerStats stats)

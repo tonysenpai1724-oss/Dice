@@ -277,13 +277,16 @@ public class PlayerStats
         );
     }
 
-    public HeroStatSnapshot ToHeroStatSnapshot(HeroData heroData = null)
+    public HeroStatSnapshot ToHeroStatSnapshot(HeroData heroData = null, int currentHp = -1)
     {
         RefreshTemporaryScopes();
 
         HeroStatSnapshot snapshot = new HeroStatSnapshot(heroData);
 
         snapshot.hp = Mathf.RoundToInt(GetStatValue(HeroStatType.Hp));
+        snapshot.currentHp = currentHp >= 0
+            ? Mathf.Clamp(currentHp, 0, snapshot.hp)
+            : Mathf.Clamp(snapshot.currentHp, 0, snapshot.hp);
         snapshot.damage = Mathf.RoundToInt(GetStatValue(HeroStatType.Damage));
         snapshot.defense = Mathf.RoundToInt(GetStatValue(HeroStatType.Defense));
         snapshot.critDamage = GetStatValue(HeroStatType.CritDamage);

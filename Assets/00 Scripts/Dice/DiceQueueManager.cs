@@ -215,6 +215,9 @@ public class DiceQueueManager : Singleton<DiceQueueManager>
                     {
                         float attackDuration = enemyManager.PlayerAttack(gameplay.skillDamage);
 
+                        if (fastFlushRequested || !enemyManager.HasAliveEnemies())
+                            break;
+
                         if (attackIndex < attackCount - 1)
                         {
                             float waitDuration = attackDuration > 0f ? attackDuration : multiAttackDelay;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemPreviewGenerator : MonoBehaviour
+public class ItemPreviewGenerator : Singleton<ItemPreviewGenerator>
 {
     public Camera previewCamera;
     public RenderTexture renderTexture;
@@ -16,6 +16,15 @@ public class ItemPreviewGenerator : MonoBehaviour
 
     InventoryItemPreview pooledPreviewItem;
     InventoryItemPreview pooledPreviewPrefab;
+
+    public static ItemPreviewGenerator Resolve()
+    {
+        ItemPreviewGenerator instance = Instance;
+        if (instance != null)
+            return instance;
+
+        return FindFirstObjectByType<ItemPreviewGenerator>(FindObjectsInactive.Include);
+    }
 
     public Texture2D Capture(GameObject previewPrefab)
     {

@@ -15,7 +15,8 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects: []
+    ReferencedUnityObjects:
+    - {fileID: 21300000, guid: c6627808b2c216a42aa84e50decf35df, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -40,7 +41,199 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
+      Data: 8
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
       Data: 0
+    - Name: $v
+      Entry: 7
+      Data: 2|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 7
+      Data: 3|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: 4|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 7
+      Data: 5|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 4
+    - Name: $v
+      Entry: 7
+      Data: 6|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 5
+    - Name: $v
+      Entry: 7
+      Data: 7|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 6
+    - Name: $v
+      Entry: 7
+      Data: 8|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 7
+    - Name: $v
+      Entry: 7
+      Data: 9|HeroVisualConfig, Assembly-CSharp
+    - Name: bg
+      Entry: 10
+      Data: 0
+    - Name: icon
+      Entry: 6
+      Data: 
+    - Name: dieIcon
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
