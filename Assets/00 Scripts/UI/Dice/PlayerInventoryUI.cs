@@ -1,6 +1,7 @@
 using TMPro;
 using TigerForge;
 using UnityEngine;
+using Spine.Unity;
 
 public class PlayerInventoryUI : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class PlayerInventoryUI : MonoBehaviour
 
     [Header("Base Hero Stats")]
     public HeroData heroData;
+
 
     void Start()
     {
@@ -52,6 +54,7 @@ public class PlayerInventoryUI : MonoBehaviour
         SetText(txtCritDamage, $"{stats.critDamage:0.##}");
         SetText(txtLuck, $"{stats.luck:0.##}");
         SetText(txtName, currentHeroData != null ? currentHeroData.name : string.Empty);
+
     }
 
     HeroStatSnapshot GetDisplayedStats(HeroData currentHeroData)

@@ -135,6 +135,18 @@ public class RelicManager : MonoBehaviour
         }
     }
 
+    public void OnPlayerTurnStarted()
+    {
+        SyncChapterScope();
+
+        for (int i = 0; i < activeRelics.Count; i++)
+        {
+            RelicData relic = activeRelics[i];
+            if (relic != null && relic.TargetType == RelicType.RelicArmorTurn)
+                relic.Execute();
+        }
+    }
+
     public void ExecuteLevelStartRelic(RelicData relic)
     {
         relic?.Execute();

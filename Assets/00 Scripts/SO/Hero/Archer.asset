@@ -16,11 +16,11 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 11400000, guid: bda2a59d29043a749a3b19d18adc5a00, type: 2}
     - {fileID: 11400000, guid: 2503ea57bedf49b1b6835e6a366ede7a, type: 2}
     - {fileID: 11400000, guid: 3b238dc5fd0d9774bbc16baef50553e9, type: 2}
     - {fileID: 11400000, guid: 210eb9c749cd499ca9becf8409bb74e4, type: 2}
     - {fileID: 11400000, guid: 6cdd42d683ef4b769b7d5746715f847a, type: 2}
+    - {fileID: 11400000, guid: bda2a59d29043a749a3b19d18adc5a00, type: 2}
     - {fileID: 11400000, guid: f707140fbc58caa4fa9dcd9cd483a3c7, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -52,7 +52,7 @@ MonoBehaviour:
       Data: 2|System.Collections.Generic.List`1[[DiceData, Assembly-CSharp]], mscorlib
     - Name: 
       Entry: 12
-      Data: 5
+      Data: 4
     - Name: 
       Entry: 10
       Data: 0
@@ -65,9 +65,6 @@ MonoBehaviour:
     - Name: 
       Entry: 10
       Data: 3
-    - Name: 
-      Entry: 10
-      Data: 4
     - Name: 
       Entry: 13
       Data: 
@@ -91,13 +88,13 @@ MonoBehaviour:
       Data: 4
     - Name: 
       Entry: 10
-      Data: 3
-    - Name: 
-      Entry: 10
-      Data: 0
-    - Name: 
-      Entry: 10
       Data: 2
+    - Name: 
+      Entry: 10
+      Data: 4
+    - Name: 
+      Entry: 10
+      Data: 1
     - Name: 
       Entry: 10
       Data: 5

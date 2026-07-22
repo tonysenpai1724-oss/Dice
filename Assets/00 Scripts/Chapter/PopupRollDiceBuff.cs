@@ -234,7 +234,7 @@ public class PopupRollDiceBuff : UIBase
 
         SetImageSprite(icon, GetDiceIcon(diceType));
         SetImageSprite(rollingBg, rollItemData?.bgSprite);
-        SetImageSprite(rollingHeader, rollItemData?.headerSprite);
+        //  SetImageSprite(rollingHeader, rollItemData?.headerSprite);
 
         if (rollingHeaderTxt != null)
             rollingHeaderTxt.text = GetRollingHeaderText(diceType);
@@ -264,7 +264,7 @@ public class PopupRollDiceBuff : UIBase
         //    SetImageSprite(statRewardImage, rollItemData?.bgSprite);
 
         if (statRewardTxt != null)
-            statRewardTxt.text = $"+{pendingDamageRewardPercent:0.#}%";
+            statRewardTxt.text = $"<sprite name=\"atk\"> +{pendingDamageRewardPercent:0.#}%";
     }
 
     void ClaimPendingReward()
@@ -636,4 +636,3 @@ public class PopupRollDiceBuff : UIBase
         GameManager.Instance.CompleteCurrentSpecialLevel(LevelType.RollBuff);
     }
 }
-

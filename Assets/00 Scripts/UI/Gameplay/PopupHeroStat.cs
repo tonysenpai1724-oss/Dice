@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Spine.Unity;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -15,6 +16,7 @@ public class PopupHeroStat : UIBase
     public ItemPreviewGenerator previewGenerator;
 
     readonly List<ItemToggle> spawnedDiceToggles = new();
+    public SkeletonGraphic heroSkeleton;
 
     void OnEnable()
     {
@@ -36,6 +38,7 @@ public class PopupHeroStat : UIBase
     public void SetHero(HeroData newHeroData)
     {
         heroData = newHeroData;
+        heroSkeleton.skeletonDataAsset = newHeroData.skeletonData;
         RefreshStartDice();
     }
 

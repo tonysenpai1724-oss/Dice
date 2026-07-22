@@ -31,6 +31,8 @@ public class TurnManager : MonoBehaviour
 
     public void AddTurn()
     {
+        RelicManager.Instance?.OnPlayerTurnStarted();
+
         if (DiceManager.Instance != null)
         {
             DiceManager.Instance.ConsumeBindTurns();

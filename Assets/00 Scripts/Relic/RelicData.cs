@@ -247,7 +247,7 @@ public static class RelicArmorTurnData
 
         ShieldEffect shieldEffect = player.effectManager?.AddEffect<ShieldEffect>();
         if (shieldEffect != null)
-            shieldEffect.AddStacks(armorAmount * Mathf.Max(1, stackApply));
+            shieldEffect.SetStacks(armorAmount * Mathf.Max(1, stackApply));
     }
 }
 

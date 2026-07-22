@@ -2,6 +2,15 @@ public class ShieldEffect : GameEffect
 {
     public override EffectType EffectType => EffectType.Buff;
 
+    public void SetStacks(int amount)
+    {
+        Stacks = amount > 0 ? amount : 0;
+        NotifyStacksChanged();
+
+        if (Stacks <= 0)
+            RemoveSelf();
+    }
+
     protected override void Awake()
     {
         base.Awake();
@@ -31,4 +40,3 @@ public class ShieldEffect : GameEffect
             damageEvent.Cancel();
     }
 }
-
