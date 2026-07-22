@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class RelicManager : MonoBehaviour
@@ -7,6 +8,8 @@ public class RelicManager : MonoBehaviour
 
     [SerializeField] private List<RelicData> activeRelics = new();
     [SerializeField] private List<RelicData> startingRelics = new();
+    [SerializeField] private RelicDatabaseSO relicDatabase;
+    [SerializeField] private List<RelicData> allRelics = new();
 
     int currentChapterId = -1;
 
@@ -166,5 +169,23 @@ public class RelicManager : MonoBehaviour
                 activeRelics.Add(relic);
         }
     }
+    [Button]
+    public void AddAllRelic()
+    {
+        SyncChapterScope();
 
+        List<RelicData> relics = relicDatabase != null ? relicDatabase.relicDatas : allRelics;
+        if (relics == null)
+            return;
+
+        for (int i = 0; i < relics.Count; i++)
+        {
+            RelicData relic = relics[i];
+            if (relic == null || activeRelics.Contains(relic))
+                continue;
+
+            activeRelics.Add(relic);
+            ExecuteLevelStartRelic(relic);
+        }
+    }
 }

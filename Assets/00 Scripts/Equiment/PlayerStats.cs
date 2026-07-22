@@ -114,7 +114,7 @@ public class PlayerStats
         int currentChapterId = ChapterManager.Instance.CurrentChapterId;
         int currentLevelIndex = ChapterManager.Instance.CurrentLevelIndex;
 
-        Debug.Log($"[PlayerStats] RefreshTemporaryScopes currentChapter={currentChapterId} currentLevel={currentLevelIndex} cachedChapter={cachedChapterId} cachedLevel={cachedLevelIndex}");
+        //        Debug.Log($"[PlayerStats] RefreshTemporaryScopes currentChapter={currentChapterId} currentLevel={currentLevelIndex} cachedChapter={cachedChapterId} cachedLevel={cachedLevelIndex}");
 
         if (cachedChapterId != currentChapterId)
         {
@@ -217,14 +217,14 @@ public class PlayerStats
 
     public void ClearTemporaryLevelStats()
     {
-        Debug.Log("[PlayerStats] ClearTemporaryLevelStats");
+        //Debug.Log("[PlayerStats] ClearTemporaryLevelStats");
         ClearStats(TemporaryLevelKey);
         temporaryLevelStatApplyIndex = 0;
     }
 
     public void ClearTemporaryChapterStats()
     {
-        Debug.Log("[PlayerStats] ClearTemporaryChapterStats");
+        //Debug.Log("[PlayerStats] ClearTemporaryChapterStats");
         ClearStats(TemporaryChapterKey);
         temporaryChapterStatApplyIndex = 0;
     }
