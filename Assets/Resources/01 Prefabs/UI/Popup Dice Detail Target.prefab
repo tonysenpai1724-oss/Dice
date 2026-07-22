@@ -314,6 +314,7 @@ GameObject:
   - component: {fileID: 3104547499901188013}
   - component: {fileID: 1449425663161614368}
   - component: {fileID: 6928800809314661485}
+  - component: {fileID: 7967394046845111563}
   m_Layer: 5
   m_Name: Popup Dice Detail Target
   m_TagString: Untagged
@@ -397,7 +398,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PopupDiceDetailTarget
   allowBackKey: 0
-  animatorUI: {fileID: 0}
+  animatorUI: {fileID: 7967394046845111563}
   buttonClose: {fileID: 0}
   blockPanel: {fileID: 0}
   hackObj: {fileID: 0}
@@ -406,6 +407,28 @@ MonoBehaviour:
   diceDescriptionText: {fileID: 4776396189657734208}
   diceStatsText: {fileID: 4151113038739056412}
   diceData: {fileID: 0}
+--- !u!95 &7967394046845111563
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4741048727380743626}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa8d49cb9216c53479779e290b52cc48, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4983034871067467464
 GameObject:
   m_ObjectHideFlags: 0

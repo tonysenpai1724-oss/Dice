@@ -15,8 +15,7 @@ public class LevelManager : Singleton<LevelManager>
     [Button]
     public void LoadCurrentLevel()
     {
-        if (currentLevel == null)
-            return;
+        currentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : currentLevel;
 
         LoadLevel(currentLevel);
     }

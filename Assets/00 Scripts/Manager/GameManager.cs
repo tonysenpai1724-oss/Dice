@@ -155,22 +155,23 @@ public class GameManager : Singleton<GameManager>
             GameType = gameType;
 
             Level currentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : null;
-            if (currentLevel != null)
-            {
-                switch (currentLevel.leveltype)
-                {
-                    case LevelType.MagicAltar:
-                        UIManager.Instance?.ShowPopupClonePanel();
-                        return;
-                    // case LevelType.Upgrade:
-                    //     UIManager.Instance?.ShowPopupUpgradeDice();
+            // if (currentLevel != null)
+            // {
+            //     switch (currentLevel.leveltype)
+            //     {
+            //         case LevelType.MagicAltar:
+            //             UIManager.Instance?.ShowPopupClonePanel();
+            //             return;
+            //         // case LevelType.Upgrade:
+            //         //     UIManager.Instance?.ShowPopupUpgradeDice();
 
-                    // return;
-                    case LevelType.Shop:
-                        UIManager.Instance?.ShowPopupShop();
-                        return;
-                }
-            }
+            //         // return;
+            //         case LevelType.Shop:
+
+            //             UIManager.Instance?.ShowPopupShop();
+            //             return;
+            //     }
+            // }
 
             GoSceneGameplay();
         });
@@ -185,22 +186,37 @@ public class GameManager : Singleton<GameManager>
         if (currentLevel == null || currentLevel.leveltype != expectedLevelType)
             return;
 
-        bool shouldReturnHome = GameState == EGameState.Gameplay;
+        bool shouldContinueGameplay = GameState == EGameState.Gameplay;
 
         if (!ChapterManager.Instance.IsAtFinalPlayableLevel())
             ChapterManager.Instance.AdvanceAfterWin();
 
-        if (shouldReturnHome)
-            GoSceneHome();
+        if (shouldContinueGameplay)
+            ContinueGameplay();
         else
             UIManager.Instance?.RefreshHomeUI();
+    }
+
+    public void ContinueGameplay()
+    {
+        if (GameState == EGameState.Loading)
+            return;
+
+        if (GameState == EGameState.Gameplay && GameplayManager.Instance != null)
+        {
+            GameplayManager.Instance.ContinueCurrentLevelInScene();
+            return;
+        }
+
+        GoSceneGameplay();
     }
 
     public bool IsCurrentLevelPopupOnlyGameplay()
     {
         Level currentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : null;
         return currentLevel != null &&
-            (currentLevel.leveltype == LevelType.Roll || currentLevel.leveltype == LevelType.RollBuff
+            (currentLevel.leveltype == LevelType.MagicAltar || currentLevel.leveltype == LevelType.Shop
+            || currentLevel.leveltype == LevelType.Roll || currentLevel.leveltype == LevelType.RollBuff
             || currentLevel.leveltype == LevelType.Upgrade);
     }
 

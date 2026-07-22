@@ -76,7 +76,7 @@ public class DiceThrowController : MonoBehaviour
             hand.gameObject.SetActive(false);
     }
 
-    void DisableThrowControllerForPopupOnlyLevel()
+    public void DisableThrowControllerForPopupOnlyLevel()
     {
         Clear();
 
@@ -391,6 +391,11 @@ public class DiceThrowController : MonoBehaviour
 
     public void Clear()
     {
+        StopAllCoroutines();
+        dragging = false;
+        waitingForBoard = false;
+        pointerStartedOverBoardDice = false;
+
         if (hoveredBoardDice != null)
         {
             hoveredBoardDice.SetHovered(false);
@@ -400,7 +405,18 @@ public class DiceThrowController : MonoBehaviour
         if (currentDice != null)
         {
             currentDice.gameObject.SetActive(false);
+            currentDice = null;
         }
+
+        HideThrowVisuals();
+    }
+
+    public void ResetForNextLevel()
+    {
+        Clear();
+        canLook = true;
+        enabled = true;
+        StartCoroutine(SpawnCurrentDiceAfterHeroStartDice());
     }
     bool IsPointerOverBoardMesh()
     {

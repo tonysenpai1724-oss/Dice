@@ -66,19 +66,19 @@ MonoBehaviour:
       gridColumn: 4
       entryIndex: 1
     - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+      position: {x: 264.19202, y: -199.22, z: 0}
+      useUIPosition: 1
+      useWorldPosition: 0
+      isBackRow: 0
+      gridRow: 2
+      gridColumn: 4
+      entryIndex: 2
+    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
       position: {x: 440.32, y: -40, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 1
       gridRow: 0
-      gridColumn: 5
-      entryIndex: 2
-    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
-      position: {x: 440.32, y: -199.22, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 1
-      gridRow: 2
       gridColumn: 5
       entryIndex: 5
   - waveName: Wave
@@ -124,19 +124,19 @@ MonoBehaviour:
       gridColumn: 4
       entryIndex: 1
     - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+      position: {x: 264.19202, y: -199.22, z: 0}
+      useUIPosition: 1
+      useWorldPosition: 0
+      isBackRow: 0
+      gridRow: 2
+      gridColumn: 4
+      entryIndex: 2
+    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
       position: {x: 440.32, y: -40, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 1
       gridRow: 0
-      gridColumn: 5
-      entryIndex: 2
-    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
-      position: {x: 440.32, y: -199.22, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 1
-      gridRow: 2
       gridColumn: 5
       entryIndex: 5
   leveltype: 0

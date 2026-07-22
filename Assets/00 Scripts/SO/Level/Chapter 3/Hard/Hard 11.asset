@@ -49,12 +49,20 @@ MonoBehaviour:
       gridRow: 1
       gridColumn: 5
       entryIndex: 2
-    - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
+    - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
       position: {x: 264.19202, y: -40, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
       gridRow: 0
+      gridColumn: 4
+      entryIndex: 0
+    - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
+      position: {x: 264.19202, y: -199.22, z: 0}
+      useUIPosition: 1
+      useWorldPosition: 0
+      isBackRow: 0
+      gridRow: 2
       gridColumn: 4
       entryIndex: 3
     - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
@@ -65,20 +73,12 @@ MonoBehaviour:
       gridRow: 2
       gridColumn: 4
       entryIndex: 5
-    - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
       position: {x: 440.32, y: -40, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 1
       gridRow: 0
-      gridColumn: 5
-      entryIndex: 0
-    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
-      position: {x: 440.32, y: -199.22, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 1
-      gridRow: 2
       gridColumn: 5
       entryIndex: 4
   - waveName: Wave
@@ -107,12 +107,20 @@ MonoBehaviour:
       gridRow: 1
       gridColumn: 5
       entryIndex: 2
-    - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
+    - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
       position: {x: 264.19202, y: -40, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 0
       gridRow: 0
+      gridColumn: 4
+      entryIndex: 0
+    - data: {fileID: 11400000, guid: f65c8c59f3ec8bc41a20ae6027211308, type: 2}
+      position: {x: 264.19202, y: -199.22, z: 0}
+      useUIPosition: 1
+      useWorldPosition: 0
+      isBackRow: 0
+      gridRow: 2
       gridColumn: 4
       entryIndex: 3
     - data: {fileID: 11400000, guid: 165b0a96077a45c4d9686b2ed227deb1, type: 2}
@@ -123,20 +131,12 @@ MonoBehaviour:
       gridRow: 2
       gridColumn: 4
       entryIndex: 5
-    - data: {fileID: 11400000, guid: cb18baa8f25fcf245ba5d5cb3a6b2852, type: 2}
+    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
       position: {x: 440.32, y: -40, z: 0}
       useUIPosition: 1
       useWorldPosition: 0
       isBackRow: 1
       gridRow: 0
-      gridColumn: 5
-      entryIndex: 0
-    - data: {fileID: 11400000, guid: 0f7d0c4977815704a996cf986d7d0778, type: 2}
-      position: {x: 440.32, y: -199.22, z: 0}
-      useUIPosition: 1
-      useWorldPosition: 0
-      isBackRow: 1
-      gridRow: 2
       gridColumn: 5
       entryIndex: 4
   leveltype: 0

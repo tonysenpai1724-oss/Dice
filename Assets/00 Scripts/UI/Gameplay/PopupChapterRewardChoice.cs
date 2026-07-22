@@ -76,8 +76,8 @@ public class PopupChapterRewardChoice : UIBase
         skipReward.ReceiveResource(EResourceFrom.GameDrop);
 
         Hide();
-        if (UIManager.Instance != null)
-            UIManager.Instance.ShowPopupEndGame();
+        if (GameplayManager.Instance != null)
+            GameplayManager.Instance.ContinueAfterWinReward();
     }
     void SetupRewardItem(ChapterRewardChoiceItem item, ChapterRewardChoiceOption option)
     {
@@ -178,8 +178,8 @@ public class PopupChapterRewardChoice : UIBase
             GameplayManager.Instance.ApplyChapterRewardChoice(option);
 
         Hide();
-        if (UIManager.Instance != null)
-            UIManager.Instance.ShowPopupEndGame();
+        if (GameplayManager.Instance != null)
+            GameplayManager.Instance.ContinueAfterWinReward();
     }
 
     void ClearItems()

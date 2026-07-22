@@ -203,14 +203,27 @@ public class GameplayManager : MonoBehaviour
 
         switch (currentLevel.leveltype)
         {
+            case LevelType.MagicAltar:
+                DiceManager.Instance?.ClearBoard();
+                UIManager.Instance?.ShowPopupClonePanel();
+                return true;
+            case LevelType.Shop:
+                DiceManager.Instance?.ClearBoard();
+                UIManager.Instance?.ShowPopupShop();
+                return true;
             case LevelType.Roll:
+                DiceManager.Instance?.ClearBoard();
                 UIManager.Instance?.ShowPopupRoll();
                 return true;
             case LevelType.RollBuff:
+                DiceManager.Instance?.ClearBoard();
                 UIManager.Instance?.ShowPopupRollBuff();
                 return true;
             case LevelType.Upgrade:
+                DiceManager.Instance?.ClearBoard();
                 UIManager.Instance?.ShowPopupUpgradeClone();
+                return true;
+            case LevelType.Jester:
                 return true;
 
         }
@@ -312,11 +325,9 @@ public class GameplayManager : MonoBehaviour
 
         if (winGame)
         {
+            Level completedLevel = ChapterManager.Instance != null ? ChapterManager.Instance.GetCurrentLevel() : null;
+
             TigerForge.EventManager.EmitEvent(Constant.ON_END_GAME);
-            // if (ChapterManager.Instance != null)
-            //     ChapterManager.Instance.AdvanceAfterWin();
-            // else
-            //     IPlayerInfoController.Instance.WinLevel();
 
             IAchievementController.Instance.UpdateAchievementProgress(EAchievementType.LevelWin);
             if (GameManager.Instance.GameType == EGameType.Endless)
@@ -329,11 +340,18 @@ public class GameplayManager : MonoBehaviour
             PackReward.AddResource(new CommonResource(ECommonResource.ActivePoint, 1));
 
             PackReward.ReceiveResource(EResourceFrom.ReviveIngame);
-            List<ChapterRewardChoiceOption> rewardChoices = BuildChapterRewardChoices(ChapterManager.Instance.GetCurrentLevel().leveltype);
+
+            List<ChapterRewardChoiceOption> rewardChoices = completedLevel != null ? BuildChapterRewardChoices(completedLevel.leveltype) : null;
+
+            if (ChapterManager.Instance != null)
+                ChapterManager.Instance.AdvanceAfterWin();
+            else
+                IPlayerInfoController.Instance.WinLevel();
+
             if (rewardChoices != null && rewardChoices.Count > 0)
                 UIManager.Instance.ShowPopupChoice(rewardChoices);
             else
-                UIManager.Instance.ShowPopupEndGame();
+                ContinueAfterWinReward();
 
         }
         else
@@ -348,6 +366,59 @@ public class GameplayManager : MonoBehaviour
             UIManager.Instance.ShowPopupEndGame();
         }
     }
+
+    public void ContinueAfterWinReward()
+    {
+        if (!winGame)
+        {
+            UIManager.Instance.ShowPopupEndGame();
+            return;
+        }
+
+        GameManager.Instance.ContinueGameplay();
+    }
+
+    public void ContinueCurrentLevelInScene()
+    {
+        LevelTime = 180;
+        CurrentLevel = ChapterManager.Instance != null ? ChapterManager.Instance.CurrentLevelIndex + 1 : IPlayerInfoController.Instance.CurrentLevel();
+        IsGameEnded = false;
+        ClearDiceSkillState();
+        SetState(EGamePlayState.Cinematic);
+
+        DiceThrowController diceThrowController = FindFirstObjectByType<DiceThrowController>();
+        bool popupOnlyGameplay = GameManager.Instance != null && GameManager.Instance.IsCurrentLevelPopupOnlyGameplay();
+        if (diceThrowController != null)
+        {
+            if (popupOnlyGameplay)
+                diceThrowController.DisableThrowControllerForPopupOnlyLevel();
+            else
+                diceThrowController.Clear();
+        }
+
+        if (DiceManager.Instance != null)
+            DiceManager.Instance.ClearBoard();
+
+        if (TryShowSpecialLevelPopup())
+            return;
+
+        PlayerController player = EnemyManager.Instance != null ? EnemyManager.Instance.player : null;
+        if (player != null)
+            player.InitializeDiceDatas();
+
+        if (DiceManager.Instance != null)
+            DiceManager.Instance.ResetBoard();
+
+        if (LevelManager.Instance != null)
+            LevelManager.Instance.LoadCurrentLevel();
+
+        if (diceThrowController != null)
+            diceThrowController.ResetForNextLevel();
+
+        StartGame();
+        TigerForge.EventManager.EmitEvent(Constant.EVENT_LEVEL_INITED);
+    }
+
     public void OnClick(Vector3 pos)
     {
         DebugCustom.LogColor("OnClick", pos);

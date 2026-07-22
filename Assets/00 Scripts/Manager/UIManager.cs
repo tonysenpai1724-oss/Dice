@@ -39,6 +39,39 @@ public class UIManager : Singleton<UIManager>
             }
         }
     }
+    public void HandleCloseUI(UIBase uI)
+    {
+        if (lstOpenningUI == null)
+            return;
+
+        lstOpenningUI.RemoveAll(ui => ui == null || ui == uI || !ui.gameObject.activeInHierarchy);
+        SyncGameplayPauseState();
+    }
+
+    public void SyncGameplayPauseState()
+    {
+        if (GameplayManager.Instance == null || lstOpenningUI == null)
+            return;
+
+        lstOpenningUI.RemoveAll(ui => ui == null || !ui.gameObject.activeInHierarchy);
+
+        bool hasPausePopup = lstOpenningUI.Exists(ui => ui != null && ui.ShouldPauseGameplay);
+        if (hasPausePopup)
+        {
+            if (GameplayManager.Instance.State != EGamePlayState.Pause)
+                GameplayManager.Instance.SetState(EGamePlayState.Pause);
+
+            return;
+        }
+
+        if (GameplayManager.Instance.State == EGamePlayState.Pause || Time.timeScale == 0f)
+        {
+            EGamePlayState resumeState = GameplayManager.Instance.LastState == EGamePlayState.Pause
+                ? EGamePlayState.Running
+                : GameplayManager.Instance.LastState;
+            GameplayManager.Instance.SetState(resumeState);
+        }
+    }
     IEnumerator IEWaitSafeZone()
     {
         while (uISafeZone == null)
@@ -95,7 +128,10 @@ public class UIManager : Singleton<UIManager>
 
     public void Close(UIBase uI)
     {
-        lstOpenningUI.RemoveAll(ui => ui == null);
+        if (lstOpenningUI == null)
+            return;
+
+        lstOpenningUI.RemoveAll(ui => ui == null || !ui.gameObject.activeInHierarchy);
 
         if (uI == null)
             return;
@@ -105,13 +141,7 @@ public class UIManager : Singleton<UIManager>
         {
             lstOpenningUI.Remove(uI);
         }
-        if (GameplayManager.Instance)
-        {
-            if (lstOpenningUI.Count == 0 && GameplayManager.Instance.State == EGamePlayState.Pause)
-            {
-                GameplayManager.Instance.SetState(GameplayManager.Instance.LastState);
-            }
-        }
+        SyncGameplayPauseState();
     }
 
     protected virtual void Update()
@@ -325,7 +355,6 @@ public class UIManager : Singleton<UIManager>
         if (ui == null)
             return;
         ui.SetDiceDetails(data, sprite);
-        ui.StopAllCoroutines();
         ui.Show();
     }
 
@@ -337,7 +366,6 @@ public class UIManager : Singleton<UIManager>
         if (ui == null || !ui.gameObject.activeSelf)
             return;
 
-        ui.StopAllCoroutines();
         ui.Hide();
     }
     public void ShowPopupRollBuff()

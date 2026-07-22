@@ -45,6 +45,7 @@ public class DiceManager : MonoBehaviour
 
     [Header("Stack")]
     List<Dice> boardDices = new List<Dice>();
+    List<Dice> spawnedDices = new List<Dice>();
 
     public DiceQueueManager diceQueue;
     public DiceQueueUI diceQueueUI;
@@ -498,33 +499,40 @@ public class DiceManager : MonoBehaviour
 
     public void SpawnStartBoard()
     {
-        if (boardService == null)
+        if (GameManager.Instance == null || !GameManager.Instance.IsCurrentLevelPopupOnlyGameplay())
         {
-            Debug.LogError("BoardService is null!");
+            if (boardService == null)
+            {
+                Debug.LogError("BoardService is null!");
+                return;
+            }
+
+            int targetSpawnCount = Random.Range(minStartSpawnCount, maxStartSpawnCount + 1);
+            List<DiceData> plannedStartDice = BuildBalancedStartDicePlan(targetSpawnCount);
+
+            List<Vector3> plannedPositions = boardService.BuildSpreadSpawnPositions(targetSpawnCount);
+
+            int spawnCount = Mathf.Min(plannedStartDice.Count, plannedPositions.Count);
+            for (int i = 0; i < spawnCount; i++)
+            {
+                DiceData data = plannedStartDice[i];
+                if (data == null)
+                    continue;
+
+                // Sửa: gọi qua boardService
+                Vector3 position = boardService.FindClearPosition(plannedPositions[i], null, diceSpacingRadius);
+                if (boardService.IsOccupied(position, null, diceSpacingRadius))
+                    continue;
+
+                SpawnDice(data, position);
+            }
+
+            SpawnPlayerStartDiceDatas(targetSpawnCount);
+        }
+        else
+        {
             return;
         }
-
-        int targetSpawnCount = Random.Range(minStartSpawnCount, maxStartSpawnCount + 1);
-        List<DiceData> plannedStartDice = BuildBalancedStartDicePlan(targetSpawnCount);
-
-        List<Vector3> plannedPositions = boardService.BuildSpreadSpawnPositions(targetSpawnCount);
-
-        int spawnCount = Mathf.Min(plannedStartDice.Count, plannedPositions.Count);
-        for (int i = 0; i < spawnCount; i++)
-        {
-            DiceData data = plannedStartDice[i];
-            if (data == null)
-                continue;
-
-            // Sửa: gọi qua boardService
-            Vector3 position = boardService.FindClearPosition(plannedPositions[i], null, diceSpacingRadius);
-            if (boardService.IsOccupied(position, null, diceSpacingRadius))
-                continue;
-
-            SpawnDice(data, position);
-        }
-
-        SpawnPlayerStartDiceDatas(targetSpawnCount);
     }
 
     List<DiceData> BuildBalancedStartDicePlan(int targetSpawnCount)
@@ -801,6 +809,9 @@ public class DiceManager : MonoBehaviour
         if (d == null)
             return null;
 
+        if (!spawnedDices.Contains(d))
+            spawnedDices.Add(d);
+
         d.Setup(data);
 
         Vector3 clearPos = boardService != null
@@ -841,6 +852,9 @@ public class DiceManager : MonoBehaviour
         {
             boardDices.Add(dice);
         }
+
+        if (!spawnedDices.Contains(dice))
+            spawnedDices.Add(dice);
     }
 
     public void SetBoardMergeEnabled(bool enabled)
@@ -943,6 +957,7 @@ public class DiceManager : MonoBehaviour
             return;
 
         boardDices.Remove(dice);
+        spawnedDices.Remove(dice);
 
         dice.Despawn();
     }
@@ -1019,11 +1034,38 @@ public class DiceManager : MonoBehaviour
 
     public void ClearBoard()
     {
+        StopAllCoroutines();
         IsSpawningHeroStartDice = false;
 
-        foreach (Dice dice in boardDices)
+        List<Dice> dicesToClear = new List<Dice>();
+        AddDicesToClearList(dicesToClear, boardDices);
+        AddDicesToClearList(dicesToClear, spawnedDices);
+        AddDicesToClearList(dicesToClear, FindObjectsByType<Dice>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
+
+        for (int i = 0; i < dicesToClear.Count; i++)
         {
-            ObjectPooler.Despawn(dice);
+            Dice dice = dicesToClear[i];
+            if (dice != null)
+                dice.Despawn();
+        }
+
+        boardDices.Clear();
+        spawnedDices.Clear();
+        bindTurnsMap.Clear();
+        ClearCurrentHover();
+    }
+
+    void AddDicesToClearList(ICollection<Dice> target, IEnumerable<Dice> source)
+    {
+        if (target == null || source == null)
+            return;
+
+        foreach (Dice dice in source)
+        {
+            if (dice == null || target.Contains(dice))
+                continue;
+
+            target.Add(dice);
         }
     }
 
