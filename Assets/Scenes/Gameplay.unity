@@ -8291,7 +8291,7 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: dc939d6aeafc14e43857a03821db14ae, type: 3}
     hideWhenZero: 1
   - type: 2
-    icon: {fileID: 21300000, guid: 175222b4042ea374c9992071ab9eddb2, type: 3}
+    icon: {fileID: 21300000, guid: 6a142488b059c7a40b46a29bdf04bfc4, type: 3}
     hideWhenZero: 1
   - type: 3
     icon: {fileID: 0}

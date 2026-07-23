@@ -650,8 +650,6 @@ MonoBehaviour:
   rb: {fileID: 8306218777647176642}
   cachedCollider: {fileID: 4665481078757927754}
   meshRenderer: {fileID: 3696985381103359607}
-  decals: []
-  decals2: []
   decalMeshes:
   - {fileID: 5621345164251960559}
   - {fileID: 223205714786108244}
@@ -682,7 +680,7 @@ MonoBehaviour:
   driftStopVelocity: 2
   driftStopAngularVelocity: 2
   driftStopDelay: 0.05
-  headOnImpactAssist: 0.75
+  headOnImpactAssist: 1
   headOnImpactDotThreshold: 0.9
   shotSpinForwardTorque: 7
   shotSpinYawTorque: 2

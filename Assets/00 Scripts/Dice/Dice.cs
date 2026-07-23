@@ -79,6 +79,7 @@ public class Dice : PoolingObject
     bool isHovered;
     float slowMoveTimer;
     float shotStopGraceTimer;
+    Vector3 lastPlanarVelocity;
     readonly RigidbodyConstraints groundedConstraints =
         RigidbodyConstraints.FreezePositionY |
         RigidbodyConstraints.FreezeRotationX |
@@ -202,6 +203,7 @@ public class Dice : PoolingObject
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = false;
         shotStopGraceTimer = 0f;
+        lastPlanarVelocity = Vector3.zero;
         ApplyPhysicsSettings();
         ApplyGroundedConstraints();
 
@@ -297,7 +299,20 @@ public class Dice : PoolingObject
 
     void FixedUpdate()
     {
+        CachePlanarVelocity();
         StopSlowDrift();
+    }
+
+    void CachePlanarVelocity()
+    {
+        if (rb == null || rb.isKinematic)
+        {
+            lastPlanarVelocity = Vector3.zero;
+            return;
+        }
+
+        lastPlanarVelocity = rb.linearVelocity;
+        lastPlanarVelocity.y = 0f;
     }
 
     void StopSlowDrift()
@@ -470,6 +485,7 @@ public class Dice : PoolingObject
 
     void OnCollisionStay(Collision col)
     {
+        ApplyHeadOnImpactAssist(col);
         TryMergeCollision(col);
     }
 
@@ -484,8 +500,29 @@ public class Dice : PoolingObject
         if (other == null || other == this || other.rb == null)
             return;
 
+        Vector3 planarVelocity = GetImpactPlanarVelocity();
+
+        ApplyImpactAssistToDice(other, planarVelocity);
+    }
+
+    Vector3 GetImpactPlanarVelocity()
+    {
         Vector3 planarVelocity = rb.linearVelocity;
         planarVelocity.y = 0f;
+
+        if (lastPlanarVelocity.sqrMagnitude > planarVelocity.sqrMagnitude)
+            planarVelocity = lastPlanarVelocity;
+
+        return planarVelocity;
+    }
+
+    void ApplyImpactAssistToDice(Dice other, Vector3 planarVelocity)
+    {
+        if (other == null || other == this || other.rb == null)
+            return;
+
+        if (other.state == DiceState.Merging || other.state == DiceState.FlyingCombo)
+            return;
 
         if (planarVelocity.sqrMagnitude <= 0.01f)
             return;
@@ -499,23 +536,48 @@ public class Dice : PoolingObject
 
         Vector3 moveDirection = planarVelocity.normalized;
         Vector3 impactDirection = hitDirection.normalized;
-        float headOnDot = Vector3.Dot(
+
+        float movingTowardTargetDot = Vector3.Dot(
             moveDirection,
             impactDirection
         );
 
-        if (headOnDot < headOnImpactDotThreshold)
+        if (movingTowardTargetDot <= 0f)
             return;
 
-        Vector3 assistImpulse =
-            impactDirection *
+        other.rb.WakeUp();
+        other.slowMoveTimer = 0f;
+        other.shotStopGraceTimer = Mathf.Max(
+            other.shotStopGraceTimer,
+            0.18f
+        );
+
+        Vector3 otherPlanarVelocity = other.rb.linearVelocity;
+        otherPlanarVelocity.y = 0f;
+
+        float targetPushSpeed =
             planarVelocity.magnitude *
             headOnImpactAssist;
 
-        other.rb.AddForce(
-            assistImpulse,
-            ForceMode.Impulse
+        float currentPushSpeed = Vector3.Dot(
+            otherPlanarVelocity,
+            moveDirection
         );
+        currentPushSpeed = Mathf.Max(0f, currentPushSpeed);
+
+        if (currentPushSpeed >= targetPushSpeed)
+            return;
+
+        Vector3 targetPlanarVelocity =
+            otherPlanarVelocity +
+            moveDirection *
+            (targetPushSpeed - currentPushSpeed);
+
+        Vector3 targetVelocity = other.rb.linearVelocity;
+        targetVelocity.x = targetPlanarVelocity.x;
+        targetVelocity.z = targetPlanarVelocity.z;
+
+        other.rb.linearVelocity = targetVelocity;
     }
 
     void TryMergeCollision(Collision col)

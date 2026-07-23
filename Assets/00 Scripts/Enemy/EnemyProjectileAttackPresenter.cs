@@ -54,7 +54,7 @@ public class EnemyProjectileAttackPresenter
 
         if (useComboAttack && attackTrack != null)
         {
-            Debug.Log($"[EnemyProjectileAttackPresenter] Playing combo attack animation: {attackAnimation}");
+            // Debug.Log($"[EnemyProjectileAttackPresenter] Playing combo attack animation: {attackAnimation}");
             coroutineHost.StartCoroutine(SpawnProjectileOnAttackEvent(player, attackTrack, target, damage));
         }
         else
