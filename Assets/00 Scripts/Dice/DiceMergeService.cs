@@ -126,12 +126,18 @@ public class DiceMergeService
 
             if (RelicManager.Instance != null && RelicManager.Instance.ShouldCloneMergedDice())
             {
+                DiceData cloneData = getDiceData?.Invoke(Mathf.Max(1, nextData.level - 1), DiceType.Normal);
+                if (cloneData == null)
+                    Debug.LogWarning($"Khong tim thay data clone Level {Mathf.Max(1, nextData.level - 1)} Type {DiceType.Normal}");
+
                 Vector3 cloneSpawnPos = boardService.FindClearPosition(mergePos);
-                Dice clonedDice = spawnDice?.Invoke(nextData, cloneSpawnPos);
+                Dice clonedDice = cloneData != null ? spawnDice?.Invoke(cloneData, cloneSpawnPos) : null;
                 if (clonedDice != null)
                 {
                     spawnMergeFloatingText?.Invoke(clonedDice.transform.position, clonedDice.data.level.ToString(), clonedDice.data.diceColor);
+                    comboChainMap[clonedDice] = chain;
                     clonedDice.PlaceUpright(clonedDice.transform.position);
+                    continueCombo?.Invoke(clonedDice);
                 }
             }
 
@@ -271,4 +277,3 @@ public class DiceMergeService
         }
     }
 }
-

@@ -24,12 +24,7 @@ MonoBehaviour:
   TargetType: 17
   rarity: 3
   stackApply: 1
-  valueApply: 20
-  valueApplyByLevel:
-  - 20
-  - 40
-  - 60
-  - 80
-  - 100
+  valueApply: 5
+  valueApplyByLevel: 050000000a0000000f0000001400000019000000
   relicSprite: {fileID: 0}
   description: Co ty le sinh san khi vien xuc xac dang merge
