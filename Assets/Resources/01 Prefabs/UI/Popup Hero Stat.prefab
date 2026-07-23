@@ -817,7 +817,7 @@ MonoBehaviour:
   txtDamage: {fileID: 2698596320979988614}
   txtDefense: {fileID: 7566172778580565575}
   txtCritRate: {fileID: 5771602233235235259}
-  txtCritDamage: {fileID: 0}
+  txtCritDamage: {fileID: 7411449089851946665}
   txtLuck: {fileID: 7411449089851946665}
   txtName: {fileID: 8341181381756949897}
   heroData: {fileID: 11400000, guid: 12a5bfc4dc4e00d4784cb60dfc32d9b0, type: 2}

@@ -251,7 +251,7 @@ public class ChapterDiceSession : MonoBehaviour
         GameManager.Instance.SaveLocalData(SaveKey, json);
         // BaseDataController.SaveLocalCachedData(SaveKey, cachedData);
         DebugLogRuntimeDice("SaveSession");
-        Debug.Log($"[ChapterDiceSession] Saved json count={cachedData.runtimeDices.Count} json={json}");
+        //        Debug.Log($"[ChapterDiceSession] Saved json count={cachedData.runtimeDices.Count} json={json}");
     }
 
     void LoadSession()
@@ -593,6 +593,6 @@ public class ChapterDiceSession : MonoBehaviour
                 .Append(")");
         }
 
-        Debug.Log($"[ChapterDiceSession] {context} count={runtimeDiceDatas.Count} heroStartDiceAdded={heroStartDiceAdded} list=[{builder}]");
+        //        Debug.Log($"[ChapterDiceSession] {context} count={runtimeDiceDatas.Count} heroStartDiceAdded={heroStartDiceAdded} list=[{builder}]");
     }
 }

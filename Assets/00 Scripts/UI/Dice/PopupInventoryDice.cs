@@ -4,8 +4,8 @@
 
     public void CloseAll()
     {
-        if (HideDetailPopups())
-            return;
+        HideDetailPopups();
+        //return;
 
         if (inventoryUIController != null)
             inventoryUIController.Hide();

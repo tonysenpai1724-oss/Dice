@@ -263,7 +263,7 @@ public class EnemyManager : Singleton<EnemyManager>
             return 0f;
         }
 
-        int finalDamage = CombatSystem.CalculateCriticalDamage(player, damage, out bool isCritical);
+        int finalDamage = CombatSystem.CalculateCriticalDamage(player, damage, diceData, out bool isCritical);
         PlayerAttackDamageContext damageContext = new(
             player,
             target,
@@ -272,10 +272,12 @@ public class EnemyManager : Singleton<EnemyManager>
             isCritical,
             isCounter
         );
+        Debug.Log($"Before relic dmg={damageContext.Damage} crit={damageContext.IsCritical}");
         RelicManager.GetOrCreate().ModifyPlayerAttackDamage(damageContext);
+        Debug.Log($"After relic dmg={damageContext.Damage}");
 
         float attackDuration = projectileAttackPresenter != null
-            ? projectileAttackPresenter.PlayPlayerAttack(target, damageContext.Damage)
+            ? projectileAttackPresenter.PlayPlayerAttack(target, damageContext.Damage, damageContext.IsCritical)
             : 0f;
         CheckWinGame();
         return attackDuration;

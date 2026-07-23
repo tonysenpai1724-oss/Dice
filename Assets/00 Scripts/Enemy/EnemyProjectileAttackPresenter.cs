@@ -40,7 +40,7 @@ public class EnemyProjectileAttackPresenter
         this.decrementActiveProjectiles = decrementActiveProjectiles;
     }
 
-    public float PlayPlayerAttack(Enemy target, int damage)
+    public float PlayPlayerAttack(Enemy target, int damage, bool isCritical = false)
     {
         PlayerController player = getPlayer?.Invoke();
         if (target == null || player == null)
@@ -55,11 +55,11 @@ public class EnemyProjectileAttackPresenter
         if (useComboAttack && attackTrack != null)
         {
             // Debug.Log($"[EnemyProjectileAttackPresenter] Playing combo attack animation: {attackAnimation}");
-            coroutineHost.StartCoroutine(SpawnProjectileOnAttackEvent(player, attackTrack, target, damage));
+            coroutineHost.StartCoroutine(SpawnProjectileOnAttackEvent(player, attackTrack, target, damage, isCritical));
         }
         else
         {
-            coroutineHost.StartCoroutine(SpawnProjectileDelayed(target, damage));
+            coroutineHost.StartCoroutine(SpawnProjectileDelayed(target, damage, isCritical));
         }
 
         if (player.skeletonGraphic != null)
@@ -87,12 +87,12 @@ public class EnemyProjectileAttackPresenter
         return Mathf.Max(0f, trackEntry.AnimationEnd - trackEntry.AnimationStart) / timeScale;
     }
 
-    IEnumerator SpawnProjectileOnAttackEvent(PlayerController player, TrackEntry attackTrack, Enemy target, int damage)
+    IEnumerator SpawnProjectileOnAttackEvent(PlayerController player, TrackEntry attackTrack, Enemy target, int damage, bool isCritical)
     {
         if (player == null || player.skeletonGraphic == null || player.skeletonGraphic.AnimationState == null)
         {
             Debug.Log("[EnemyProjectileAttackPresenter] Missing skeletonGraphic/AnimationState, fallback spawn");
-            SpawnProjectile(target, damage);
+            SpawnProjectile(target, damage, isCritical);
             yield break;
         }
 
@@ -111,7 +111,7 @@ public class EnemyProjectileAttackPresenter
 
             eventTriggered = true;
             //            Debug.Log($"[EnemyProjectileAttackPresenter] Matched combo event {ComboAttackEventName}, spawning projectile");
-            SpawnProjectile(target, damage);
+            SpawnProjectile(target, damage, isCritical);
         }
 
         float fallbackDelay = Mathf.Max(attackTrack.AnimationEnd - attackTrack.AnimationStart, 0.5f) + 0.1f;
@@ -128,18 +128,18 @@ public class EnemyProjectileAttackPresenter
 
         if (!eventTriggered)
         {
-            Debug.Log($"[EnemyProjectileAttackPresenter] Combo event {ComboAttackEventName} not received in time, fallback spawn");
-            SpawnProjectile(target, damage);
+            //            Debug.Log($"[EnemyProjectileAttackPresenter] Combo event {ComboAttackEventName} not received in time, fallback spawn");
+            SpawnProjectile(target, damage, isCritical);
         }
     }
 
-    IEnumerator SpawnProjectileDelayed(Enemy target, int damage)
+    IEnumerator SpawnProjectileDelayed(Enemy target, int damage, bool isCritical)
     {
         yield return new WaitForSeconds(0.35f);
-        SpawnProjectile(target, damage);
+        SpawnProjectile(target, damage, isCritical);
     }
 
-    void SpawnProjectile(Enemy target, int damage)
+    void SpawnProjectile(Enemy target, int damage, bool isCritical)
     {
         PlayerController player = getPlayer?.Invoke();
         RectTransform projectilePrefab = getProjectilePrefab?.Invoke();
@@ -173,7 +173,7 @@ public class EnemyProjectileAttackPresenter
             {
                 if (target != null)
                 {
-                    target.OnTakeDamage(damage);
+                    target.OnTakeDamage(damage, isCritical);
                     RelicManager.Instance?.NotifyPlayerDealtDamage(player, damage);
                 }
 

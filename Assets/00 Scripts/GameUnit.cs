@@ -30,6 +30,7 @@ public abstract class GameUnit : MonoBehaviour
     [Header("Floating Damage Text")]
     [SerializeField] Vector2 damageTextScreenOffset = new Vector2(0f, 48f);
     [SerializeField] Color damageTextColor = new Color(1f, 0.2f, 0.08f, 1f);
+    [SerializeField] Color criticalDamageTextColor = Color.yellow;
 
     public event Action<GameUnit, int, int> OnHpChanged;
     public event Action<GameUnitDamageEvent> OnBeforeDamage;
@@ -75,6 +76,11 @@ public abstract class GameUnit : MonoBehaviour
 
     public virtual void OnTakeDamage(int amount)
     {
+        OnTakeDamage(amount, false);
+    }
+
+    public virtual void OnTakeDamage(int amount, bool isCritical)
+    {
         if (amount <= 0 || !IsAlive())
             return;
 
@@ -87,7 +93,7 @@ public abstract class GameUnit : MonoBehaviour
         amount = damageEvent.Amount;
 
         currentHp = Mathf.Max(0, currentHp - amount);
-        ShowDamageFloatingText(amount);
+        ShowDamageFloatingText(amount, isCritical);
         OnDamaged?.Invoke(this, amount);
         TigerForge.EventManager.EmitEventData(
             Constant.ON_UNIT_DAMAGED,
@@ -252,7 +258,7 @@ public abstract class GameUnit : MonoBehaviour
         }
     }
 
-    void ShowDamageFloatingText(int amount)
+    void ShowDamageFloatingText(int amount, bool isCritical)
     {
         if (amount <= 0 || DiceManager.Instance == null)
             return;
@@ -265,7 +271,8 @@ public abstract class GameUnit : MonoBehaviour
             screenBounds.yMax + damageTextScreenOffset.y
         );
 
-        DiceManager.Instance.SpawnFloatingTextDmg(screenPosition, $"-{amount}", damageTextColor);
+        Color textColor = isCritical ? criticalDamageTextColor : damageTextColor;
+        DiceManager.Instance.SpawnFloatingTextDmg(screenPosition, $"-{amount}", textColor);
     }
 
     void LayoutHpBarToSpine()
