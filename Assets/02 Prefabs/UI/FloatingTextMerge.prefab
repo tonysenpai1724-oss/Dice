@@ -250,7 +250,7 @@ GameObject:
   - component: {fileID: 4833235390354421855}
   - component: {fileID: 309452369356109436}
   m_Layer: 0
-  m_Name: FloatingText
+  m_Name: FloatingTextMerge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

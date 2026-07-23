@@ -465,6 +465,13 @@ MonoBehaviour:
   dieAnim: DIE
   hurtAnim: Hurt
   aimAttackSpeed: 1.5
+  autoLayoutHpBarToSpine: 1
+  hpBarScreenOffset: {x: 0, y: 0}
+  hpBarWidthScale: 0.85
+  hpBarMinWidth: 150
+  hpBarMaxWidth: 260
+  damageTextScreenOffset: {x: 0, y: 48}
+  damageTextColor: {r: 1, g: 0.2, b: 0.08, a: 1}
   deathFadeDuration: 0.3
   type: 0
   enemyLevel: 0

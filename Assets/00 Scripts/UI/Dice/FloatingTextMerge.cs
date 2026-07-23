@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-public class FloatingText : MonoBehaviour
+public class FloatingTextMerge : MonoBehaviour
 {
     public float moveSpeed = 1f;
     public float duration = 1f;
@@ -106,12 +106,23 @@ public class FloatingText : MonoBehaviour
         UpdateScreenPosition();
     }
 
+    public void SetScreenPosition(Vector2 screenPosition)
+    {
+        useWorldPosition = false;
+        SetTextScreenPosition(screenPosition);
+    }
+
     void UpdateScreenPosition()
     {
         if (worldCamera == null)
             return;
 
         Vector3 screenPosition = worldCamera.WorldToScreenPoint(worldPosition);
+        SetTextScreenPosition(screenPosition);
+    }
+
+    void SetTextScreenPosition(Vector2 screenPosition)
+    {
 
         if (textRectTransform == null)
         {

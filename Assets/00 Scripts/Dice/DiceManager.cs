@@ -57,6 +57,8 @@ public class DiceManager : MonoBehaviour
     public bool IsSpawningHeroStartDice { get; private set; }
 
     [SerializeField] GameObject floatingTextPrefab;
+    [SerializeField] GameObject floatingTextPrefab2;
+
     [SerializeField] Vector3 floatingTextOffset = new Vector3(0f, 1.5f, 0f);
 
     void Awake()
@@ -1069,18 +1071,53 @@ public class DiceManager : MonoBehaviour
         }
     }
 
-    void SpawnMergeFloatingText(Vector3 position, string value, Color color)
+    public void SpawnFloatingText(Vector3 position, string value, Color color, Camera camera = null)
     {
         if (floatingTextPrefab == null)
             return;
-        Vector3 spawnPosition = position + floatingTextOffset;
-        GameObject spawned = Instantiate(floatingTextPrefab, spawnPosition, Quaternion.identity);
-        FloatingText floatingText = spawned.GetComponent<FloatingText>();
+
+        GameObject spawned = Instantiate(floatingTextPrefab, position, Quaternion.identity);
+        FloatingTextMerge floatingText = spawned.GetComponent<FloatingTextMerge>();
         if (floatingText != null)
         {
-            floatingText.SetWorldPosition(spawnPosition);
+            floatingText.SetWorldPosition(position, camera);
             floatingText.SetText(value, color);
         }
+    }
+
+    public void SpawnFloatingTextAtScreenPosition(Vector2 screenPosition, string value, Color color)
+    {
+        if (floatingTextPrefab == null)
+            return;
+
+        GameObject spawned = Instantiate(floatingTextPrefab, screenPosition, Quaternion.identity);
+        FloatingTextDmg floatingText = spawned.GetComponent<FloatingTextDmg>();
+        if (floatingText == null)
+            floatingText = spawned.AddComponent<FloatingTextDmg>();
+
+        if (floatingText != null)
+        {
+            floatingText.SetScreenPosition(screenPosition);
+            floatingText.SetText(value, color);
+        }
+    }
+    public void SpawnFloatingTextDmg(Vector2 screenPosition, string value, Color color)
+    {
+        if (floatingTextPrefab2 == null)
+            return;
+
+        GameObject spawned = Instantiate(floatingTextPrefab2, screenPosition, Quaternion.identity);
+        FloatingTextDmg floatingText = spawned.GetComponent<FloatingTextDmg>();
+        if (floatingText != null)
+        {
+            floatingText.SetScreenPosition(screenPosition);
+            floatingText.SetText(value, color);
+        }
+    }
+
+    void SpawnMergeFloatingText(Vector3 position, string value, Color color)
+    {
+        SpawnFloatingText(position + floatingTextOffset, value, color);
     }
 
     #endregion

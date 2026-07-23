@@ -20,6 +20,17 @@ public abstract class GameUnit : MonoBehaviour
     [Header("Combat")]
     public float aimAttackSpeed = 1f;
 
+    [Header("HP Bar Layout")]
+    [SerializeField] bool autoLayoutHpBarToSpine = true;
+    [SerializeField] Vector2 hpBarScreenOffset = new Vector2(0f, 24f);
+    [SerializeField] float hpBarWidthScale = 0.85f;
+    [SerializeField] float hpBarMinWidth = 90f;
+    [SerializeField] float hpBarMaxWidth = 260f;
+
+    [Header("Floating Damage Text")]
+    [SerializeField] Vector2 damageTextScreenOffset = new Vector2(0f, 48f);
+    [SerializeField] Color damageTextColor = new Color(1f, 0.2f, 0.08f, 1f);
+
     public event Action<GameUnit, int, int> OnHpChanged;
     public event Action<GameUnitDamageEvent> OnBeforeDamage;
     public event Action<GameUnit, int> OnDamaged;
@@ -76,6 +87,7 @@ public abstract class GameUnit : MonoBehaviour
         amount = damageEvent.Amount;
 
         currentHp = Mathf.Max(0, currentHp - amount);
+        ShowDamageFloatingText(amount);
         OnDamaged?.Invoke(this, amount);
         TigerForge.EventManager.EmitEventData(
             Constant.ON_UNIT_DAMAGED,
@@ -90,6 +102,11 @@ public abstract class GameUnit : MonoBehaviour
         }
 
         PlayHurtAnimation();
+    }
+
+    void LateUpdate()
+    {
+        LayoutHpBarToSpine();
     }
 
     public virtual void OnHeal(int amount)
@@ -229,7 +246,159 @@ public abstract class GameUnit : MonoBehaviour
     void UpdateHpBar(GameUnit unit, int current, int max)
     {
         if (hpBar != null)
+        {
             hpBar.SetHp(current, max);
+            LayoutHpBarToSpine();
+        }
+    }
+
+    void ShowDamageFloatingText(int amount)
+    {
+        if (amount <= 0 || DiceManager.Instance == null)
+            return;
+
+        if (!TryGetSpineScreenBounds(out Rect screenBounds))
+            return;
+
+        Vector2 screenPosition = new Vector2(
+            screenBounds.center.x + damageTextScreenOffset.x,
+            screenBounds.yMax + damageTextScreenOffset.y
+        );
+
+        DiceManager.Instance.SpawnFloatingTextDmg(screenPosition, $"-{amount}", damageTextColor);
+    }
+
+    void LayoutHpBarToSpine()
+    {
+        if (!autoLayoutHpBarToSpine || hpBar == null)
+            return;
+
+        RectTransform hpBarRect = hpBar.transform as RectTransform;
+        RectTransform parentRect = hpBarRect != null ? hpBarRect.parent as RectTransform : null;
+        if (hpBarRect == null || parentRect == null)
+            return;
+
+        if (!TryGetSpineScreenBounds(out Rect screenBounds))
+            return;
+
+        Canvas canvas = hpBarRect.GetComponentInParent<Canvas>();
+        Camera canvasCamera = GetCanvasCamera(canvas);
+        Vector2 screenPosition = new Vector2(
+            screenBounds.center.x + hpBarScreenOffset.x,
+            screenBounds.yMax + hpBarScreenOffset.y
+        );
+
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(parentRect, screenPosition, canvasCamera, out Vector3 worldPosition))
+            hpBarRect.position = worldPosition;
+
+        if (TryGetParentLocalPoint(parentRect, new Vector2(screenBounds.xMin, screenBounds.center.y), canvasCamera, out Vector2 minLocal) &&
+            TryGetParentLocalPoint(parentRect, new Vector2(screenBounds.xMax, screenBounds.center.y), canvasCamera, out Vector2 maxLocal))
+        {
+            float width = Mathf.Abs(maxLocal.x - minLocal.x) * Mathf.Max(0.01f, hpBarWidthScale);
+            width = Mathf.Clamp(width, hpBarMinWidth, hpBarMaxWidth);
+            hpBarRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+        }
+    }
+
+    bool TryGetSpineScreenBounds(out Rect screenBounds)
+    {
+        if (TryGetSkeletonGraphicScreenBounds(out screenBounds))
+            return true;
+
+        if (TryGetSkeletonAnimationScreenBounds(out screenBounds))
+            return true;
+
+        screenBounds = default;
+        return false;
+    }
+
+    bool TryGetSkeletonGraphicScreenBounds(out Rect screenBounds)
+    {
+        screenBounds = default;
+        if (skeletonGraphic == null)
+            return false;
+
+        RectTransform rectTransform = skeletonGraphic.rectTransform;
+        if (rectTransform == null)
+            return false;
+
+        Canvas canvas = rectTransform.GetComponentInParent<Canvas>();
+        Camera camera = GetCanvasCamera(canvas);
+        Vector3[] corners = new Vector3[4];
+        rectTransform.GetWorldCorners(corners);
+        return TryBuildScreenBounds(corners, camera, out screenBounds);
+    }
+
+    bool TryGetSkeletonAnimationScreenBounds(out Rect screenBounds)
+    {
+        screenBounds = default;
+        if (skeletonAnimation == null)
+            return false;
+
+        Renderer renderer = skeletonAnimation.GetComponent<Renderer>();
+        Camera camera = Camera.main;
+        if (renderer == null || camera == null)
+            return false;
+
+        Bounds bounds = renderer.bounds;
+        if (bounds.size.sqrMagnitude <= 0f)
+            return false;
+
+        Vector3 min = bounds.min;
+        Vector3 max = bounds.max;
+        Vector3[] corners =
+        {
+            new Vector3(min.x, min.y, min.z),
+            new Vector3(min.x, min.y, max.z),
+            new Vector3(min.x, max.y, min.z),
+            new Vector3(min.x, max.y, max.z),
+            new Vector3(max.x, min.y, min.z),
+            new Vector3(max.x, min.y, max.z),
+            new Vector3(max.x, max.y, min.z),
+            new Vector3(max.x, max.y, max.z)
+        };
+
+        return TryBuildScreenBounds(corners, camera, out screenBounds);
+    }
+
+    bool TryBuildScreenBounds(Vector3[] worldCorners, Camera camera, out Rect screenBounds)
+    {
+        screenBounds = default;
+        if (worldCorners == null || worldCorners.Length == 0)
+            return false;
+
+        float minX = float.PositiveInfinity;
+        float minY = float.PositiveInfinity;
+        float maxX = float.NegativeInfinity;
+        float maxY = float.NegativeInfinity;
+
+        for (int i = 0; i < worldCorners.Length; i++)
+        {
+            Vector3 screenPoint = RectTransformUtility.WorldToScreenPoint(camera, worldCorners[i]);
+            minX = Mathf.Min(minX, screenPoint.x);
+            minY = Mathf.Min(minY, screenPoint.y);
+            maxX = Mathf.Max(maxX, screenPoint.x);
+            maxY = Mathf.Max(maxY, screenPoint.y);
+        }
+
+        if (!float.IsFinite(minX) || !float.IsFinite(minY) || !float.IsFinite(maxX) || !float.IsFinite(maxY))
+            return false;
+
+        screenBounds = Rect.MinMaxRect(minX, minY, maxX, maxY);
+        return screenBounds.width > 0f && screenBounds.height > 0f;
+    }
+
+    bool TryGetParentLocalPoint(RectTransform parentRect, Vector2 screenPosition, Camera camera, out Vector2 localPoint)
+    {
+        return RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, screenPosition, camera, out localPoint);
+    }
+
+    Camera GetCanvasCamera(Canvas canvas)
+    {
+        if (canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+            return null;
+
+        return canvas.worldCamera;
     }
 }
 
@@ -277,4 +446,3 @@ public sealed class GameUnitDamageEvent
         Amount = 0;
     }
 }
-
