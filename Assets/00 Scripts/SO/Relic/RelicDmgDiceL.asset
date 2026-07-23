@@ -24,6 +24,12 @@ MonoBehaviour:
   TargetType: 11
   rarity: 6
   stackApply: 1
-  valueApply: 50
+  valueApply: 30
+  valueApplyByLevel:
+  - 30
+  - 60
+  - 90
+  - 120
+  - 150
   relicSprite: {fileID: 0}
-  description: Tăng sát thương với Dice có value trên 5
+  description: Tang sat thuong voi Dice co value tu 6

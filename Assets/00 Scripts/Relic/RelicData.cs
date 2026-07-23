@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "RuneDice/Relic/Relic Base")]
@@ -8,91 +9,119 @@ public class RelicData : SerializedScriptableObject
     public ERarity rarity = ERarity.Rare;
     public int stackApply = 1;
     public int valueApply = 1;
+    public List<int> valueApplyByLevel = new();
     public Sprite relicSprite;
     [TextArea] public string description;
 
-    public virtual void Execute()
+    public int GetValueApply(int level)
     {
+        if (valueApplyByLevel != null && valueApplyByLevel.Count > 0)
+        {
+            int valueIndex = Mathf.Clamp(level, 1, valueApplyByLevel.Count) - 1;
+            return valueApplyByLevel[valueIndex];
+        }
+
+        return valueApply * Mathf.Max(1, level);
+    }
+
+    public virtual void Execute(int level = 1)
+    {
+        int levelValueApply = GetValueApply(level);
         switch (TargetType)
         {
             case RelicType.RelicArmorTurn:
-                RelicArmorTurnData.Execute(stackApply, valueApply);
+                RelicArmorTurnData.Execute(stackApply, levelValueApply);
                 break;
         }
     }
 
-    public DiceData ResolveDiceDataBeforeSkill(DiceData diceData)
+    public DiceData ResolveDiceDataBeforeSkill(DiceData diceData, int level = 1)
     {
+        int levelValueApply = GetValueApply(level);
         switch (TargetType)
         {
             case RelicType.RelicBomb6:
-                return RelicBomb6Data.ResolveDiceData(diceData, valueApply);
+                return RelicBomb6Data.ResolveDiceData(diceData, levelValueApply);
             default:
                 return diceData;
         }
     }
 
-    public void ApplyBeforeDiceSkill(DiceData diceData, GameplayManager gameplay)
+    public void ApplyBeforeDiceSkill(DiceData diceData, GameplayManager gameplay, int level = 1)
     {
+        int levelValueApply = GetValueApply(level);
         switch (TargetType)
         {
             case RelicType.Relic2by2:
-                Relic2by2Data.Execute(diceData, gameplay, valueApply);
+                Relic2by2Data.Execute(diceData, gameplay, levelValueApply);
                 break;
             case RelicType.RelicLucky7:
-                RelicLucky7Data.Execute(diceData, gameplay, valueApply);
+                RelicLucky7Data.Execute(diceData, gameplay, levelValueApply);
                 break;
         }
     }
 
-    public void ModifyPlayerAttackDamage(PlayerAttackDamageContext context)
+    public void ModifyPlayerAttackDamage(PlayerAttackDamageContext context, int level = 1)
     {
+        int levelValueApply = GetValueApply(level);
         switch (TargetType)
         {
             case RelicType.RelicDmgBurn:
-                RelicDmgBurnData.Apply(context, valueApply);
+                RelicDmgBurnData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgStun:
-                RelicDmgStunData.Apply(context, valueApply);
+                RelicDmgStunData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgVulnerable:
-                RelicDmgVulnerableData.Apply(context, valueApply);
+                RelicDmgVulnerableData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgExhausted:
-                RelicDmgExhaustedData.Apply(context, valueApply);
+                RelicDmgExhaustedData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgCrit:
-                RelicDmgCritData.Apply(context, valueApply);
+                RelicDmgCritData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgCounter:
-                RelicDmgCounterData.Apply(context, valueApply);
+                RelicDmgCounterData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgBoss:
-                RelicDmgBossData.Apply(context, valueApply);
+                RelicDmgBossData.Apply(context, levelValueApply);
+                break;
+            case RelicType.RelicDmgDice1:
+                RelicDmgDice1Data.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgDiceS:
-                RelicDmgDiceSData.Apply(context, valueApply);
+                RelicDmgDiceSData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgDiceM:
-                RelicDmgDiceMData.Apply(context, valueApply);
+                RelicDmgDiceMData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicDmgDiceL:
-                RelicDmgDiceLData.Apply(context, valueApply);
+                RelicDmgDiceLData.Apply(context, levelValueApply);
                 break;
             case RelicType.RelicBerserker:
-                RelicBerserkerData.Apply(context, valueApply);
+                RelicBerserkerData.Apply(context, levelValueApply);
                 break;
         }
     }
 
-    public void NotifyPlayerDealtDamage(PlayerController player, int damage)
+    public void NotifyPlayerDealtDamage(PlayerController player, int damage, int level = 1)
     {
+        int levelValueApply = GetValueApply(level);
         switch (TargetType)
         {
             case RelicType.RelicDmgHeal:
-                RelicDmgHealData.Execute(player, damage, valueApply);
+                RelicDmgHealData.Execute(player, damage, levelValueApply);
                 break;
         }
+    }
+
+    public bool ShouldCloneMergedDice(int level = 1)
+    {
+        if (TargetType != RelicType.RelicCloneMerge)
+            return false;
+
+        return RelicDataHelper.RollChance(GetValueApply(level));
     }
 }
 
@@ -113,7 +142,9 @@ public enum RelicType
     Relic2by2,
     RelicLucky7,
     RelicBomb6,
-    RelicBerserker
+    RelicBerserker,
+    RelicDmgDice1,
+    RelicCloneMerge
 }
 
 public sealed class PlayerAttackDamageContext
@@ -268,7 +299,16 @@ public static class RelicDmgDiceSData
 {
     public static void Apply(PlayerAttackDamageContext context, int valueApply)
     {
-        if (context != null && (context.DiceValue == 1 || context.DiceValue == 2))
+        if (context != null && (context.DiceValue == 2 || context.DiceValue == 3))
+            context.AddPercentDamage(valueApply);
+    }
+}
+
+public static class RelicDmgDice1Data
+{
+    public static void Apply(PlayerAttackDamageContext context, int valueApply)
+    {
+        if (context != null && context.DiceValue == 1)
             context.AddPercentDamage(valueApply);
     }
 }
@@ -277,7 +317,7 @@ public static class RelicDmgDiceMData
 {
     public static void Apply(PlayerAttackDamageContext context, int valueApply)
     {
-        if (context != null && (context.DiceValue == 3 || context.DiceValue == 4))
+        if (context != null && (context.DiceValue == 4 || context.DiceValue == 5))
             context.AddPercentDamage(valueApply);
     }
 }

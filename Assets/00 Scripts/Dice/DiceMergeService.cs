@@ -124,6 +124,17 @@ public class DiceMergeService
 
             spawnMergeFloatingText?.Invoke(merged.transform.position, merged.data.level.ToString(), merged.data.diceColor);
 
+            if (RelicManager.Instance != null && RelicManager.Instance.ShouldCloneMergedDice())
+            {
+                Vector3 cloneSpawnPos = boardService.FindClearPosition(mergePos);
+                Dice clonedDice = spawnDice?.Invoke(nextData, cloneSpawnPos);
+                if (clonedDice != null)
+                {
+                    spawnMergeFloatingText?.Invoke(clonedDice.transform.position, clonedDice.data.level.ToString(), clonedDice.data.diceColor);
+                    clonedDice.PlaceUpright(clonedDice.transform.position);
+                }
+            }
+
             if (merged.data != null && merged.data.hitEffectPrefab != null)
             {
                 Vector3 fxPos = merged.transform.position;
@@ -260,5 +271,4 @@ public class DiceMergeService
         }
     }
 }
-
 

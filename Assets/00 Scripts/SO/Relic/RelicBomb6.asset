@@ -24,6 +24,12 @@ MonoBehaviour:
   TargetType: 14
   rarity: 4
   stackApply: 1
-  valueApply: 27
+  valueApply: 10
+  valueApplyByLevel:
+  - 10
+  - 20
+  - 30
+  - 40
+  - 50
   relicSprite: {fileID: 0}
   description: Có tỷ lệ các dice số 6 tự động biến thành dice bomb

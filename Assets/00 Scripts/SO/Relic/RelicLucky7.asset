@@ -24,6 +24,12 @@ MonoBehaviour:
   TargetType: 13
   rarity: 4
   stackApply: 1
-  valueApply: 33
+  valueApply: 10
+  valueApplyByLevel:
+  - 10
+  - 20
+  - 30
+  - 40
+  - 50
   relicSprite: {fileID: 0}
   description: Có tỷ lệ các dice số 7 được thực hiện 3 lần

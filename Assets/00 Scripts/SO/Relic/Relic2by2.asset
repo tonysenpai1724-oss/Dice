@@ -24,6 +24,12 @@ MonoBehaviour:
   TargetType: 12
   rarity: 4
   stackApply: 1
-  valueApply: 22
+  valueApply: 10
+  valueApplyByLevel:
+  - 10
+  - 20
+  - 30
+  - 40
+  - 50
   relicSprite: {fileID: 0}
   description: Có tỷ lệ thực hiện 2 lần với các dice có value là 2

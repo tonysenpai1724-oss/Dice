@@ -24,6 +24,12 @@ MonoBehaviour:
   TargetType: 9
   rarity: 6
   stackApply: 1
-  valueApply: 50
+  valueApply: 20
+  valueApplyByLevel:
+  - 20
+  - 40
+  - 60
+  - 80
+  - 100
   relicSprite: {fileID: 0}
-  description: Tăng sát thương với Dice có value là 1 và 2
+  description: Tang sat thuong voi Dice co value la 2 va 3

@@ -24,6 +24,12 @@ MonoBehaviour:
   TargetType: 15
   rarity: 4
   stackApply: 1
-  valueApply: 50
+  valueApply: 20
+  valueApplyByLevel:
+  - 20
+  - 40
+  - 60
+  - 80
+  - 100
   relicSprite: {fileID: 0}
   description: Gây thêm sát thương dựa trên lượng máu đã mất

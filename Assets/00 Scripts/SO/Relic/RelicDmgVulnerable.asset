@@ -24,6 +24,12 @@ MonoBehaviour:
   TargetType: 2
   rarity: 3
   stackApply: 1
-  valueApply: 20
+  valueApply: 10
+  valueApplyByLevel:
+  - 10
+  - 20
+  - 30
+  - 40
+  - 50
   relicSprite: {fileID: 0}
   description: Tăng sát thương lên kẻ địch đang bị tổn thương

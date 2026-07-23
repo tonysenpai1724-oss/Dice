@@ -11,6 +11,7 @@ public class RelicManager : MonoBehaviour
     [SerializeField] private RelicDatabaseSO relicDatabase;
     [SerializeField] private List<RelicData> allRelics = new();
 
+    readonly Dictionary<RelicData, int> activeRelicLevels = new();
     int currentChapterId = -1;
 
     public IReadOnlyList<RelicData> ActiveRelics => activeRelics;
@@ -38,6 +39,7 @@ public class RelicManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        NormalizeActiveRelics();
         SyncChapterScope();
     }
 
@@ -47,8 +49,8 @@ public class RelicManager : MonoBehaviour
             return false;
 
         SyncChapterScope();
-        if (!activeRelics.Contains(relic))
-            activeRelics.Add(relic);
+        int relicLevel = AddRelicLevel(relic);
+        Debug.Log($"[RelicManager] Add relic {relic.name} ({relic.TargetType}) level {relicLevel} value {relic.GetValueApply(relicLevel)}");
 
         ExecuteLevelStartRelic(relic);
         return true;
@@ -57,6 +59,7 @@ public class RelicManager : MonoBehaviour
     public void ClearChapterRelics()
     {
         activeRelics.Clear();
+        activeRelicLevels.Clear();
         AddStartingRelics();
     }
 
@@ -79,7 +82,7 @@ public class RelicManager : MonoBehaviour
             if (relic == null)
                 continue;
 
-            resolvedDiceData = relic.ResolveDiceDataBeforeSkill(resolvedDiceData);
+            resolvedDiceData = relic.ResolveDiceDataBeforeSkill(resolvedDiceData, GetRelicLevel(relic));
         }
 
         return resolvedDiceData;
@@ -95,7 +98,7 @@ public class RelicManager : MonoBehaviour
         {
             RelicData relic = activeRelics[i];
             if (relic != null)
-                relic.ApplyBeforeDiceSkill(diceData, gameplay);
+                relic.ApplyBeforeDiceSkill(diceData, gameplay, GetRelicLevel(relic));
         }
     }
 
@@ -109,7 +112,7 @@ public class RelicManager : MonoBehaviour
         {
             RelicData relic = activeRelics[i];
             if (relic != null)
-                relic.ModifyPlayerAttackDamage(context);
+                relic.ModifyPlayerAttackDamage(context, GetRelicLevel(relic));
         }
     }
 
@@ -123,7 +126,7 @@ public class RelicManager : MonoBehaviour
         {
             RelicData relic = activeRelics[i];
             if (relic != null)
-                relic.NotifyPlayerDealtDamage(player, damage);
+                relic.NotifyPlayerDealtDamage(player, damage, GetRelicLevel(relic));
         }
     }
 
@@ -131,7 +134,8 @@ public class RelicManager : MonoBehaviour
     {
         for (int i = 0; i < activeRelics.Count; i++)
         {
-            activeRelics[i]?.Execute();
+            RelicData relic = activeRelics[i];
+            relic?.Execute(GetRelicLevel(relic));
         }
     }
 
@@ -143,18 +147,43 @@ public class RelicManager : MonoBehaviour
         {
             RelicData relic = activeRelics[i];
             if (relic != null && relic.TargetType == RelicType.RelicArmorTurn)
-                relic.Execute();
+                relic.Execute(GetRelicLevel(relic));
         }
     }
 
     public void ExecuteLevelStartRelic(RelicData relic)
     {
-        relic?.Execute();
+        relic?.Execute(GetRelicLevel(relic));
+    }
+
+    public bool ShouldCloneMergedDice()
+    {
+        SyncChapterScope();
+
+        for (int i = 0; i < activeRelics.Count; i++)
+        {
+            RelicData relic = activeRelics[i];
+            if (relic != null && relic.ShouldCloneMergedDice(GetRelicLevel(relic)))
+                return true;
+        }
+
+        return false;
+    }
+
+    public int GetRelicLevel(RelicData relic)
+    {
+        if (relic == null)
+            return 0;
+
+        if (activeRelicLevels.TryGetValue(relic, out int level))
+            return Mathf.Max(1, level);
+
+        return activeRelics.Contains(relic) ? 1 : 0;
     }
 
     void SyncChapterScope()
     {
-        int chapterId = ChapterManager.Instance != null ? ChapterManager.Instance.CurrentChapterId : currentChapterId;
+        int chapterId = ChapterManager.Instance != null ? ChapterManager.Instance.CurrentChapterId : 0;
         if (currentChapterId < 0)
         {
             currentChapterId = chapterId;
@@ -177,10 +206,51 @@ public class RelicManager : MonoBehaviour
         for (int i = 0; i < startingRelics.Count; i++)
         {
             RelicData relic = startingRelics[i];
-            if (relic != null && !activeRelics.Contains(relic))
-                activeRelics.Add(relic);
+            if (relic != null)
+                AddRelicLevel(relic);
         }
     }
+
+    int AddRelicLevel(RelicData relic)
+    {
+        if (relic == null)
+            return 0;
+
+        int nextLevel = GetRelicLevel(relic) + 1;
+        if (!activeRelics.Contains(relic))
+            activeRelics.Add(relic);
+
+        activeRelicLevels[relic] = nextLevel;
+        return nextLevel;
+    }
+
+    void NormalizeActiveRelics()
+    {
+        activeRelicLevels.Clear();
+        if (activeRelics == null)
+        {
+            activeRelics = new List<RelicData>();
+            return;
+        }
+
+        List<RelicData> uniqueRelics = new List<RelicData>();
+        for (int i = 0; i < activeRelics.Count; i++)
+        {
+            RelicData relic = activeRelics[i];
+            if (relic == null)
+                continue;
+
+            if (!uniqueRelics.Contains(relic))
+                uniqueRelics.Add(relic);
+
+            activeRelicLevels.TryGetValue(relic, out int currentLevel);
+            activeRelicLevels[relic] = currentLevel + 1;
+        }
+
+        activeRelics.Clear();
+        activeRelics.AddRange(uniqueRelics);
+    }
+
     [Button]
     public void AddAllRelic()
     {
@@ -193,10 +263,11 @@ public class RelicManager : MonoBehaviour
         for (int i = 0; i < relics.Count; i++)
         {
             RelicData relic = relics[i];
-            if (relic == null || activeRelics.Contains(relic))
+            if (relic == null)
                 continue;
 
-            activeRelics.Add(relic);
+            int relicLevel = AddRelicLevel(relic);
+            Debug.Log($"[RelicManager] Add all relic {relic.name} ({relic.TargetType}) level {relicLevel} value {relic.GetValueApply(relicLevel)}");
             ExecuteLevelStartRelic(relic);
         }
     }
