@@ -38,6 +38,18 @@ public class InventoryItemPreview : MonoBehaviour
         ApplyDecalMaterials();
     }
 
+    public void PrepareForCapture()
+    {
+        if (itemPreview != null)
+        {
+            itemPreview.sprite = null;
+            itemPreview.enabled = false;
+        }
+
+        if (preferMeshDecals)
+            DisableDecalProjectors();
+    }
+
     public void Setup(DiceData diceData, Texture2D texture)
     {
         Setup(diceData);
@@ -94,6 +106,21 @@ public class InventoryItemPreview : MonoBehaviour
             decalMesh.enabled = enabled;
             if (material != null)
                 decalMesh.sharedMaterial = material;
+        }
+    }
+
+    void DisableDecalProjectors()
+    {
+        DecalProjector[] projectors = GetComponentsInChildren<DecalProjector>(true);
+        for (int i = 0; i < projectors.Length; i++)
+        {
+            DecalProjector projector = projectors[i];
+            if (projector == null)
+                continue;
+
+            projector.enabled = false;
+            if (projector.gameObject.activeSelf)
+                projector.gameObject.SetActive(false);
         }
     }
 
@@ -175,5 +202,4 @@ public class InventoryItemPreview : MonoBehaviour
 
     }
 }
-
 

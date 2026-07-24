@@ -62,8 +62,8 @@ public class ChapterRewardChoiceItem : MonoBehaviour
     void SetOwnedIcon(Texture2D texture)
     {
         ReleaseOwnedIcon();
-        ownedIconTexture = texture;
-        ownedIconSprite = CreateSprite(texture);
+        ownedIconTexture = CopyTexture(texture);
+        ownedIconSprite = CreateSprite(ownedIconTexture);
         SetIcon(ownedIconSprite);
     }
 
@@ -118,6 +118,33 @@ public class ChapterRewardChoiceItem : MonoBehaviour
 
         Texture2D copiedTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         copiedTexture.ReadPixels(rect, 0, 0);
+        copiedTexture.Apply();
+
+        RenderTexture.active = previous;
+        RenderTexture.ReleaseTemporary(renderTexture);
+
+        return copiedTexture;
+    }
+
+    Texture2D CopyTexture(Texture2D sourceTexture)
+    {
+        if (sourceTexture == null)
+            return null;
+
+        RenderTexture renderTexture = RenderTexture.GetTemporary(
+            sourceTexture.width,
+            sourceTexture.height,
+            0,
+            RenderTextureFormat.Default,
+            RenderTextureReadWrite.Linear
+        );
+
+        RenderTexture previous = RenderTexture.active;
+        Graphics.Blit(sourceTexture, renderTexture);
+        RenderTexture.active = renderTexture;
+
+        Texture2D copiedTexture = new Texture2D(sourceTexture.width, sourceTexture.height, TextureFormat.RGBA32, false);
+        copiedTexture.ReadPixels(new Rect(0f, 0f, sourceTexture.width, sourceTexture.height), 0, 0);
         copiedTexture.Apply();
 
         RenderTexture.active = previous;

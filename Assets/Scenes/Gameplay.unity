@@ -14396,8 +14396,8 @@ MonoBehaviour:
   dicePrefab: {fileID: 3375883884255902782, guid: 619a2ae4ad28acd47894c63a17e14615, type: 3}
   diceDatabase: {fileID: 11400000, guid: b7f2f8d9e8982064d9e13c46459422bd, type: 2}
   boardCollider: {fileID: 1917797493}
-  minStartSpawnCount: 14
-  maxStartSpawnCount: 16
+  minStartSpawnCount: 10
+  maxStartSpawnCount: 12
   maxSingleDiceShare: 0.5
   minStartLevel: 1
   maxStartLevel: 3

@@ -7128,8 +7128,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -14.229919}
-  m_SizeDelta: {x: 0, y: 75.88013}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8323015337874916412
 CanvasRenderer:
@@ -7211,7 +7211,7 @@ MonoBehaviour:
   iconDie2Result: {fileID: 674458367853532269}
   typeIconResult: {fileID: 7944241623354077507}
   bg: {fileID: 983988913151209196}
-  chooseBgBottom: 1276
+  chooseBgBottom: 1205
 --- !u!1 &9096428379861596923
 GameObject:
   m_ObjectHideFlags: 0

@@ -84,6 +84,13 @@ public class PopupChapterRewardChoice : UIBase
         if (item == null)
             return;
 
+        Texture2D existingTexture = GetExistingOptionTexture(option);
+        if (existingTexture != null)
+        {
+            item.Setup(option, OnSelectOption, existingTexture);
+            return;
+        }
+
         Sprite existingIcon = GetExistingOptionIcon(option);
         if (existingIcon != null)
         {
@@ -99,6 +106,19 @@ public class PopupChapterRewardChoice : UIBase
         }
 
         item.Setup(option, OnSelectOption);
+    }
+
+    Texture2D GetExistingOptionTexture(ChapterRewardChoiceOption option)
+    {
+        if (option == null || option.type == ChapterRewardChoiceType.AddRune)
+            return null;
+
+        DiceData diceData = GetOptionDice(option);
+        if (inventoryUIController == null || diceData == null)
+            return null;
+
+        ItemToggle itemToggle = inventoryUIController.GetToggle(diceData);
+        return itemToggle != null ? itemToggle.PreviewTexture : null;
     }
 
     Sprite GetExistingOptionIcon(ChapterRewardChoiceOption option)
@@ -193,4 +213,3 @@ public class PopupChapterRewardChoice : UIBase
         spawnedItems.Clear();
     }
 }
-

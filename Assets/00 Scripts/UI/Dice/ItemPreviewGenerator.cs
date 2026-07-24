@@ -149,6 +149,9 @@ public class ItemPreviewGenerator : Singleton<ItemPreviewGenerator>
         if (previewCamera == null || renderTexture == null)
             return null;
 
+        if (!renderTexture.IsCreated())
+            renderTexture.Create();
+
         RenderTexture currentRT = RenderTexture.active;
         RenderTexture currentCameraRT = previewCamera.targetTexture;
         CameraClearFlags currentClearFlags = previewCamera.clearFlags;
@@ -163,6 +166,7 @@ public class ItemPreviewGenerator : Singleton<ItemPreviewGenerator>
             0f
         );
         RenderTexture.active = renderTexture;
+        GL.Clear(true, true, previewCamera.backgroundColor);
 
         previewCamera.Render();
 
@@ -253,9 +257,11 @@ public class ItemPreviewGenerator : Singleton<ItemPreviewGenerator>
             return;
 
         item.gameObject.SetActive(true);
+        SetLayerRecursively(item.gameObject, GetPreviewLayer());
         item.transform.localPosition = previewLocalPosition;
         item.transform.localScale = previewLocalScale;
         item.transform.localRotation = Quaternion.Euler(previewLocalEulerAngles);
+        item.PrepareForCapture();
         item.Setup(diceData);
     }
 
@@ -312,8 +318,11 @@ public class ItemPreviewGenerator : Singleton<ItemPreviewGenerator>
         cropSize = Mathf.Min(cropSize, Mathf.Max(width, height));
 
         int centerX = Mathf.RoundToInt((minX + maxX) * 0.5f);
-        int startX = centerX - cropSize / 2;
-        int startY = minY - padding;
+        int centerY = Mathf.RoundToInt((minY + maxY) * 0.5f);
+        int maxStartX = Mathf.Max(0, width - cropSize);
+        int maxStartY = Mathf.Max(0, height - cropSize);
+        int startX = Mathf.Clamp(centerX - cropSize / 2, 0, maxStartX);
+        int startY = Mathf.Clamp(centerY - cropSize / 2, 0, maxStartY);
 
         Texture2D cropped = new Texture2D(cropSize, cropSize, TextureFormat.RGBA32, false);
         Color32[] clearPixels = new Color32[cropSize * cropSize];
