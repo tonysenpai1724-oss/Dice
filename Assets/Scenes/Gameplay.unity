@@ -5437,7 +5437,7 @@ MonoBehaviour:
   hurtAnim: Hurt
   aimAttackSpeed: 2
   autoLayoutHpBarToSpine: 1
-  hpBarScreenOffset: {x: -25, y: 140}
+  hpBarScreenOffset: {x: 30, y: 0}
   hpBarWidthScale: 0.85
   hpBarMinWidth: 300
   hpBarMaxWidth: 400
@@ -35918,6 +35918,7 @@ MonoBehaviour:
   driftStopAngularVelocity: 0.22
   driftStopDelay: 0.08
   headOnImpactAssist: 0.75
+  chainedImpactAssistMultiplier: 0.55
   headOnImpactDotThreshold: 0.9
   shotSpinForwardTorque: 7
   shotSpinYawTorque: 2
@@ -36102,6 +36103,7 @@ MonoBehaviour:
   driftStopAngularVelocity: 0.22
   driftStopDelay: 0.08
   headOnImpactAssist: 0.75
+  chainedImpactAssistMultiplier: 0.55
   headOnImpactDotThreshold: 0.9
   shotSpinForwardTorque: 7
   shotSpinYawTorque: 2
@@ -36266,6 +36268,7 @@ MonoBehaviour:
   driftStopAngularVelocity: 0.22
   driftStopDelay: 0.08
   headOnImpactAssist: 0.75
+  chainedImpactAssistMultiplier: 0.55
   headOnImpactDotThreshold: 0.9
   shotSpinForwardTorque: 7
   shotSpinYawTorque: 2

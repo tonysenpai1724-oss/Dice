@@ -53,6 +53,7 @@ public class Enemy : GameUnit
             PlayAnimation(idleAnim, true);
         }
         NotifyHpChanged();
+        RefreshHpBarLayout(data.hpBarScreenOffsetOverride);
     }
 
     public virtual void Setup(EnemyEntryConfig entry)
@@ -76,6 +77,7 @@ public class Enemy : GameUnit
             PlayAnimation(idleAnim, true);
         }
         NotifyHpChanged();
+        RefreshHpBarLayout(data.hpBarScreenOffsetOverride);
     }
 
     public virtual void SetHp(int hp, int damage)

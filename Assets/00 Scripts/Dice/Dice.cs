@@ -65,6 +65,7 @@ public class Dice : PoolingObject
     public float driftStopAngularVelocity = 0.22f;
     public float driftStopDelay = 0.08f;
     public float headOnImpactAssist = 0.75f;
+    public float chainedImpactAssistMultiplier = 0.55f;
     public float headOnImpactDotThreshold = 0.9f;
     public float shotSpinForwardTorque = 7f;
     public float shotSpinYawTorque = 2f;
@@ -491,8 +492,16 @@ public class Dice : PoolingObject
 
     void ApplyHeadOnImpactAssist(Collision col)
     {
-        if (state != DiceState.Shot || rb == null)
+        if (rb == null)
             return;
+
+        if (state != DiceState.Shot && shotStopGraceTimer <= 0f)
+            return;
+
+        float impactAssistMultiplier =
+            state == DiceState.Shot
+                ? 1f
+                : chainedImpactAssistMultiplier;
 
         Dice other =
             col.collider.GetComponentInParent<Dice>();
@@ -502,7 +511,11 @@ public class Dice : PoolingObject
 
         Vector3 planarVelocity = GetImpactPlanarVelocity();
 
-        ApplyImpactAssistToDice(other, planarVelocity);
+        ApplyImpactAssistToDice(
+            other,
+            planarVelocity,
+            impactAssistMultiplier
+        );
     }
 
     Vector3 GetImpactPlanarVelocity()
@@ -516,7 +529,11 @@ public class Dice : PoolingObject
         return planarVelocity;
     }
 
-    void ApplyImpactAssistToDice(Dice other, Vector3 planarVelocity)
+    void ApplyImpactAssistToDice(
+        Dice other,
+        Vector3 planarVelocity,
+        float impactAssistMultiplier
+    )
     {
         if (other == null || other == this || other.rb == null)
             return;
@@ -557,7 +574,8 @@ public class Dice : PoolingObject
 
         float targetPushSpeed =
             planarVelocity.magnitude *
-            headOnImpactAssist;
+            headOnImpactAssist *
+            Mathf.Max(0f, impactAssistMultiplier);
 
         float currentPushSpeed = Vector3.Dot(
             otherPlanarVelocity,

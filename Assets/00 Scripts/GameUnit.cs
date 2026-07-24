@@ -110,11 +110,6 @@ public abstract class GameUnit : MonoBehaviour
         PlayHurtAnimation();
     }
 
-    void LateUpdate()
-    {
-        LayoutHpBarToSpine();
-    }
-
     public virtual void OnHeal(int amount)
     {
         if (amount <= 0 || !IsAlive())
@@ -252,10 +247,7 @@ public abstract class GameUnit : MonoBehaviour
     void UpdateHpBar(GameUnit unit, int current, int max)
     {
         if (hpBar != null)
-        {
             hpBar.SetHp(current, max);
-            LayoutHpBarToSpine();
-        }
     }
 
     void ShowDamageFloatingText(int amount, bool isCritical)
@@ -275,10 +267,17 @@ public abstract class GameUnit : MonoBehaviour
         DiceManager.Instance.SpawnFloatingTextDmg(screenPosition, $"-{amount}", textColor);
     }
 
-    void LayoutHpBarToSpine()
+    protected void RefreshHpBarLayout()
+    {
+        RefreshHpBarLayout(Vector2.zero);
+    }
+
+    protected void RefreshHpBarLayout(Vector2 extraScreenOffset)
     {
         if (!autoLayoutHpBarToSpine || hpBar == null)
             return;
+
+        PrepareSpineBoundsMeasurement();
 
         RectTransform hpBarRect = hpBar.transform as RectTransform;
         RectTransform parentRect = hpBarRect != null ? hpBarRect.parent as RectTransform : null;
@@ -291,20 +290,24 @@ public abstract class GameUnit : MonoBehaviour
         Canvas canvas = hpBarRect.GetComponentInParent<Canvas>();
         Camera canvasCamera = GetCanvasCamera(canvas);
         Vector2 screenPosition = new Vector2(
-            screenBounds.center.x + hpBarScreenOffset.x,
-            screenBounds.yMax + hpBarScreenOffset.y
+            screenBounds.center.x + hpBarScreenOffset.x + extraScreenOffset.x,
+            screenBounds.yMax + hpBarScreenOffset.y + extraScreenOffset.y
         );
 
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(parentRect, screenPosition, canvasCamera, out Vector3 worldPosition))
             hpBarRect.position = worldPosition;
 
-        if (TryGetParentLocalPoint(parentRect, new Vector2(screenBounds.xMin, screenBounds.center.y), canvasCamera, out Vector2 minLocal) &&
-            TryGetParentLocalPoint(parentRect, new Vector2(screenBounds.xMax, screenBounds.center.y), canvasCamera, out Vector2 maxLocal))
+    }
+
+    void PrepareSpineBoundsMeasurement()
+    {
+        if (skeletonGraphic != null)
         {
-            float width = Mathf.Abs(maxLocal.x - minLocal.x) * Mathf.Max(0.01f, hpBarWidthScale);
-            width = Mathf.Clamp(width, hpBarMinWidth, hpBarMaxWidth);
-            hpBarRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+            skeletonGraphic.Update(0f);
+            skeletonGraphic.UpdateMesh();
         }
+
+        Canvas.ForceUpdateCanvases();
     }
 
     bool TryGetSpineScreenBounds(out Rect screenBounds)
@@ -331,6 +334,24 @@ public abstract class GameUnit : MonoBehaviour
 
         Canvas canvas = rectTransform.GetComponentInParent<Canvas>();
         Camera camera = GetCanvasCamera(canvas);
+
+        Bounds meshBounds = skeletonGraphic.MeshGenerator.GetMeshBounds();
+        if (meshBounds.size.sqrMagnitude > 0f)
+        {
+            Vector3 min = meshBounds.min;
+            Vector3 max = meshBounds.max;
+            Vector3[] meshCorners =
+            {
+                rectTransform.TransformPoint(new Vector3(min.x, min.y, 0f)),
+                rectTransform.TransformPoint(new Vector3(min.x, max.y, 0f)),
+                rectTransform.TransformPoint(new Vector3(max.x, min.y, 0f)),
+                rectTransform.TransformPoint(new Vector3(max.x, max.y, 0f))
+            };
+
+            if (TryBuildScreenBounds(meshCorners, camera, out screenBounds))
+                return true;
+        }
+
         Vector3[] corners = new Vector3[4];
         rectTransform.GetWorldCorners(corners);
         return TryBuildScreenBounds(corners, camera, out screenBounds);
@@ -393,11 +414,6 @@ public abstract class GameUnit : MonoBehaviour
 
         screenBounds = Rect.MinMaxRect(minX, minY, maxX, maxY);
         return screenBounds.width > 0f && screenBounds.height > 0f;
-    }
-
-    bool TryGetParentLocalPoint(RectTransform parentRect, Vector2 screenPosition, Camera camera, out Vector2 localPoint)
-    {
-        return RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, screenPosition, camera, out localPoint);
     }
 
     Camera GetCanvasCamera(Canvas canvas)

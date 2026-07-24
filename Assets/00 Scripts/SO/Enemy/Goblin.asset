@@ -27,7 +27,8 @@ MonoBehaviour:
   scale: {x: 1, y: 1, z: 1}
   type: 1
   enemyLevel: 0
-  skeletonData: {fileID: 11400000, guid: 4eb51745291ee6d4da979e520ed7bcdf, type: 2}
+  skeletonData: {fileID: 11400000, guid: f04764cf6d2c6f4adba443c5fc2ed019, type: 2}
   attackAnimSpeed: 1.5
   level: 1
   coinReward: 0
+  hpBarScreenOffsetOverride: {x: 40, y: 8}

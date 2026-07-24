@@ -20,6 +20,9 @@ public class EnemyData : SerializedScriptableObject
     public int level = 1;
     public int coinReward;
 
+    [Header("HP Bar")]
+    public Vector2 hpBarScreenOffsetOverride = Vector2.zero;
+
     public int GetResolvedHp(int hpOverride, float hpMultiplier = 1f)
     {
         int value = hpOverride > 0 ? hpOverride : hp;
