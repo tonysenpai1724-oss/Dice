@@ -67,6 +67,7 @@ public class PlayerController : GameUnit
             skeletonGraphic.Initialize(true);
             PlayAnimation(idleAnim, true);
         }
+        RefreshHeroHpBarLayout();
         playerStatBtn.onClick.RemoveAllListeners();
         playerStatBtn.onClick.AddListener(OnPlayerClick);
     }
@@ -157,6 +158,8 @@ public class PlayerController : GameUnit
             skeletonGraphic.Initialize(true);
             PlayAnimation(idleAnim, true);
         }
+
+        RefreshHeroHpBarLayout();
     }
 
     public void RefreshStatsFromEquipment()
@@ -232,6 +235,14 @@ public class PlayerController : GameUnit
             playerStats = PlayerStats.Shared;
     }
 
+    void RefreshHeroHpBarLayout()
+    {
+        if (data == null)
+            return;
+
+        RefreshHpBarLayout(data.hpBarScreenOffsetOverride);
+    }
+
     IEnumerator PlayHurtDelayed()
     {
         yield return new WaitForSeconds(0f);
@@ -288,7 +299,6 @@ public class PlayerController : GameUnit
         UIManager.Instance.ShowPopupHeroStat();
     }
 }
-
 
 
 

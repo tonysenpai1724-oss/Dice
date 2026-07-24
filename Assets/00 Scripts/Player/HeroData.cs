@@ -22,6 +22,9 @@ public class HeroData : SerializedScriptableObject
     public ERarity rarity;
     public Dictionary<int, List<DiceData>> startDiceLevelConfig;
     public SkeletonDataAsset skeletonData;
+
+    [Header("HP Bar")]
+    public Vector2 hpBarScreenOffsetOverride = Vector2.zero;
 }
 public enum HeroType
 {
