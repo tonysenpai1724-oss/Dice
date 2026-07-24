@@ -118,7 +118,7 @@ MonoBehaviour:
   damage: 2
   def: 0
   critDmg: 1
-  critRate: 1
+  critRate: 0.4
   luck: 0
   type: 3
   rarity: 0

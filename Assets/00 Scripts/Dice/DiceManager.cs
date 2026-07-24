@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using UnityEngine.InputSystem;
 
 public class DiceManager : MonoBehaviour
 {
@@ -42,6 +41,8 @@ public class DiceManager : MonoBehaviour
     [Header("Merge")]
     [SerializeField] DiceMergeConfig mergeConfig = new DiceMergeConfig();
     DiceMergeService mergeService;
+    DiceHoverService hoverService;
+    DiceSpawnService spawnService;
 
     [Header("Stack")]
     List<Dice> boardDices = new List<Dice>();
@@ -51,8 +52,6 @@ public class DiceManager : MonoBehaviour
     public DiceQueueUI diceQueueUI;
 
     Dictionary<Dice, int> bindTurnsMap = new Dictionary<Dice, int>();
-
-    Dice currentHover;
 
     public bool IsSpawningHeroStartDice { get; private set; }
 
@@ -87,6 +86,22 @@ public class DiceManager : MonoBehaviour
             routine => StartCoroutine(routine),
             dice => comboService.TryComboChain(dice),
             comboService.ComboChainMap);
+
+        hoverService = new DiceHoverService(
+            () => GameplayManager.Instance != null && GameplayManager.Instance.State == EGamePlayState.Pause,
+            dice => UIManager.Instance?.ShowPopupDiceDetailTarget(dice != null ? dice.data : null, null),
+            () => UIManager.Instance?.HidePopupDiceDetailTarget());
+
+        spawnService = new DiceSpawnService(
+            boardService,
+            GetStartSpawnSettings,
+            GetHeroSpawnSettings,
+            GetDiceData,
+            GetPlayerController,
+            (data, position, registerOnBoard) => SpawnDice(data, position, registerOnBoard),
+            RegisterBoardDice,
+            routine => StartCoroutine(routine),
+            value => IsSpawningHeroStartDice = value);
     }
 
     void Start()
@@ -106,7 +121,35 @@ public class DiceManager : MonoBehaviour
 
     void Update()
     {
-        HandleHover();
+        hoverService?.UpdateHover();
+    }
+
+    DiceStartSpawnSettings GetStartSpawnSettings()
+    {
+        return new DiceStartSpawnSettings
+        {
+            minStartSpawnCount = minStartSpawnCount,
+            maxStartSpawnCount = maxStartSpawnCount,
+            maxSingleDiceShare = maxSingleDiceShare,
+            minStartLevel = minStartLevel,
+            maxStartLevel = maxStartLevel,
+            diceSpacingRadius = diceSpacingRadius,
+        };
+    }
+
+    DiceHeroSpawnSettings GetHeroSpawnSettings()
+    {
+        return new DiceHeroSpawnSettings
+        {
+            animateHeroStartDice = animateHeroStartDice,
+            heroDiceSpawnPoint = heroDiceSpawnPoint,
+            heroDiceSpawnOffset = heroDiceSpawnOffset,
+            heroDiceSpawnStartDelay = heroDiceSpawnStartDelay,
+            heroDiceFlyDuration = heroDiceFlyDuration,
+            heroDiceFlyArcHeight = heroDiceFlyArcHeight,
+            heroDiceSpawnStagger = heroDiceSpawnStagger,
+            heroDiceFlySpin = heroDiceFlySpin,
+        };
     }
 
     public BoardService GetBoardService()
@@ -154,69 +197,6 @@ public class DiceManager : MonoBehaviour
         {
             ReleaseBoundDice(releasedDices[i]);
         }
-    }
-
-    void HandleHover()
-    {
-        if (GameplayManager.Instance.State == EGamePlayState.Pause)
-            return;
-        if (Mouse.current == null || Camera.main == null)
-        {
-            ClearCurrentHover();
-            return;
-        }
-
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        Dice hitDice = null;
-        float nearestDistance = float.MaxValue;
-
-        RaycastHit[] hits = Physics.RaycastAll(ray, Mathf.Infinity, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
-
-        for (int i = 0; i < hits.Length; i++)
-        {
-            RaycastHit hit = hits[i];
-            if (hit.collider == null || hit.distance >= nearestDistance)
-                continue;
-
-            Dice dice = hit.collider.GetComponentInParent<Dice>();
-            if (dice == null || !dice.gameObject.activeInHierarchy)
-                continue;
-
-            if (dice.state == DiceState.Merging || dice.state == DiceState.FlyingCombo)
-                continue;
-
-            hitDice = dice;
-            nearestDistance = hit.distance;
-        }
-
-        if (currentHover == hitDice)
-            return;
-
-        if (currentHover != null)
-            currentHover.SetHovered(false);
-
-        currentHover = hitDice;
-
-        if (currentHover != null)
-        {
-            currentHover.SetHovered(true);
-            UIManager.Instance?.ShowPopupDiceDetailTarget(currentHover.data, null);
-        }
-        else
-        {
-            UIManager.Instance?.HidePopupDiceDetailTarget();
-        }
-    }
-
-    void ClearCurrentHover()
-    {
-        if (currentHover != null)
-        {
-            currentHover.SetHovered(false);
-            currentHover = null;
-        }
-
-        UIManager.Instance?.HidePopupDiceDetailTarget();
     }
 
     public DiceData GetDiceDataByLevel(int level)
@@ -501,297 +481,11 @@ public class DiceManager : MonoBehaviour
 
     public void SpawnStartBoard()
     {
-        if (GameManager.Instance == null || !GameManager.Instance.IsCurrentLevelPopupOnlyGameplay())
-        {
-            if (boardService == null)
-            {
-                Debug.LogError("BoardService is null!");
-                return;
-            }
-
-            int targetSpawnCount = Random.Range(minStartSpawnCount, maxStartSpawnCount + 1);
-            List<DiceData> plannedStartDice = BuildBalancedStartDicePlan(targetSpawnCount);
-
-            List<Vector3> plannedPositions = boardService.BuildSpreadSpawnPositions(targetSpawnCount);
-
-            int spawnCount = Mathf.Min(plannedStartDice.Count, plannedPositions.Count);
-            for (int i = 0; i < spawnCount; i++)
-            {
-                DiceData data = plannedStartDice[i];
-                if (data == null)
-                    continue;
-
-                // Sửa: gọi qua boardService
-                Vector3 position = boardService.FindClearPosition(plannedPositions[i], null, diceSpacingRadius);
-                if (boardService.IsOccupied(position, null, diceSpacingRadius))
-                    continue;
-
-                SpawnDice(data, position);
-            }
-
-            SpawnPlayerStartDiceDatas(targetSpawnCount);
-        }
-        else
-        {
+        if (GameManager.Instance != null && GameManager.Instance.IsCurrentLevelPopupOnlyGameplay())
             return;
-        }
+        spawnService?.SpawnStartBoard();
     }
 
-    List<DiceData> BuildBalancedStartDicePlan(int targetSpawnCount)
-    {
-        List<DiceData> result = new List<DiceData>();
-        List<DiceData> normalCandidates = new List<DiceData>();
-
-        for (int level = minStartLevel; level <= maxStartLevel; level++)
-        {
-            DiceData data = GetDiceData(level, DiceType.Normal);
-            if (data != null)
-                normalCandidates.Add(data);
-        }
-
-        if (normalCandidates.Count == 0)
-            return result;
-
-        Dictionary<DiceData, int> counts = new Dictionary<DiceData, int>();
-        int maxPerDice = Mathf.Max(1, Mathf.FloorToInt(targetSpawnCount * maxSingleDiceShare));
-
-        List<DiceData> shuffled = new List<DiceData>(normalCandidates);
-        for (int i = 0; i < shuffled.Count; i++)
-        {
-            int swapIndex = Random.Range(i, shuffled.Count);
-            DiceData temp = shuffled[i];
-            shuffled[i] = shuffled[swapIndex];
-            shuffled[swapIndex] = temp;
-        }
-
-        int cursor = 0;
-        while (result.Count < targetSpawnCount)
-        {
-            DiceData candidate = shuffled[cursor % shuffled.Count];
-            cursor++;
-
-            if (!counts.ContainsKey(candidate))
-                counts[candidate] = 0;
-
-            if (counts[candidate] >= maxPerDice)
-            {
-                bool foundAlternative = false;
-                for (int i = 0; i < shuffled.Count; i++)
-                {
-                    DiceData alternative = shuffled[(cursor + i) % shuffled.Count];
-                    if (!counts.ContainsKey(alternative))
-                        counts[alternative] = 0;
-
-                    if (counts[alternative] >= maxPerDice)
-                        continue;
-
-                    candidate = alternative;
-                    foundAlternative = true;
-                    break;
-                }
-
-                if (!foundAlternative)
-                    break;
-            }
-
-            counts[candidate]++;
-            result.Add(candidate);
-        }
-
-        while (result.Count < targetSpawnCount)
-        {
-            result.Add(shuffled[Random.Range(0, shuffled.Count)]);
-        }
-
-        return result;
-    }
-
-    private void SpawnPlayerStartDiceDatas(int targetSpawnCount)
-    {
-        PlayerController player = GetPlayerController();
-        if (player == null)
-            return;
-
-        if (player.diceDatas == null || player.diceDatas.Count == 0)
-            player.InitializeDiceDatas();
-
-        if (player.diceDatas == null || boardService == null)
-            return;
-
-        if (animateHeroStartDice)
-        {
-            IsSpawningHeroStartDice = true;
-            StartCoroutine(SpawnPlayerStartDiceDatasRoutine(player, targetSpawnCount));
-            return;
-        }
-
-        for (int i = 0; i < player.diceDatas.Count; i++)
-        {
-            DiceData data = player.diceDatas[i];
-            if (data == null)
-                continue;
-
-            int attempts = 0;
-            int maxAttempts = Mathf.Max(12, targetSpawnCount * 12);
-            while (attempts < maxAttempts)
-            {
-                attempts++;
-                Vector3 position = boardService.GetRandomPositionOnBoard();
-                Vector3 clearPos = boardService.FindClearPosition(position, null, diceSpacingRadius);
-
-                if (!boardService.IsOccupied(clearPos, null, diceSpacingRadius))
-                {
-                    SpawnDice(data, clearPos);
-                    break;
-                }
-            }
-        }
-    }
-
-    IEnumerator SpawnPlayerStartDiceDatasRoutine(PlayerController player, int targetSpawnCount)
-    {
-        if (heroDiceSpawnStartDelay > 0f)
-            yield return new WaitForSeconds(heroDiceSpawnStartDelay);
-
-        List<Coroutine> flyRoutines = new List<Coroutine>();
-        List<Vector3> reservedPositions = new List<Vector3>();
-
-        for (int i = 0; i < player.diceDatas.Count; i++)
-        {
-            DiceData data = player.diceDatas[i];
-            if (data == null)
-                continue;
-
-            if (!TryGetHeroDiceBoardPosition(targetSpawnCount, reservedPositions, out Vector3 targetPosition))
-                continue;
-
-            reservedPositions.Add(targetPosition);
-
-            Dice dice = SpawnDice(data, targetPosition, false);
-            if (dice == null)
-                continue;
-
-            Vector3 startPosition = GetHeroDiceSpawnPosition(player, targetPosition);
-            flyRoutines.Add(StartCoroutine(FlyAndRegisterHeroDice(dice, startPosition, targetPosition)));
-        }
-
-        for (int i = 0; i < flyRoutines.Count; i++)
-        {
-            if (flyRoutines[i] != null)
-                yield return flyRoutines[i];
-        }
-
-        IsSpawningHeroStartDice = false;
-    }
-
-    IEnumerator FlyAndRegisterHeroDice(Dice dice, Vector3 startPosition, Vector3 targetPosition)
-    {
-        yield return FlyHeroDiceToBoard(dice, startPosition, targetPosition);
-        RegisterBoardDice(dice);
-    }
-
-    bool TryGetHeroDiceBoardPosition(int targetSpawnCount, List<Vector3> reservedPositions, out Vector3 clearPosition)
-    {
-        clearPosition = Vector3.zero;
-
-        if (boardService == null)
-            return false;
-
-        int attempts = 0;
-        int maxAttempts = Mathf.Max(12, targetSpawnCount * 12);
-        while (attempts < maxAttempts)
-        {
-            attempts++;
-            Vector3 position = boardService.GetRandomPositionOnBoard();
-            clearPosition = boardService.FindClearPosition(position, null, diceSpacingRadius);
-
-            if (!boardService.IsOccupied(clearPosition, null, diceSpacingRadius) &&
-                !IsReservedHeroDicePosition(clearPosition, reservedPositions))
-                return true;
-        }
-
-        return false;
-    }
-
-    bool IsReservedHeroDicePosition(Vector3 position, List<Vector3> reservedPositions)
-    {
-        if (reservedPositions == null)
-            return false;
-
-        float minDistance = diceSpacingRadius * 2f;
-        float minDistanceSqr = minDistance * minDistance;
-
-        for (int i = 0; i < reservedPositions.Count; i++)
-        {
-            Vector3 offset = position - reservedPositions[i];
-            offset.y = 0f;
-
-            if (offset.sqrMagnitude < minDistanceSqr)
-                return true;
-        }
-
-        return false;
-    }
-    Vector3 GetHeroDiceSpawnPosition(PlayerController player, Vector3 targetPosition)
-    {
-        if (heroDiceSpawnPoint != null)
-            return heroDiceSpawnPoint.position;
-
-        if (player != null)
-            return player.transform.position + heroDiceSpawnOffset;
-
-        return targetPosition + Vector3.up * heroDiceFlyArcHeight;
-    }
-
-    IEnumerator FlyHeroDiceToBoard(Dice dice, Vector3 startPosition, Vector3 targetPosition)
-    {
-        if (dice == null)
-            yield break;
-
-        dice.state = DiceState.FlyingCombo;
-        dice.canMerge = false;
-        dice.SetCollisionEnabled(false);
-        dice.transform.position = startPosition;
-        dice.transform.rotation = Random.rotation;
-
-        if (dice.rb != null)
-        {
-            dice.rb.linearVelocity = Vector3.zero;
-            dice.rb.angularVelocity = Vector3.zero;
-            dice.rb.isKinematic = true;
-            dice.rb.position = startPosition;
-            dice.rb.rotation = dice.transform.rotation;
-        }
-
-        float duration = Mathf.Max(0.01f, heroDiceFlyDuration);
-        Quaternion startRotation = dice.transform.rotation;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            float easedT = 1f - Mathf.Pow(1f - t, 3f);
-
-            Vector3 position = Vector3.Lerp(startPosition, targetPosition, easedT);
-            position.y += Mathf.Sin(t * Mathf.PI) * heroDiceFlyArcHeight;
-
-            dice.transform.position = position;
-            dice.transform.rotation = startRotation * Quaternion.Euler(heroDiceFlySpin * t);
-
-            if (dice.rb != null)
-            {
-                dice.rb.position = position;
-                dice.rb.rotation = dice.transform.rotation;
-            }
-
-            yield return null;
-        }
-
-        dice.state = DiceState.Idle;
-        dice.PlaceUpright(targetPosition);
-        dice.SetCollisionEnabled(true);
-    }
     PlayerController GetPlayerController()
     {
         if (EnemyManager.Instance != null && EnemyManager.Instance.player != null)
@@ -843,9 +537,7 @@ public class DiceManager : MonoBehaviour
             : null;
     }
 
-    public void RegisterBoardDice(
-        Dice dice
-    )
+    public void RegisterBoardDice( Dice dice)
     {
         if (dice == null)
             return;
@@ -1054,7 +746,7 @@ public class DiceManager : MonoBehaviour
         boardDices.Clear();
         spawnedDices.Clear();
         bindTurnsMap.Clear();
-        ClearCurrentHover();
+        hoverService?.ClearHover();
     }
 
     void AddDicesToClearList(ICollection<Dice> target, IEnumerable<Dice> source)
@@ -1123,7 +815,6 @@ public class DiceManager : MonoBehaviour
     #endregion
 
 }
-
 
 
 
