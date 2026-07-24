@@ -282,12 +282,12 @@ public class DiceComboService
         Quaternion targetRot = Quaternion.Euler(0f, dice.transform.eulerAngles.y, 0f);
         Quaternion startRot = dice.transform.rotation;
 
-        int numBounces = shouldFullBounce ? 3 : 1;
         float[] bounceHeights = shouldFullBounce ? new[] { 1.2f, 0.6f, 0.25f } : new[] { 0.9f };
         float[] bounceDurations = shouldFullBounce ? new[] { 0.35f, 0.25f, 0.18f } : new[] { 0.3f };
+        int numBounces = Mathf.Min(bounceHeights.Length, bounceDurations.Length);
 
         float totalBounceDuration = 0f;
-        for (int i = 0; i < bounceDurations.Length; i++)
+        for (int i = 0; i < numBounces; i++)
             totalBounceDuration += bounceDurations[i];
 
         float elapsedBounceTime = 0f;
@@ -362,7 +362,6 @@ public class DiceComboService
         rigidbody.angularVelocity = Vector3.zero;
     }
 }
-
 
 
 

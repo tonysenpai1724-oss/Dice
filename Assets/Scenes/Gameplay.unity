@@ -14415,9 +14415,9 @@ MonoBehaviour:
     comboArcHeight: 4
     comboDuration: 0.7
     comboSideScatter: 0.45
-    comboSpinTurnsX: {x: 1265, y: 2530}
-    comboSpinTurnsY: {x: 210, y: 630}
-    comboSpinTurnsZ: {x: 1265, y: 2530}
+    comboSpinTurnsX: {x: 360, y: 720}
+    comboSpinTurnsY: {x: 90, y: 360}
+    comboSpinTurnsZ: {x: 360, y: 720}
     comboDistancePerChain: 4
     maxComboDistanceLimit: 30
     comboArcPerChain: 3
