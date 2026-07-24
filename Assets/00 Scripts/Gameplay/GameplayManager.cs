@@ -348,6 +348,8 @@ public class GameplayManager : MonoBehaviour
             else
                 IPlayerInfoController.Instance.WinLevel();
 
+            TigerForge.EventManager.EmitEvent(Constant.ON_WIN_LEVEL);
+
             if (rewardChoices != null && rewardChoices.Count > 0)
                 UIManager.Instance.ShowPopupChoice(rewardChoices);
             else
@@ -357,6 +359,7 @@ public class GameplayManager : MonoBehaviour
         else
         {
             TigerForge.EventManager.EmitEvent(Constant.ON_END_GAME);
+            TigerForge.EventManager.EmitEvent(Constant.ON_LOSE_LEVEL);
             if (GameManager.Instance.GameType == EGameType.Endless)
             {
                 PackReward = new PackageResource();
@@ -424,7 +427,6 @@ public class GameplayManager : MonoBehaviour
         DebugCustom.LogColor("OnClick", pos);
     }
 }
-
 
 
 

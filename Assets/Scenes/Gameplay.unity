@@ -23346,6 +23346,7 @@ GameObject:
   - component: {fileID: 1741286564}
   - component: {fileID: 1741286566}
   - component: {fileID: 1741286565}
+  - component: {fileID: 1741286567}
   m_Layer: 5
   m_Name: Wave
   m_TagString: Untagged
@@ -23416,6 +23417,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1741286563}
   m_CullTransparentMesh: 1
+--- !u!114 &1741286567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1741286563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 680842452e26e791c84cdbbf2c2774ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaveChapterUI
+  waveCountText: {fileID: 172232984}
 --- !u!1 &1744405809
 GameObject:
   m_ObjectHideFlags: 0

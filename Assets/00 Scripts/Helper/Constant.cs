@@ -123,6 +123,8 @@ public static class Constant
     public const string ON_EQUIMENT_DICE_CHANGED = "ON_EQUIMENT_DICE_CHANGED";
     public const string EVENT_ROLL_DICE = "EventRollDice";
     public const string EVENT_ON_ROLL_RESULT = "EventOnRollResult";
+    public const string ON_WIN_LEVEL = "ON_WIN_LEVEL";
+    public const string ON_LOSE_LEVEL = "ON_LOSE_LEVEL";
     #endregion
 }
 
