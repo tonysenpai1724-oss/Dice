@@ -23430,6 +23430,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveChapterUI
   waveCountText: {fileID: 172232984}
+  progressFill: {fileID: 613347262}
+  startMilestoneImage: {fileID: 39349407}
+  middleMilestoneImage: {fileID: 2140436215}
+  endMilestoneImage: {fileID: 1127000971}
+  arrowRect: {fileID: 1005886058}
+  activeMilestoneSprite: {fileID: 21300000, guid: be9e843c4f701a74c8e26f61173609ed, type: 3}
+  inactiveMilestoneSprite: {fileID: 21300000, guid: 0f2fa89d37a4e1c4cbdf8fd8ca603175, type: 3}
+  progressTweenDuration: 0.35
+  arrowLocalOffset: {x: 0, y: 30}
 --- !u!1 &1744405809
 GameObject:
   m_ObjectHideFlags: 0
