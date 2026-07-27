@@ -181,6 +181,25 @@ public class RelicManager : MonoBehaviour
         return activeRelics.Contains(relic) ? 1 : 0;
     }
 
+    public List<RelicData> GetRewardRelics()
+    {
+        List<RelicData> sourceRelics = relicDatabase != null ? relicDatabase.relicDatas : allRelics;
+        List<RelicData> result = new List<RelicData>();
+        if (sourceRelics == null)
+            return result;
+
+        for (int i = 0; i < sourceRelics.Count; i++)
+        {
+            RelicData relic = sourceRelics[i];
+            if (relic == null || result.Contains(relic))
+                continue;
+
+            result.Add(relic);
+        }
+
+        return result;
+    }
+
     void SyncChapterScope()
     {
         int chapterId = ChapterManager.Instance != null ? ChapterManager.Instance.CurrentChapterId : 0;

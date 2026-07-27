@@ -4,12 +4,12 @@ public class ChapterRewardChoiceBuilder
 {
     readonly DiceDatabaseSO diceDatabase;
     readonly ChapterDiceSession diceSession;
-    readonly List<RuneSkillData> runes;
-    public ChapterRewardChoiceBuilder(DiceDatabaseSO diceDatabase, ChapterDiceSession diceSession, List<RuneSkillData> runes)
+    readonly List<RelicData> relics;
+    public ChapterRewardChoiceBuilder(DiceDatabaseSO diceDatabase, ChapterDiceSession diceSession, List<RelicData> relics)
     {
         this.diceDatabase = diceDatabase;
         this.diceSession = diceSession;
-        this.runes = runes;
+        this.relics = relics;
     }
     public List<ChapterRewardChoiceOption> BuildChoices(int maxOptions = 3, int maxAttempts = 30)
     {
@@ -49,7 +49,7 @@ public class ChapterRewardChoiceBuilder
                 //    return GenerateRuneReward();
                 return GenerateAddDiceReward();
             case 2:
-                return GenerateRuneReward();
+                return GenerateRelicReward();
         }
         return null;
     }
@@ -59,13 +59,13 @@ public class ChapterRewardChoiceBuilder
         switch (rand)
         {
             case 0:
-                return GenerateRuneReward();
+                return GenerateRelicReward();
             //return GenerateUpgradeReward();
             case 1:
-                return GenerateRuneReward();
+                return GenerateRelicReward();
             //return GenerateAddDiceReward();
             case 2:
-                return GenerateRuneReward();
+                return GenerateRelicReward();
         }
         return null;
     }
@@ -105,19 +105,19 @@ public class ChapterRewardChoiceBuilder
             targetDice = dice
         };
     }
-    ChapterRewardChoiceOption GenerateRuneReward()
+    ChapterRewardChoiceOption GenerateRelicReward()
     {
-        if (runes == null || runes.Count == 0)
+        if (relics == null || relics.Count == 0)
             return null;
-        RuneSkillData rune = runes[Random.Range(0, runes.Count)];
-        if (rune == null)
+        RelicData relic = relics[Random.Range(0, relics.Count)];
+        if (relic == null)
             return null;
         return new ChapterRewardChoiceOption
         {
-            type = ChapterRewardChoiceType.AddRune,
-            title = $"Add Rune {rune.TargetType}",
-            description = "Gain 1 rune for this run",
-            runeSkill = rune
+            type = ChapterRewardChoiceType.Relic,
+            title = $"Add {relic.name}",
+            description = "Gain 1 relic for this run",
+            relicData = relic
         };
     }
     bool ContainsSameRewardOption(List<ChapterRewardChoiceOption> currentOptions, ChapterRewardChoiceOption candidate)
@@ -143,6 +143,10 @@ public class ChapterRewardChoiceBuilder
                     break;
                 case ChapterRewardChoiceType.AddRune:
                     if (current.runeSkill == candidate.runeSkill)
+                        return true;
+                    break;
+                case ChapterRewardChoiceType.Relic:
+                    if (current.relicData == candidate.relicData)
                         return true;
                     break;
             }

@@ -19,4 +19,5 @@ public class ChapterRewardChoiceOption
     public DiceData sourceDice;
     public DiceData targetDice;
     public RuneSkillData runeSkill;
+    public RelicData relicData;
 }

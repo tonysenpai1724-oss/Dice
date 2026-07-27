@@ -554,6 +554,9 @@ public class ChapterDiceSession : MonoBehaviour
             if (data == null)
                 continue;
 
+            if (data.type == DiceType.Normal)
+                continue;
+
             result.Add(data);
         }
 

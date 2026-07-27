@@ -110,7 +110,7 @@ public class PopupChapterRewardChoice : UIBase
 
     Texture2D GetExistingOptionTexture(ChapterRewardChoiceOption option)
     {
-        if (option == null || option.type == ChapterRewardChoiceType.AddRune)
+        if (option == null || option.type == ChapterRewardChoiceType.AddRune || option.type == ChapterRewardChoiceType.Relic)
             return null;
 
         DiceData diceData = GetOptionDice(option);
@@ -128,6 +128,9 @@ public class PopupChapterRewardChoice : UIBase
 
         if (option.type == ChapterRewardChoiceType.AddRune)
             return option.runeSkill != null ? option.runeSkill.runeSprite : null;
+
+        if (option.type == ChapterRewardChoiceType.Relic)
+            return option.relicData != null ? option.relicData.relicSprite : null;
 
         DiceData diceData = GetOptionDice(option);
         if (inventoryUIController == null || diceData == null)

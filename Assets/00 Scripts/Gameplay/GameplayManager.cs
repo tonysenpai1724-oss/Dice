@@ -278,10 +278,11 @@ public class GameplayManager : MonoBehaviour
 
     public List<ChapterRewardChoiceOption> BuildChapterRewardChoices(LevelType levelType)
     {
+        RelicManager relicManager = RelicManager.GetOrCreate();
         ChapterRewardChoiceBuilder builder = new ChapterRewardChoiceBuilder(
             DiceManager.Instance != null ? DiceManager.Instance.diceDatabase : null,
             ChapterDiceSession.GetOrCreate(),
-            RuneManager.Instance.RuneSkillDatas
+            relicManager != null ? relicManager.GetRewardRelics() : null
         );
         if (levelType == LevelType.Chest || levelType == LevelType.ChestReward)
             return builder.BuildChestChoices();
@@ -310,6 +311,10 @@ public class GameplayManager : MonoBehaviour
             case ChapterRewardChoiceType.AddRune:
                 if (option.runeSkill != null)
                     RuneManager.Instance?.TryAddRune(option.runeSkill);
+                break;
+            case ChapterRewardChoiceType.Relic:
+                if (option.relicData != null)
+                    RelicManager.Instance?.TryAddRelic(option.relicData);
                 break;
         }
     }
@@ -427,6 +432,4 @@ public class GameplayManager : MonoBehaviour
         DebugCustom.LogColor("OnClick", pos);
     }
 }
-
-
 
