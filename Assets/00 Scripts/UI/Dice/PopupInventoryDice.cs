@@ -22,7 +22,7 @@
 
         foreach (UIBase ui in UIManager.Instance.lstOpenningUI.ToArray())
         {
-            if (!(ui is PopupDiceDetail) && !(ui is PopupRuneDetail))
+            if (!(ui is PopupDiceDetail) && !(ui is PopupRuneDetail) && !(ui is PopupRelicDetail))
                 continue;
 
             ui.Hide();

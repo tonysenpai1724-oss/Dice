@@ -486,6 +486,18 @@ public class UIManager : Singleton<UIManager>
         ui.ShowRuneDetails(runeData);
         ui.Show();
     }
+    public void ShowPopupRelicDetail(RelicData relicData)
+    {
+        if (relicData == null)
+            return;
+
+        PopupRelicDetail ui = GetUI("Popup Relic Detail") as PopupRelicDetail;
+        if (ui == null)
+            return;
+
+        ui.ShowRelicDetails(relicData);
+        ui.Show();
+    }
     public void ShowPopupConfirm(System.Action actionOk, System.Action actionNo = null, string txtDesc = "Confirm Action?", string txtTile = "Warning", EButtonColor okColor = EButtonColor.Yellow, string txtBtnOk = "OK", EButtonColor noColor = EButtonColor.Blue, string txtBtnNo = "No")
     {
         PopupConfirmAction ui = GetUI("Popup Confirm Action") as PopupConfirmAction;
@@ -587,7 +599,6 @@ public class UIManager : Singleton<UIManager>
     #endregion
     #endregion
 }
-
 
 
 

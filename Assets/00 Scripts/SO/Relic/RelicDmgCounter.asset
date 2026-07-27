@@ -25,11 +25,6 @@ MonoBehaviour:
   rarity: 3
   stackApply: 1
   valueApply: 10
-  valueApplyByLevel:
-  - 10
-  - 20
-  - 30
-  - 40
-  - 50
-  relicSprite: {fileID: 0}
-  description: Tăng sát thương khi phản kích
+  valueApplyByLevel: 0a000000140000001e0000002800000032000000
+  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
+  description: "T\u0103ng s\xE1t th\u01B0\u01A1ng khi ph\u1EA3n k\xEDch"

@@ -6,7 +6,8 @@ public enum ItemToggleType
 {
     None,
     Dice,
-    Rune
+    Rune,
+    Relic
 }
 
 public class ItemToggle : MonoBehaviour
@@ -14,6 +15,7 @@ public class ItemToggle : MonoBehaviour
     public ItemToggleType itemType;
     public DiceData data;
     public RuneSkillData runeData;
+    public RelicData relicData;
     public Button btn;
     public RawImage previewRawImage;
     public Image previewImage;
@@ -51,6 +53,7 @@ public class ItemToggle : MonoBehaviour
         itemType = ItemToggleType.Dice;
         data = diceData;
         runeData = null;
+        relicData = null;
         onSelected = onSelectedCallback;
         SetPreview(texture);
         SetSelect(false);
@@ -64,6 +67,7 @@ public class ItemToggle : MonoBehaviour
         itemType = ItemToggleType.Rune;
         data = null;
         runeData = runeSkillData;
+        relicData = null;
         onSelected = onSelectedCallback;
         SetPreview(sprite);
         SetSelect(false);
@@ -71,11 +75,26 @@ public class ItemToggle : MonoBehaviour
         if (btn != null)
             btn.interactable = runeData != null;
     }
+
+    public void Setup(RelicData relic, Sprite sprite, Action<ItemToggle> onSelectedCallback = null)
+    {
+        itemType = ItemToggleType.Relic;
+        data = null;
+        runeData = null;
+        relicData = relic;
+        onSelected = onSelectedCallback;
+        SetPreview(sprite);
+        SetSelect(false);
+
+        if (btn != null)
+            btn.interactable = relicData != null;
+    }
     public void Clear()
     {
         itemType = ItemToggleType.None;
         data = null;
         runeData = null;
+        relicData = null;
         onSelected = null;
         SetPreview((Texture2D)null);
 
@@ -99,6 +118,11 @@ public class ItemToggle : MonoBehaviour
                 if (runeData == null)
                     return;
                 Debug.Log(runeData.name);
+                break;
+            case ItemToggleType.Relic:
+                if (relicData == null)
+                    return;
+                Debug.Log(relicData.name);
                 break;
             default:
                 return;

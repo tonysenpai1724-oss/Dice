@@ -25,11 +25,6 @@ MonoBehaviour:
   rarity: 6
   stackApply: 1
   valueApply: 30
-  valueApplyByLevel:
-  - 30
-  - 60
-  - 90
-  - 120
-  - 150
-  relicSprite: {fileID: 0}
+  valueApplyByLevel: 1e0000003c0000005a0000007800000096000000
+  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
   description: Tang sat thuong voi Dice co value tu 6

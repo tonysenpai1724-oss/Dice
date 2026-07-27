@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 public enum InventoryDiceSource
 {
@@ -13,7 +14,7 @@ public enum InventoryDiceSource
 public enum InventoryViewTab
 {
     Dice,
-    Rune
+    Relic
 }
 
 public class InventoryUIController : UIBase
@@ -28,7 +29,8 @@ public class InventoryUIController : UIBase
 
     [Header("Tabs")]
     public Button diceButton;
-    public Button runeButton;
+    [FormerlySerializedAs("runeButton")]
+    public Button relicButton;
     public InventoryViewTab defaultTab = InventoryViewTab.Dice;
 
     public event Action<ItemToggle> ItemSelected;
@@ -48,7 +50,6 @@ public class InventoryUIController : UIBase
         BindTabButtons();
         SelectTab(defaultTab, false);
         TigerForge.EventManager.StartListening(Constant.ON_EQUIMENT_DICE_CHANGED, RefreshCurrentTab);
-        TigerForge.EventManager.StartListening(Constant.ON_RUNE_CHANGE, RefreshCurrentTab);
     }
 
     public void SetDiceItems(List<DiceData> newDiceItems)
@@ -71,7 +72,6 @@ public class InventoryUIController : UIBase
     void OnDestroy()
     {
         TigerForge.EventManager.StopListening(Constant.ON_EQUIMENT_DICE_CHANGED, RefreshCurrentTab);
-        TigerForge.EventManager.StopListening(Constant.ON_RUNE_CHANGE, RefreshCurrentTab);
     }
 
     public void ShowDice()
@@ -79,9 +79,15 @@ public class InventoryUIController : UIBase
         SelectTab(InventoryViewTab.Dice);
     }
 
-    public void ShowRunes()
+    // Legacy rune tab:
+    // public void ShowRunes()
+    // {
+    //     SelectTab(InventoryViewTab.Rune);
+    // }
+
+    public void ShowRelics()
     {
-        SelectTab(InventoryViewTab.Rune);
+        SelectTab(InventoryViewTab.Relic);
     }
 
     public void RefreshItems()
@@ -130,7 +136,41 @@ public class InventoryUIController : UIBase
             item.btn.interactable = canClick;
         }
     }
-    public void RefreshRunes()
+    // Legacy rune tab:
+    // public void RefreshRunes()
+    // {
+    //     ClearItems();
+    //
+    //     if (itemTogglePrefab == null)
+    //         return;
+    //
+    //     Transform parent = itemParent != null ? itemParent : transform;
+    //     itemToggles.Clear();
+    //
+    //     RuneManager runeManager = RuneManager.Instance;
+    //     if (runeManager == null)
+    //         return;
+    //
+    //     for (int i = 0; i < runeManager.SlotCount; i++)
+    //     {
+    //         if (!runeManager.IsSlotUnlocked(i))
+    //             continue;
+    //
+    //         RuneSkillData runeData = runeManager.GetRune(i);
+    //         if (runeData == null)
+    //             continue;
+    //
+    //         Sprite runeSprite = runeData.runeSprite;
+    //         ItemToggle itemToggle = Instantiate(itemTogglePrefab, parent);
+    //         itemToggle.Setup(runeData, runeSprite, OnItemToggleSelected);
+    //         if (itemToggle.btn != null)
+    //             itemToggle.btn.interactable = itemToggleCanClick;
+    //         itemToggles.Add(itemToggle);
+    //         spawnedToggles.Add(itemToggle);
+    //     }
+    // }
+
+    public void RefreshRelics()
     {
         ClearItems();
 
@@ -140,24 +180,20 @@ public class InventoryUIController : UIBase
         Transform parent = itemParent != null ? itemParent : transform;
         itemToggles.Clear();
 
-        RuneManager runeManager = RuneManager.Instance;
-        RuneViewManager runeViewManager = RuneViewManager.Instance;
-
-        if (runeManager == null)
+        RelicManager relicManager = RelicManager.Instance;
+        if (relicManager == null)
             return;
 
-        for (int i = 0; i < runeManager.SlotCount; i++)
+        IReadOnlyList<RelicData> activeRelics = relicManager.ActiveRelics;
+        for (int i = 0; i < activeRelics.Count; i++)
         {
-            if (!runeManager.IsSlotUnlocked(i))
+            RelicData relicData = activeRelics[i];
+            if (relicData == null)
                 continue;
 
-            RuneSkillData runeData = runeManager.GetRune(i);
-            if (runeData == null)
-                continue;
-
-            Sprite runeSprite = runeData.runeSprite;
+            Sprite relicSprite = relicData.relicSprite;
             ItemToggle itemToggle = Instantiate(itemTogglePrefab, parent);
-            itemToggle.Setup(runeData, runeSprite, OnItemToggleSelected);
+            itemToggle.Setup(relicData, relicSprite, OnItemToggleSelected);
             if (itemToggle.btn != null)
                 itemToggle.btn.interactable = itemToggleCanClick;
             itemToggles.Add(itemToggle);
@@ -209,8 +245,8 @@ public class InventoryUIController : UIBase
             case ItemToggleType.Dice:
                 UIManager.Instance.ShowPopupDiceDetail(itemToggle.data, itemToggle.PreviewSprite);
                 break;
-            case ItemToggleType.Rune:
-                UIManager.Instance.ShowPopupRuneDetail(itemToggle.runeData);
+            case ItemToggleType.Relic:
+                UIManager.Instance.ShowPopupRelicDetail(itemToggle.relicData);
                 break;
         }
     }
@@ -252,10 +288,10 @@ public class InventoryUIController : UIBase
             diceButton.onClick.AddListener(ShowDice);
         }
 
-        if (runeButton != null)
+        if (relicButton != null)
         {
-            runeButton.onClick.RemoveListener(ShowRunes);
-            runeButton.onClick.AddListener(ShowRunes);
+            relicButton.onClick.RemoveListener(ShowRelics);
+            relicButton.onClick.AddListener(ShowRelics);
         }
     }
 
@@ -275,9 +311,9 @@ public class InventoryUIController : UIBase
 
     void RefreshCurrentTab()
     {
-        if (currentTab == InventoryViewTab.Rune)
+        if (currentTab == InventoryViewTab.Relic)
         {
-            RefreshRunes();
+            RefreshRelics();
             return;
         }
 
@@ -289,8 +325,8 @@ public class InventoryUIController : UIBase
         if (diceButton != null)
             diceButton.interactable = currentTab != InventoryViewTab.Dice;
 
-        if (runeButton != null)
-            runeButton.interactable = currentTab != InventoryViewTab.Rune;
+        if (relicButton != null)
+            relicButton.interactable = currentTab != InventoryViewTab.Relic;
     }
 
     Vector3 GetItemPosition(int index)
@@ -331,8 +367,6 @@ public class InventoryUIController : UIBase
         spawnedItems.Clear();
     }
 }
-
-
 
 
 

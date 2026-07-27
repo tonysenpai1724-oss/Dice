@@ -25,11 +25,7 @@ MonoBehaviour:
   rarity: 3
   stackApply: 1
   valueApply: 10
-  valueApplyByLevel:
-  - 10
-  - 20
-  - 30
-  - 40
-  - 50
-  relicSprite: {fileID: 0}
-  description: Tăng sát thương lên kẻ địch đang bị kiệt sức
+  valueApplyByLevel: 0a000000140000001e0000002800000032000000
+  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
+  description: "T\u0103ng s\xE1t th\u01B0\u01A1ng l\xEAn k\u1EBB \u0111\u1ECBch \u0111ang
+    b\u1ECB ki\u1EC7t s\u1EE9c"

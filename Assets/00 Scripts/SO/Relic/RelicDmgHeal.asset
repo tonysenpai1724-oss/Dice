@@ -25,11 +25,7 @@ MonoBehaviour:
   rarity: 3
   stackApply: 1
   valueApply: 20
-  valueApplyByLevel:
-  - 20
-  - 40
-  - 60
-  - 80
-  - 100
-  relicSprite: {fileID: 0}
-  description: Hồi máu dựa trên lượng sát thương gây ra
+  valueApplyByLevel: 14000000280000003c0000005000000064000000
+  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
+  description: "H\u1ED3i m\xE1u d\u1EF1a tr\xEAn l\u01B0\u1EE3ng s\xE1t th\u01B0\u01A1ng
+    g\xE2y ra"

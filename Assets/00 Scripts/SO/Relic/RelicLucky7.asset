@@ -25,11 +25,7 @@ MonoBehaviour:
   rarity: 4
   stackApply: 1
   valueApply: 10
-  valueApplyByLevel:
-  - 10
-  - 20
-  - 30
-  - 40
-  - 50
-  relicSprite: {fileID: 0}
-  description: Có tỷ lệ các dice số 7 được thực hiện 3 lần
+  valueApplyByLevel: 0a000000140000001e0000002800000032000000
+  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
+  description: "C\xF3 t\u1EF7 l\u1EC7 c\xE1c dice s\u1ED1 7 \u0111\u01B0\u1EE3c th\u1EF1c
+    hi\u1EC7n 3 l\u1EA7n"

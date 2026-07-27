@@ -25,11 +25,7 @@ MonoBehaviour:
   rarity: 4
   stackApply: 1
   valueApply: 10
-  valueApplyByLevel:
-  - 10
-  - 20
-  - 30
-  - 40
-  - 50
-  relicSprite: {fileID: 0}
-  description: Có tỷ lệ thực hiện 2 lần với các dice có value là 2
+  valueApplyByLevel: 0a000000140000001e0000002800000032000000
+  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
+  description: "C\xF3 t\u1EF7 l\u1EC7 th\u1EF1c hi\u1EC7n 2 l\u1EA7n v\u1EDBi c\xE1c
+    dice c\xF3 value l\xE0 2"

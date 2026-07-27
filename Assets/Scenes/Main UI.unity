@@ -4852,7 +4852,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  skeletonDataAsset: {fileID: 11400000, guid: 51d70e5886d449946b92473e64256ae5, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 95b93cfe72052474c9ef152991157977, type: 2}
   additiveMaterial: {fileID: 0}
   multiplyMaterial: {fileID: 0}
   screenMaterial: {fileID: 0}
@@ -4861,7 +4861,7 @@ MonoBehaviour:
   initialSkinName: 
   initialFlipX: 0
   initialFlipY: 0
-  startingAnimation: Idle
+  startingAnimation: 
   startingLoop: 0
   timeScale: 1
   freeze: 0
@@ -11612,7 +11612,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6617068270822724717}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 2
   m_Camera: {fileID: 0}

@@ -26,5 +26,5 @@ MonoBehaviour:
   stackApply: 1
   valueApply: 5
   valueApplyByLevel: 050000000a0000000f0000001400000019000000
-  relicSprite: {fileID: 0}
+  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
   description: Co ty le sinh san khi vien xuc xac dang merge
