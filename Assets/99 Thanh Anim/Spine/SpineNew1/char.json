@@ -1,6 +1,6 @@
 {
 "skeleton": {
-	"hash": "iBK3o/tDekQ",
+	"hash": "r62OO938g2E",
 	"spine": "4.2.43",
 	"x": -79.41,
 	"y": -5.52,
@@ -612,7 +612,7 @@
 			"77": {
 				"attachment": [
 					{ "time": 0.2, "name": "77" },
-					{ "time": 1.0333 }
+					{ "time": 1 }
 				]
 			}
 		},
@@ -1294,6 +1294,9 @@
 					{ "slot": "71", "offset": 10 }
 				]
 			}
+		],
+		"events": [
+			{ "time": 1, "name": "Attack" }
 		]
 	},
 	"Attack1": {

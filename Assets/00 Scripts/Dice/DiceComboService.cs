@@ -161,10 +161,9 @@ public class DiceComboService
         return false;
     }
 
-    public IEnumerator ComboJumpRoutine(Dice dice, Dice target, Vector3 targetPos, Vector3 dir, bool shouldFullBounce)
+ public IEnumerator ComboJumpRoutine(Dice dice, Dice target, Vector3 targetPos, Vector3 dir, bool shouldFullBounce)
     {
-        if (dice == null)
-            yield break;
+        if (dice == null) yield break;
 
         dice.state = DiceState.FlyingCombo;
         dice.canMerge = true;
@@ -178,66 +177,59 @@ public class DiceComboService
         Vector3 finalDestination = targetPos;
         finalDestination.y = boardService.GetBoardSurfaceY();
 
-        bool canAimForTarget =
-            target != null &&
-            target.gameObject.activeInHierarchy &&
-            target.Level == dice.Level &&
-            !target.isMerging;
+        bool canAimForTarget = target != null &&
+                               target.gameObject.activeInHierarchy &&
+                               target.Level == dice.Level &&
+                               !target.isMerging;
 
         if (!canAimForTarget)
             finalDestination = boardService.FindClearPosition(finalDestination, dice, config.diceSpacingRadius);
 
         Vector3 jumpDir = dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward;
-        float comboCount = comboChainMap.TryGetValue(dice, out int currentChain)
-            ? currentChain + 1
-            : 1;
-
+        float comboCount = comboChainMap.TryGetValue(dice, out int currentChain) ? currentChain + 1 : 1;
         comboChainMap[dice] = (int)comboCount;
         comboLastTime[dice] = Time.time;
 
-        float dynamicDuration = Mathf.Min(
-            config.comboDuration + comboCount * config.comboDurationPerChain,
-            config.maxComboDuration);
+        float dynamicDuration = Mathf.Min(config.comboDuration + comboCount * config.comboDurationPerChain, config.maxComboDuration);
+        float dynamicArcHeight = Mathf.Min(config.comboArcHeight + comboCount * config.comboArcPerChain, config.maxComboArcHeight);
 
-        float dynamicArcHeight = Mathf.Min(
-            config.comboArcHeight + comboCount * config.comboArcPerChain,
-            config.maxComboArcHeight);
+        // Chia khoảng cách: Cú đập góc đầu tiên sẽ cách vị trí đích một khoảng đáng kể
+        float totalDist = Vector3.Distance(start, finalDestination);
+        float bounceDist = shouldFullBounce ? Mathf.Min(3.2f, totalDist * 0.6f) : Mathf.Min(1.5f, totalDist * 0.3f);
 
-        float originalDist = Vector3.Distance(start, finalDestination);
-        float actualBounceDistance = shouldFullBounce
-            ? Mathf.Min(2.8f, originalDist * 0.55f)
-            : 0f;
+        Vector3 impactPoint1 = finalDestination - jumpDir * bounceDist;
+        impactPoint1.y = boardService.GetBoardSurfaceY();
 
-        Vector3 mainJumpEnd = finalDestination - jumpDir * actualBounceDistance;
-        mainJumpEnd.y = boardService.GetBoardSurfaceY();
+        // Nhịp nảy thứ 2 (Nảy trung gian)
+        Vector3 impactPoint2 = Vector3.Lerp(impactPoint1, finalDestination, 0.65f);
+        impactPoint2.y = boardService.GetBoardSurfaceY();
 
-        Vector3 sideOffset = Vector3.Cross(
-            Vector3.up,
-            jumpDir) * UnityEngine.Random.Range(-config.comboSideScatter, config.comboSideScatter);
+        Vector3 sideOffset = Vector3.Cross(Vector3.up, jumpDir) * UnityEngine.Random.Range(-config.comboSideScatter, config.comboSideScatter);
 
         Vector3 spinVelocity = new Vector3(
             UnityEngine.Random.Range(config.comboSpinTurnsX.x, config.comboSpinTurnsX.y),
             UnityEngine.Random.Range(config.comboSpinTurnsY.x, config.comboSpinTurnsY.y),
             UnityEngine.Random.Range(config.comboSpinTurnsZ.x, config.comboSpinTurnsZ.y));
 
-        if (UnityEngine.Random.value < 0.2f)
-            spinVelocity *= 1.8f;
+        if (UnityEngine.Random.value < 0.2f) spinVelocity *= 1.8f;
 
         float t = 0f;
         bool merged = false;
         float mergeDistance = Mathf.Max(1.2f, config.diceSpacingRadius * 1.25f);
         Vector3 previousPosition = start;
 
+        // ========================================================================
+        // PHA 1: BAY CHÍNH TRÊN KHÔNG (CÚ LAO MẠNH BAN ĐẦU)
+        // ========================================================================
         while (t < 1f)
         {
-            if (dice == null)
-                yield break;
+            if (dice == null) yield break;
 
             t += Time.deltaTime / Mathf.Max(0.01f, dynamicDuration);
             float clampedT = Mathf.Clamp01(t);
             float easedT = 1f - Mathf.Pow(1f - clampedT, 2f);
 
-            Vector3 pos = Vector3.Lerp(start, mainJumpEnd, easedT);
+            Vector3 pos = Vector3.Lerp(start, impactPoint1, easedT);
             float arc = Mathf.Pow(Mathf.Clamp01(Mathf.Sin(clampedT * Mathf.PI)), 0.7f);
             pos.y = boardService.GetBoardSurfaceY() + arc * dynamicArcHeight;
             pos += sideOffset * Mathf.Sin(clampedT * Mathf.PI);
@@ -267,74 +259,119 @@ public class DiceComboService
             yield return null;
         }
 
-        if (merged || dice == null)
-            yield break;
+        if (merged || dice == null) yield break;
 
         comboChainMap.Remove(dice);
-        if (target != null)
-            comboChainMap.Remove(target);
+        if (target != null) comboChainMap.Remove(target);
 
-        finalDestination = boardService.FindClearPosition(
-            finalDestination,
-            dice,
-            config.diceSpacingRadius);
+        finalDestination = boardService.FindClearPosition(finalDestination, dice, config.diceSpacingRadius);
 
-        Quaternion targetRot = Quaternion.Euler(0f, dice.transform.eulerAngles.y, 0f);
-        Quaternion startRot = dice.transform.rotation;
+        // ========================================================================
+        // PHA 2: VA CỔNG 1 (IMPACT GÓC -> BẬT TUNG LÊN KHÔNG TRUNG)
+        // ========================================================================
+        Vector3 impactDir = jumpDir.sqrMagnitude > 0.001f ? jumpDir.normalized : Vector3.forward;
+        Vector3 rightAxis = Vector3.Cross(Vector3.up, impactDir).normalized;
+        if (rightAxis.sqrMagnitude <= 0.001f) rightAxis = Vector3.right;
 
-        float[] bounceHeights = shouldFullBounce ? new[] { 1.2f, 0.6f, 0.25f } : new[] { 0.9f };
-        float[] bounceDurations = shouldFullBounce ? new[] { 0.35f, 0.25f, 0.18f } : new[] { 0.3f };
-        int numBounces = Mathf.Min(bounceHeights.Length, bounceDurations.Length);
+        Quaternion flatYawRot = Quaternion.Euler(0f, dice.transform.eulerAngles.y, 0f);
 
-        float totalBounceDuration = 0f;
-        for (int i = 0; i < numBounces; i++)
-            totalBounceDuration += bounceDurations[i];
+        // Tạo góc cắm mũi cực mạnh khi va đất
+        float cornerPitch = 48f;
+        float cornerRoll = (UnityEngine.Random.value < 0.5f ? 1f : -1f) * 35f;
+        Quaternion impactCornerRot = Quaternion.AngleAxis(cornerPitch, rightAxis) *
+                                     Quaternion.AngleAxis(cornerRoll, impactDir) * flatYawRot;
 
-        float elapsedBounceTime = 0f;
-        Vector3 horizontalStart = mainJumpEnd;
-        Vector3 horizontalEnd = finalDestination;
+        // Góc đỉnh vòng nảy (Xoay cuộn tiếp theo đà bay)
+        Quaternion midAirBounceRot = Quaternion.AngleAxis(180f, rightAxis) * flatYawRot;
 
-        for (int bounceIndex = 0; bounceIndex < numBounces; bounceIndex++)
+        // Góc chạm lại sàn ở nhịp 2 (Góc nghiêng nhẹ)
+        Quaternion secondImpactRot = Quaternion.AngleAxis(15f, rightAxis) * flatYawRot;
+
+        // 1. NHỊP 1: ĐẬP GÓC XUỐNG SÀN VÀ NẢY VÔ TUNG LÊN KHÔNG TRUNG
+        float bounce1Duration = shouldFullBounce ? 0.32f : 0.22f;
+        float bounce1Height = shouldFullBounce ? 1.4f : 0.6f; // Độ cao bật tung
+        float b1Timer = 0f;
+
+        Quaternion airRotStart = dice.transform.rotation;
+
+        while (b1Timer < 1f)
         {
-            float bounceDuration = bounceDurations[bounceIndex];
-            float bounceHeight = bounceHeights[bounceIndex];
-            float bounceTime = 0f;
+            if (dice == null) yield break;
 
-            while (bounceTime < 1f)
+            b1Timer += Time.deltaTime / bounce1Duration;
+            float progress = Mathf.Clamp01(b1Timer);
+
+            // Tọa độ XZ trượt tới trước
+            Vector3 currentXZ = Vector3.Lerp(impactPoint1, impactPoint2, progress);
+
+            // Quỹ đạo Parabol nảy lên cao
+            float heightArc = Mathf.Sin(progress * Mathf.PI) * bounce1Height;
+            Vector3 targetPosStep = new Vector3(currentXZ.x, boardService.GetBoardSurfaceY() + heightArc, currentXZ.z);
+
+            // Xoay từ góc chạm đất đầu tiên -> cuộn tiếp trên không -> góc đáp nhịp 2
+            Quaternion targetRotStep;
+            if (progress < 0.3f)
             {
-                if (dice == null)
-                    yield break;
-
-                bounceTime += Time.deltaTime / bounceDuration;
-                elapsedBounceTime += Time.deltaTime;
-                float currentBounceT = Mathf.Clamp01(elapsedBounceTime / totalBounceDuration);
-
-                float forwardEase = 1f - Mathf.Pow(1f - currentBounceT, 2f);
-                Vector3 horizontalPos = Vector3.Lerp(horizontalStart, horizontalEnd, forwardEase);
-
-                float currentY = boardService.GetBoardSurfaceY() + Mathf.Sin(Mathf.Clamp01(bounceTime) * Mathf.PI) * bounceHeight;
-                Vector3 bouncePos = new Vector3(horizontalPos.x, currentY, horizontalPos.z);
-                Vector3 bounceVelocity = (bouncePos - previousPosition) / Mathf.Max(Time.deltaTime, 0.0001f);
-
-                dice.rb.linearVelocity = bounceVelocity;
-                dice.rb.MovePosition(bouncePos);
-                dice.rb.MoveRotation(Quaternion.Slerp(startRot, targetRot, 1f - Mathf.Pow(1f - currentBounceT, 3f)));
-                previousPosition = bouncePos;
-                yield return null;
+                // Snap nhanh về góc cắm mũi trong 30% thời gian đầu
+                targetRotStep = Quaternion.Slerp(airRotStart, impactCornerRot, progress / 0.3f);
             }
+            else
+            {
+                // Sau đó xoay cuộn tròn trên không trung
+                targetRotStep = Quaternion.Slerp(impactCornerRot, secondImpactRot, (progress - 0.3f) / 0.7f);
+            }
+
+            Vector3 stepVelocity = (targetPosStep - previousPosition) / Mathf.Max(Time.deltaTime, 0.0001f);
+            dice.rb.linearVelocity = stepVelocity;
+            dice.rb.MovePosition(targetPosStep);
+            dice.rb.MoveRotation(targetRotStep);
+
+            previousPosition = targetPosStep;
+            yield return null;
         }
 
+        // ========================================================================
+        // PHA 3: CẠNH VÀ MẶT (LẬT MA SÁT VỀ ĐÍCH)
+        // ========================================================================
+        float bounce2Duration = 0.16f;
+        float bounce2Height = 0.15f;
+        float b2Timer = 0f;
+
+        Quaternion finalFlatRotation = flatYawRot;
+
+        while (b2Timer < 1f)
+        {
+            if (dice == null) yield break;
+
+            b2Timer += Time.deltaTime / bounce2Duration;
+            float progress = Mathf.Clamp01(b2Timer);
+
+            Vector3 currentXZ = Vector3.Lerp(impactPoint2, finalDestination, progress);
+            float heightArc = Mathf.Sin(progress * Mathf.PI) * bounce2Height;
+            Vector3 targetPosStep = new Vector3(currentXZ.x, boardService.GetBoardSurfaceY() + heightArc, currentXZ.z);
+
+            // Úp phẳng dần mặt xúc xắc xuống bàn
+            Quaternion targetRotStep = Quaternion.Slerp(secondImpactRot, finalFlatRotation, Mathf.SmoothStep(0f, 1f, progress));
+
+            Vector3 stepVelocity = (targetPosStep - previousPosition) / Mathf.Max(Time.deltaTime, 0.0001f);
+            dice.rb.linearVelocity = stepVelocity;
+            dice.rb.MovePosition(targetPosStep);
+            dice.rb.MoveRotation(targetRotStep);
+
+            previousPosition = targetPosStep;
+            yield return null;
+        }
+
+        // CHỐT VỊ TRÍ VÀ TẮT VẬT LÝ
         dice.rb.linearVelocity = Vector3.zero;
         dice.rb.angularVelocity = Vector3.zero;
         dice.transform.position = finalDestination;
-        dice.transform.rotation = targetRot;
+        dice.transform.rotation = finalFlatRotation;
         dice.rb.position = finalDestination;
-        dice.rb.rotation = targetRot;
+        dice.rb.rotation = finalFlatRotation;
         dice.ApplyGroundedConstraints();
         dice.rb.Sleep();
         dice.state = DiceState.Idle;
-
-        runCoroutine?.Invoke(RecoverUprightRoutine(dice));
     }
 
     public IEnumerator RecoverUprightRoutine(Dice dice)
@@ -361,14 +398,4 @@ public class DiceComboService
         rigidbody.linearVelocity = Vector3.zero;
         rigidbody.angularVelocity = Vector3.zero;
     }
-}
-
-
-
-
-
-
-
-
-
-
+} 

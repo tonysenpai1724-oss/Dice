@@ -120,7 +120,7 @@ public class EnemyManager : Singleton<EnemyManager>
             () => projectileOffset,
             () => projectileRotationOffset,
             () => activeProjectiles++,
-            () => activeProjectiles--);
+            () => activeProjectiles = Mathf.Max(0, activeProjectiles - 1));
 
         waveSpawner = new EnemyWaveSpawner(
             () => currentLevel,

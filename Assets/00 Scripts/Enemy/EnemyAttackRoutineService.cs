@@ -1,5 +1,6 @@
 using System.Collections;
 using System;
+using Spine;
 
 public class EnemyAttackRoutineService
 {
@@ -16,40 +17,79 @@ public class EnemyAttackRoutineService
         if (player == null || enemy == null)
             yield break;
 
-        bool attackCompleted = false;
+        bool damageApplied = false;
         Spine.TrackEntry attackTrack = enemy.PlayAnimation(enemy.attackAnim, false);
 
         if (attackTrack == null)
             yield break;
 
         attackTrack.TimeScale = UnityEngine.Mathf.Max(0.1f, enemy.enemyAttackAnimSpeed);
-        attackTrack.Complete += _ => attackCompleted = true;
+        bool resolved = false;
 
-        float duration = attackTrack.Animation.Duration / attackTrack.TimeScale;
-        float halfTime = duration * 0.5f;
+        void ApplyAttackDamage()
+        {
+            if (damageApplied || enemy == null || !enemy.IsAlive() || player == null)
+                return;
+
+            damageApplied = true;
+            int attackDamage = enemy.damage;
+            ExhaustEffect exhaustEffect = enemy.effectManager?.GetEffect<ExhaustEffect>();
+            if (exhaustEffect != null)
+                attackDamage = exhaustEffect.ApplyToDamage(attackDamage);
+
+            int finalDamage = CombatSystem.ApplyDefenseToPlayer(player, attackDamage);
+            player.OnTakeDamage(finalDamage);
+        }
+
+        void ResolveAttack()
+        {
+            if (resolved)
+                return;
+
+            resolved = true;
+
+            if (!damageApplied)
+                ApplyAttackDamage();
+        }
+
+        void OnAttackEvent(TrackEntry trackEntry, Event spineEvent)
+        {
+            if (damageApplied || !SpineEventUtility.IsAttackEvent(spineEvent))
+                return;
+
+            ApplyAttackDamage();
+        }
+
+        void OnTrackFinished(TrackEntry trackEntry)
+        {
+            ResolveAttack();
+        }
+
+        attackTrack.Event += OnAttackEvent;
+        attackTrack.End += OnTrackFinished;
+        attackTrack.Interrupt += OnTrackFinished;
+        attackTrack.Dispose += OnTrackFinished;
+
+        float duration = SpineEventUtility.GetTrackDuration(attackTrack);
         float timer = 0f;
 
-        while (enemy != null && enemy.IsAlive())
+        while (enemy != null && enemy.IsAlive() && !resolved)
         {
             timer += UnityEngine.Time.deltaTime;
 
-            if (!attackCompleted && (attackTrack.TrackTime >= halfTime || timer >= halfTime))
-            {
-                attackCompleted = true;
-                int attackDamage = enemy.damage;
-                ExhaustEffect exhaustEffect = enemy.effectManager?.GetEffect<ExhaustEffect>();
-                if (exhaustEffect != null)
-                    attackDamage = exhaustEffect.ApplyToDamage(attackDamage);
-
-                int finalDamage = CombatSystem.ApplyDefenseToPlayer(player, attackDamage);
-                player.OnTakeDamage(finalDamage);
-            }
-
             if (attackTrack.IsComplete || timer >= duration)
-                break;
+                ResolveAttack();
 
             yield return null;
         }
+
+        attackTrack.Event -= OnAttackEvent;
+        attackTrack.End -= OnTrackFinished;
+        attackTrack.Interrupt -= OnTrackFinished;
+        attackTrack.Dispose -= OnTrackFinished;
+
+        if (!resolved)
+            ResolveAttack();
 
         if (enemy != null && enemy.IsAlive() && enemy.skeletonGraphic != null)
         {

@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class EnemyProjectileAttackPresenter
 {
-    const string ComboAttackEventName = "Attack";
-
     readonly MonoBehaviour coroutineHost;
     readonly Func<PlayerController> getPlayer;
     readonly Func<RectTransform> getProjectilePrefab;
@@ -48,13 +46,15 @@ public class EnemyProjectileAttackPresenter
 
         incrementActiveProjectiles?.Invoke();
         string attackAnimation = player.GetNextAttackAnimation();
-        bool useComboAttack = attackAnimation == player.comboAttackAnim;
         TrackEntry attackTrack = player.PlayAnimation(attackAnimation, false);
-        float attackDuration = GetTrackDuration(attackTrack);
 
-        if (useComboAttack && attackTrack != null)
+        if (attackTrack != null)
+            attackTrack.TimeScale = Mathf.Max(0.1f, player.aimAttackSpeed);
+
+        float attackDuration = SpineEventUtility.GetTrackDuration(attackTrack);
+
+        if (attackTrack != null)
         {
-            // Debug.Log($"[EnemyProjectileAttackPresenter] Playing combo attack animation: {attackAnimation}");
             coroutineHost.StartCoroutine(SpawnProjectileOnAttackEvent(player, attackTrack, target, damage, isCritical));
         }
         else
@@ -78,15 +78,6 @@ public class EnemyProjectileAttackPresenter
         return attackDuration;
     }
 
-    float GetTrackDuration(TrackEntry trackEntry)
-    {
-        if (trackEntry == null)
-            return 0f;
-
-        float timeScale = Mathf.Max(0.01f, trackEntry.TimeScale);
-        return Mathf.Max(0f, trackEntry.AnimationEnd - trackEntry.AnimationStart) / timeScale;
-    }
-
     IEnumerator SpawnProjectileOnAttackEvent(PlayerController player, TrackEntry attackTrack, Enemy target, int damage, bool isCritical)
     {
         if (player == null || player.skeletonGraphic == null || player.skeletonGraphic.AnimationState == null)
@@ -97,40 +88,57 @@ public class EnemyProjectileAttackPresenter
         }
 
         bool eventTriggered = false;
+        bool resolved = false;
+
+        void Resolve(bool shouldSpawn)
+        {
+            if (resolved)
+                return;
+
+            resolved = true;
+
+            if (shouldSpawn)
+                SpawnProjectile(target, damage, isCritical);
+            else
+                decrementActiveProjectiles?.Invoke();
+        }
 
         void OnAttackTrackEvent(TrackEntry trackEntry, Spine.Event spineEvent)
         {
-            string eventName = spineEvent != null && spineEvent.Data != null ? spineEvent.Data.Name : "null";
-            //  Debug.Log($"[EnemyProjectileAttackPresenter] Attack track event received name={eventName}");
-
             if (eventTriggered || spineEvent == null || spineEvent.Data == null)
                 return;
 
-            if (!string.Equals(spineEvent.Data.Name, ComboAttackEventName, StringComparison.OrdinalIgnoreCase))
+            if (!SpineEventUtility.IsAttackEvent(spineEvent))
                 return;
 
             eventTriggered = true;
-            //            Debug.Log($"[EnemyProjectileAttackPresenter] Matched combo event {ComboAttackEventName}, spawning projectile");
-            SpawnProjectile(target, damage, isCritical);
+            Resolve(true);
         }
 
-        float fallbackDelay = Mathf.Max(attackTrack.AnimationEnd - attackTrack.AnimationStart, 0.5f) + 0.1f;
-        //  Debug.Log($"[EnemyProjectileAttackPresenter] Subscribed attack TrackEntry.Event waiting for {ComboAttackEventName}, fallbackDelay={fallbackDelay:0.###}");
+        void OnTrackFinished(TrackEntry trackEntry)
+        {
+            Resolve(!eventTriggered);
+        }
+
+        float fallbackDelay = Mathf.Max(SpineEventUtility.GetTrackDuration(attackTrack), 0.35f) + 0.1f;
         attackTrack.Event += OnAttackTrackEvent;
+        attackTrack.End += OnTrackFinished;
+        attackTrack.Interrupt += OnTrackFinished;
+        attackTrack.Dispose += OnTrackFinished;
         float elapsed = 0f;
-        while (!eventTriggered && elapsed < fallbackDelay)
+        while (!resolved && elapsed < fallbackDelay)
         {
             elapsed += Time.deltaTime;
             yield return null;
         }
 
         attackTrack.Event -= OnAttackTrackEvent;
+        attackTrack.End -= OnTrackFinished;
+        attackTrack.Interrupt -= OnTrackFinished;
+        attackTrack.Dispose -= OnTrackFinished;
 
-        if (!eventTriggered)
-        {
-            //            Debug.Log($"[EnemyProjectileAttackPresenter] Combo event {ComboAttackEventName} not received in time, fallback spawn");
-            SpawnProjectile(target, damage, isCritical);
-        }
+        if (!resolved)
+            Resolve(!eventTriggered);
     }
 
     IEnumerator SpawnProjectileDelayed(Enemy target, int damage, bool isCritical)
@@ -164,6 +172,16 @@ public class EnemyProjectileAttackPresenter
         targetPos.y += projectileRotationOffset;
         Vector3 dir = targetPos - projectile.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        bool projectileReleased = false;
+
+        void ReleaseProjectile()
+        {
+            if (projectileReleased)
+                return;
+
+            projectileReleased = true;
+            decrementActiveProjectiles?.Invoke();
+        }
 
         projectile.rotation = Quaternion.Euler(0, 0, angle - 90f);
         projectile.DOMove(targetPos, Mathf.Max(1f, projectileSpeed))
@@ -178,7 +196,8 @@ public class EnemyProjectileAttackPresenter
                 }
 
                 UnityEngine.Object.Destroy(projectile.gameObject);
-                decrementActiveProjectiles?.Invoke();
-            });
+                ReleaseProjectile();
+            })
+            .OnKill(ReleaseProjectile);
     }
 }
