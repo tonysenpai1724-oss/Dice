@@ -26,6 +26,6 @@ MonoBehaviour:
   stackApply: 1
   valueApply: 10
   valueApplyByLevel: 0a000000140000001e0000002800000032000000
-  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
+  relicSprite: {fileID: 21300000, guid: 4cf37dd578e719beeb8ace97bbc1144a, type: 3}
   description: "T\u0103ng s\xE1t th\u01B0\u01A1ng l\xEAn k\u1EBB \u0111\u1ECBch \u0111ang
     b\u1ECB b\u1ECFng"

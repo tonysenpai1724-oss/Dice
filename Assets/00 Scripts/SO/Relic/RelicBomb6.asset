@@ -26,6 +26,6 @@ MonoBehaviour:
   stackApply: 1
   valueApply: 10
   valueApplyByLevel: 0a000000140000001e0000002800000032000000
-  relicSprite: {fileID: 21300000, guid: f8cf6d5d8a3f1fc4ba21b55b51d05f82, type: 3}
+  relicSprite: {fileID: 21300000, guid: 61d3fb220a33ab5959de5cc6a377d0c3, type: 3}
   description: "C\xF3 t\u1EF7 l\u1EC7 c\xE1c dice s\u1ED1 6 t\u1EF1 \u0111\u1ED9ng
     bi\u1EBFn th\xE0nh dice bomb"
