@@ -618,6 +618,11 @@ public class EnemyManager : Singleton<EnemyManager>
 
     void DrawCombatGridGizmos()
     {
+#if UNITY_EDITOR
+        if (spawnArea != null && Selection.Contains(spawnArea.gameObject))
+            return;
+#endif
+
         if (spawnArea == null || !spawnArea.HasValidArea)
             return;
 

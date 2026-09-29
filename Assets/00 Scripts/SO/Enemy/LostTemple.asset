@@ -31,4 +31,4 @@ MonoBehaviour:
   attackAnimSpeed: 1.5
   level: 1
   coinReward: 0
-  hpBarScreenOffsetOverride: {x: 10, y: -112}
+  hpBarScreenOffsetOverride: {x: 10, y: 0}

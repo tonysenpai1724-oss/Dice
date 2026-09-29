@@ -186,19 +186,77 @@ public class EnemySpawnArea : MonoBehaviour
             Vector3 min = GetWorldMinPoint();
             Vector3 max = GetWorldMaxPoint();
             Gizmos.DrawWireCube((min + max) * 0.5f, max - min);
-            return;
+        }
+        else
+        {
+            Vector3 minUI = GetUIMinPoint();
+            Vector3 maxUI = GetUIMaxPoint();
+            Vector3 p0 = uiArea.TransformPoint(new Vector3(minUI.x, minUI.y, 0f));
+            Vector3 p1 = uiArea.TransformPoint(new Vector3(maxUI.x, minUI.y, 0f));
+            Vector3 p2 = uiArea.TransformPoint(new Vector3(maxUI.x, maxUI.y, 0f));
+            Vector3 p3 = uiArea.TransformPoint(new Vector3(minUI.x, maxUI.y, 0f));
+
+            Gizmos.DrawLine(p0, p1);
+            Gizmos.DrawLine(p1, p2);
+            Gizmos.DrawLine(p2, p3);
+            Gizmos.DrawLine(p3, p0);
         }
 
-        Vector3 minUI = GetUIMinPoint();
-        Vector3 maxUI = GetUIMaxPoint();
-        Vector3 p0 = uiArea.TransformPoint(new Vector3(minUI.x, minUI.y, 0f));
-        Vector3 p1 = uiArea.TransformPoint(new Vector3(maxUI.x, minUI.y, 0f));
-        Vector3 p2 = uiArea.TransformPoint(new Vector3(maxUI.x, maxUI.y, 0f));
-        Vector3 p3 = uiArea.TransformPoint(new Vector3(minUI.x, maxUI.y, 0f));
+        DrawSpawnGridGizmos();
+    }
 
-        Gizmos.DrawLine(p0, p1);
-        Gizmos.DrawLine(p1, p2);
-        Gizmos.DrawLine(p2, p3);
-        Gizmos.DrawLine(p3, p0);
+    void DrawSpawnGridGizmos()
+    {
+        int rows = 3;
+        int columns = 6;
+
+#if UNITY_EDITOR
+        EnemyManager manager = FindFirstObjectByType<EnemyManager>();
+        EnemyLevelPositionGenerator generator = manager != null ? manager.spawnPositionGenerator : null;
+        if (generator != null)
+        {
+            rows = generator.gridRows;
+            columns = generator.gridColumns;
+        }
+#endif
+
+        rows = Mathf.Max(1, rows);
+        columns = Mathf.Max(2, columns);
+
+        for (int row = 0; row < rows; row++)
+        {
+            Vector3 start = GetGridWorldPoint(row, 0, rows, columns);
+            Vector3 end = GetGridWorldPoint(row, columns - 1, rows, columns);
+            Gizmos.DrawLine(start, end);
+        }
+
+        for (int column = 0; column < columns; column++)
+        {
+            Vector3 start = GetGridWorldPoint(0, column, rows, columns);
+            Vector3 end = GetGridWorldPoint(rows - 1, column, rows, columns);
+            Gizmos.DrawLine(start, end);
+        }
+
+        for (int row = 0; row < rows; row++)
+        {
+            for (int column = 0; column < columns; column++)
+            {
+                Vector3 point = GetGridWorldPoint(row, column, rows, columns);
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(point, 1.5f);
+                Gizmos.color = Color.cyan;
+            }
+        }
+    }
+
+    Vector3 GetGridWorldPoint(int row, int column, int rows, int columns)
+    {
+        float x01 = columns <= 1 ? 0.5f : (float)column / (columns - 1);
+        float y01 = rows <= 1 ? 0.5f : 1f - (float)row / (rows - 1);
+        Vector3 point = GetPoint(x01, y01);
+
+        return spawnSpace == EnemySpawnSpace.UI
+            ? uiArea.TransformPoint(point)
+            : point;
     }
 }
